@@ -52,7 +52,7 @@ se_param <- function(x1,  # vector of observations
         c1 <- v1 * (1 / (phi1 ^ 2) + 1 / (xbar1 ^ 2))
         c2 <- v2 / (phi1 ^ 2)
         se <- abs(phi1) * sqrt(c1 / n1 + c2 / n2)
-    }
+    } else stop ("dif option", dif, "not recognized.")
 
     # Return standard error
     return(se)

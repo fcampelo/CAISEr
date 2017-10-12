@@ -41,25 +41,25 @@ calc_se <- function(x1,           # vector of observations
 
 {
 
-    # ========== Error catching ========== #
-    assertthat::assert_that(
-        is.numeric(x1), is.vector(x1), length(x1) > 1,
-        is.numeric(x2), is.vector(x2), length(x2) > 1,
-        dif %in% c('simple', 'perc'),
-        method %in% c('param', 'boot'),
-        assertthat::is.count(boot.R), boot.R > 1)
-    # ==================================== #
+  # ========== Error catching ========== #
+  assertthat::assert_that(
+    is.numeric(x1), is.vector(x1), length(x1) > 1,
+    is.numeric(x2), is.vector(x2), length(x2) > 1,
+    dif %in% c('simple', 'perc'),
+    method %in% c('param', 'boot'),
+    assertthat::is.count(boot.R), boot.R > 1)
+  # ==================================== #
 
-    if (method == "param"){
-        se  <- se_param(x1 = x1, x2 = x2, dif = dif)
-    } else if (method == "boot"){
-        se <- se_boot(x1 = x1, x2 = x2, dif = dif,
-                      boot.R = boot.R)
-    }
+  if (method == "param"){
+    se <- se_param(x1 = x1, x2 = x2, dif = dif)
+  } else if (method == "boot"){
+    se <- se_boot(x1 = x1, x2 = x2, dif = dif,
+                  boot.R = boot.R)
+  }
 
-    x.est <- do.call(paste0("est_", dif),
-                     args = list(x1 = x1, x2 = x2))
+  x.est <- do.call(calc_phi,
+                   args = list(x1 = x1, x2 = x2, dif = dif))
 
-    return(list(x.est = x.est,
-                se    = se))
+  return(list(x.est = x.est,
+              se    = se))
 }

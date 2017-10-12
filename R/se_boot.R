@@ -26,26 +26,29 @@ se_boot <- function(x1,           # vector of observations
                     boot.R = 999) # number of bootstrap resamples
 {
 
-    # ========== Error catching ========== #
-    assertthat::assert_that(
-        is.numeric(x1), is.vector(x1), length(x1) > 1,
-        is.numeric(x2), is.vector(x2), length(x2) > 1,
-        assertthat::is.count(boot.R), boot.R > 1,
-        dif %in% c('simple', 'perc'))
-    # ==================================== #
+  # ========== Error catching ========== #
+  assertthat::assert_that(
+    is.numeric(x1), is.vector(x1), length(x1) > 1,
+    is.numeric(x2), is.vector(x2), length(x2) > 1,
+    assertthat::is.count(boot.R), boot.R > 1,
+    dif %in% c('simple', 'perc'))
+  # ==================================== #
 
-    # Estimators
-    if (dif == "simple") phi <- function(x1, x2){ mean(x2) - mean(x1) }
-    if (dif == "perc")   phi <- function(x1, x2){ (mean(x2) - mean(x1)) / mean(x1)}
+  # Estimators
+  if (dif == "simple") {
+    phi <- function(x1, x2){ mean(x2) - mean(x1) }
+  } else if (dif == "perc") {
+    phi <- function(x1, x2){ (mean(x2) - mean(x1)) / mean(x1) }
+  } else stop ("dif option", dif, "not recognized.")
 
-    # Perform bootstrap
-    phi.hat <- foreach(i = 1:boot.R, .combine = c) %dopar%
-    {
-        x1.b <- sample(x1, size = length(x1), replace = TRUE)
-        x2.b <- sample(x2, size = length(x2), replace = TRUE)
-        phi(x1 = x1.b, x2 = x2.b)
-    }
+  # Perform bootstrap
+  phi.hat <- foreach(i = 1:boot.R, .combine = c) %dopar%
+  {
+    x1.b <- sample(x1, size = length(x1), replace = TRUE)
+    x2.b <- sample(x2, size = length(x2), replace = TRUE)
+    phi(x1 = x1.b, x2 = x2.b)
+  }
 
-    # Return standard error
-    return(sd(phi.hat))
+  # Return standard error
+  return(sd(phi.hat))
 }

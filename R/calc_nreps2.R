@@ -1,11 +1,10 @@
 #' Determine sample sizes for a pair of algorithms on a problem instance
 #'
 #' Iteratively calculates the required sample sizes for two algorithms
-#' on a given problem instance using the **parametric** approach
-#' (based on normality of the sampling distribution of the means)
-#' so that the standard error
+#' on a given problem instance, so that the standard error
 #' of the estimate of the difference (either simple or percent) in mean
-#' performance is controlled at a predefined level.
+#' performance is controlled at a predefined level. This is a wrapper function
+#' for [nreps_boot()] and [nreps_param()]
 #'
 #' @section Instances and Algorithms:
 #' Parameters `instance`, `algorithm1` and `algorithm2` must each
@@ -91,10 +90,14 @@
 #'        _Types of Differences_ for details.
 #' @param dif name of the difference for which the SE is desired. Accepts "perc"
 #'          (for percent differences) or "simple" (for simple differences)
+#' @param method methodo to use for estimating the standard error. Accepts
+#'          "param" (for parametric) or "boot" (for bootstrap)
 #' @param nstart initial number of algorithm runs for each algorithm.
 #'      See Section _Initial Number of Observations_ for details.
 #' @param nmax maximum total allowed sample size.
 #' @param seed seed for the random number generator
+#' @param boot.R number of bootstrap resamples
+#' @param ncpus number of cores to use
 #'
 #' @return a list object containing the following items:
 #' \itemize{
@@ -104,21 +107,24 @@
 #'    \item \code{se} - standard error of the estimate
 #'    \item \code{n1j} - number of observations generated for algorithm 1
 #'    \item \code{n2j} - number of observations generated for algorithm 2
-#'    \item \code{r.opt} - estimated optimal ratio of sample sizes
+#'    \item \code{r.opt = n1j / n2j}
 #'    \item \code{seed} - the seed used for the PRNG
 #'    \item \code{dif} - the type of difference used
+#'    \item \code{method} - the method used ("param" / "boot")
 #' }
 #'
 #' @author Felipe Campelo (\email{fcampelo@@ufmg.br}),
 #'         Fernanda Takahashi (\email{fernandact@@ufmg.br})
 #'
-#' @section References:
+#' @references
 #' - F. Campelo, F. Takahashi:
 #'    Sample size estimation for power and accuracy in the experimental
 #'    comparison of algorithms (submitted, 2017).
 #' - P. Mathews.
 #'    Sample size calculations: Practical methods for engineers and scientists.
 #'    Mathews Malnar and Bailey, 2010.
+#' -  A.C. Davison, D.V. Hinkley:
+#'    Bootstrap methods and their application. Cambridge University Press (1997)
 #' -  E.C. Fieller:
 #'     Some problems in interval estimation. Journal of the Royal Statistical
 #'     Society. Series B (Methodological) 16(2), 175–185 (1954)
@@ -130,14 +136,17 @@
 #'
 #' @export
 
-nreps_param <- function(instance,         # instance parameters
+calc_nreps2 <- function(instance,         # instance parameters
                         algorithm1,       # algorithm parameters
                         algorithm2,       # algorithm parameters
                         se.max,           # desired (max) standard error
                         dif,              # difference ("simple", "perc"),
+                        method = "param", # method ("param", "boot")
                         nstart = 20,      # initial number of samples
                         nmax   = Inf,     # maximum allowed sample size
-                        seed   = NULL)    # seed for PRNG
+                        seed   = NULL,    # seed for PRNG
+                        boot.R = 999,     # number of bootstrap resamples
+                        ncpus  = 1)       # number of cores to use
 {
 
   # ========== Error catching ========== #
@@ -149,10 +158,13 @@ nreps_param <- function(instance,         # instance parameters
     assertthat::has_name(algorithm2, "name"),
     is.numeric(se.max) && length(se.max) == 1,
     dif %in% c("simple", "perc"),
+    method %in% c("param", "boot"),
     assertthat::is.count(nstart),
     is.infinite(nmax) || assertthat::is.count(nmax),
     nmax >= 2 * nstart,
-    is.null(seed) || assertthat::is.count(seed))
+    is.null(seed) || assertthat::is.count(seed),
+    assertthat::is.count(boot.R), boot.R > 1,
+    assertthat::is.count(ncpus))
   # ==================================== #
 
   # set PRNG seed
@@ -161,37 +173,40 @@ nreps_param <- function(instance,         # instance parameters
   }
   set.seed(seed)
 
-  # generate initial samples
-  n1j <- nstart # initial number of observations
-  n2j <- nstart # initial number of observations
-  x1j <- get_observations(algorithm1, instance, n1j)
-  x2j <- get_observations(algorithm2, instance, n2j)
-
-  SE <- calc_se(x1 = x1j, x2 = x2j,
-                dif = dif, method = "param")
-
-  while(SE$se > se.max & (n1j + n2j) < nmax){
-    r.opt <- calc_ropt(x1 = x1j, x2 = x2j, dif = dif)
-    if (n1j / n2j < ropt) {   # sample algorithm 1
-      x1j <- c(x1j, get_observations(algorithm1, instance, 1))
-      n1j <- n1j + 1
-    } else {                  # sample algorithm 2
-      x2j <- c(x2j, get_observations(algorithm2, instance, 1))
-      n2j <- n2j + 1
+  # Set up doParallel
+  local.cluster <- FALSE
+  if (ncpus > 1){
+    cl.workers <- getDoParWorkers()
+    if (cl.workers < ncpus){
+      available.cores <- parallel::detectCores()
+      if (ncpus >= available.cores){
+        warning("ncpus too large, we only have ", available.cores, " cores. ",
+                "Using ", ncores - 1, " cores.")
+        ncpus <- available.cores - 1
+      }
+      if (cl.workers < ncpus){
+        cl.calc_nreps2 <- parallel::makeCluster(ncpus)
+        doParallel::registerDoParallel(cl.calc_nreps2)
+        local.cluster <- TRUE
+      }
     }
-    SE <- calc_se(x1 = x1j, x2 = x2j,
-                  dif = dif, method = "param")
   }
 
-  output <- list(x1j     = x1j,
-                 x2j     = x2j,
-                 phi.est = SE$x.est,
-                 se      = SE$se,
-                 n1j     = n1j,
-                 n2j     = n2j,
-                 r.opt   = calc_ropt(x1 = x1j, x2 = x2j, dif = dif),
-                 seed    = seed,
-                 dif     = dif)
+  if (method == "param"){
+    output <- nreps_param(instance = instance,
+                          algorithm1 = algorithm1, algorithm2 = algorithm2,
+                          se.max = se.max, dif = dif, nstart = nstart,
+                          nmax = nmax, seed = seed)
+  } else if (method == "boot"){
+    output <- nreps_param(instance = instance,
+                          algorithm1 = algorithm1, algorithm2 = algorithm2,
+                          se.max = se.max, dif = dif, nstart = nstart,
+                          nmax = nmax, seed = seed, boot.R = boot.R,
+                          ncpus = ncpus)
+  }
+
+  # unregister cluster if needed
+  if (local.cluster) { stopCluster(cl.calc_nreps2) }
 
   return(output)
 }

@@ -1,7 +1,9 @@
 #' Determine sample sizes for a pair of algorithms on a problem instance
 #'
 #' Iteratively calculates the required sample sizes for two algorithms
-#' on a given problem instance, so that the standard error
+#' on a given problem instance using the **bootstrap** approach
+#' (based on normality of the sampling distribution of the means)
+#' so that the standard error
 #' of the estimate of the difference (either simple or percent) in mean
 #' performance is controlled at a predefined level.
 #'
@@ -77,7 +79,6 @@
 #' - If `dif == "perc"` it estimates (mu2 - mu1) / mu1.
 #' - If `dif == "simple"` it estimates mu2 - mu1.
 #'
-#' @inheritParams calc_se
 #' @param instance a list object containing the definitions of the problem
 #'    instance.
 #'    See Section _Problems and Algorithms_ for details.
@@ -88,27 +89,32 @@
 #' @param se.max desired upper limit for the standard error of the estimated
 #'        difference between the two algorithms. See Section
 #'        _Types of Differences_ for details.
+#' @param dif name of the difference for which the SE is desired. Accepts "perc"
+#'          (for percent differences) or "simple" (for simple differences)
 #' @param nstart initial number of algorithm runs for each algorithm.
 #'      See Section _Initial Number of Observations_ for details.
 #' @param nmax maximum total allowed sample size.
 #' @param seed seed for the random number generator
+#' @param boot.R number of bootstrap resamples
+#' @param ncpus number of cores to use
 #'
 #' @return a list object containing the following items:
 #' \itemize{
-#'    \item \code{x1} - vector of observed performance values for `algorithm1`
-#'    \item \code{x2} - vector of observed performance values for `algorithm2`
-#'    \item \code{phi.est} - estimated value for the statistic of interest of
-#'          the difference of performance of `algorithm1` and `algorithm2` on
-#'          `instance`
+#'    \item \code{x1j} - vector of observed performance values for `algorithm1`
+#'    \item \code{x2j} - vector of observed performance values for `algorithm2`
+#'    \item \code{phi.est} - estimated value for the statistic of interest
 #'    \item \code{se} - standard error of the estimate
-#'    \item \code{n} - total number of observations generated
+#'    \item \code{n1j} - number of observations generated for algorithm 1
+#'    \item \code{n2j} - number of observations generated for algorithm 2
+#'    \item \code{r.opt = n1j / n2j}
 #'    \item \code{seed} - the seed used for the PRNG
+#'    \item \code{dif} - the type of difference used
 #' }
 #'
 #' @author Felipe Campelo (\email{fcampelo@@ufmg.br}),
 #'         Fernanda Takahashi (\email{fernandact@@ufmg.br})
 #'
-#' @section References:
+#' @references
 #' - F. Campelo, F. Takahashi:
 #'    Sample size estimation for power and accuracy in the experimental
 #'    comparison of algorithms (submitted, 2017).
@@ -117,28 +123,19 @@
 #'    Mathews Malnar and Bailey, 2010.
 #' -  A.C. Davison, D.V. Hinkley:
 #'    Bootstrap methods and their application. Cambridge University Press (1997)
-#' -  E.C. Fieller:
-#'     Some problems in interval estimation. Journal of the Royal Statistical
-#'     Society. Series B (Methodological) 16(2), 175–185 (1954)
-#' - V. Franz:
-#'    Ratios: A short guide to confidence limits and proper use (2007).
-#'    https://arxiv.org/pdf/0710.2024v1.pdf
-#' - D.C. Montgomery, C.G. Runger:
-#'    Applied Statistics and Probability for Engineers, 6th edn. Wiley (2013)
 #'
 #' @export
 
 nreps_boot <- function(instance,         # instance parameters
-                        algorithm1,       # algorithm parameters
-                        algorithm2,       # algorithm parameters
-                        se.max,           # desired (max) standard error
-                        method = "param", # technique to calculate CI #method = c("param", "boot"),
-                        dif,              # difference #dif   = c("simple", "perc"),
-                        nstart = 20,      # initial number of samples
-                        nmax   = Inf,     # maximum allowed sample size
-                        seed   = NULL,    # seed for PRNG
-                        boot.R = 999,     # number of bootstrap
-                        ncpus  = 1)       # number of cores to use
+                       algorithm1,       # algorithm parameters
+                       algorithm2,       # algorithm parameters
+                       se.max,           # desired (max) standard error
+                       dif,              # difference ("simple", "perc"),
+                       nstart = 20,      # initial number of samples
+                       nmax   = Inf,     # maximum allowed sample size
+                       seed   = NULL,    # seed for PRNG
+                       boot.R = 999,     # number of bootstrap resamples
+                       ncpus  = 1)       # number of cores to use
 {
 
   # ========== Error catching ========== #
@@ -149,7 +146,6 @@ nreps_boot <- function(instance,         # instance parameters
     assertthat::has_name(algorithm1, "name"),
     assertthat::has_name(algorithm2, "name"),
     is.numeric(se.max) && length(se.max) == 1,
-    method %in% c("param", "boot"),
     dif %in% c("simple", "perc"),
     assertthat::is.count(nstart),
     is.infinite(nmax) || assertthat::is.count(nmax),
@@ -165,83 +161,73 @@ nreps_boot <- function(instance,         # instance parameters
   }
   set.seed(seed)
 
-  # genera
-  n1     <- nstart # initial number of observations
-  n2     <- nstart # initial number of observations
-
-  opt.rt <- 1    #optmal.ratio
-  delta  <- Inf
-
-
-  # initialize vector of observations
-  x1     <- get_observations(algo[[1]], instance, n1)
-  x2     <- get_observations(algo[[2]], instance, n2)
-
-  if (method=="boot"){
-    SE     <- calc_se(x1,x2,alpha = alpha, dif=dif, method = method, ...)
-    x1     <- c(x1, get_observations(algo[[1]], instance, 1))
-    SE_    <- calc_se(x1,x2,alpha = alpha, dif=dif, method = method, ...)
-    delta1 <- SE$se - SE_$se
-    x2     <- c(x2, get_observations(algo[[2]], instance, 1))
-    SE     <- calc_se(x1,x2,alpha = alpha, dif=dif, method = method, ...)
-    delta2 <- SE_$se - SE$se
-    n1 <- nstart
-    n2 <- nstart
-    delta <- SE$se
-  }
-
-  while(delta > dmax && (n1 <= nmax && n2 <= nmax)){
-    # when using the bootstrap with percent differences an optmal.ratio is not returned
-    # entering the else lace
-    # insted of the optmal ratio, the SE funcition returns the algorithm whose the increase
-    # of observations led to a greater reduction of the standard error
-    if (method == "param"){
-      if (opt.rt >= n1/n2){
-        n1      <- n1 + 1
-        x1      <- c(x1, get_observations(algo[[1]], instance, 1))
+  # Set up doParallel
+  local.cluster <- FALSE
+  if (ncpus > 1){
+    cl.workers <- getDoParWorkers()
+    if (cl.workers < ncpus){
+      available.cores <- parallel::detectCores()
+      if (ncpus >= available.cores){
+        warning("ncpus too large, we only have ", available.cores, " cores. ",
+                "Using ", ncores - 1, " cores.")
+        ncpus <- available.cores - 1
       }
-      if(opt.rt <= n1/n2){
-        n2      <- n2 + 1
-        x2      <- c(x2, get_observations(algo[[2]], instance, 1))
-      }
-
-      SE     <- calc_se(x1,x2,alpha = alpha, dif=dif, res.boot = boot.info, method = method, ...)
-    }else{
-      if(method == "boot"){
-        SE_ <- SE
-        which_run <- 0
-        if(delta2 == delta1) which_run <- rbinom(1, 1,0.5)
-        else if(delta2 >delta1) which_run <- 1
-
-        if (which_run == 0){
-          n1      <- n1 + 1
-          x1      <- c(x1, get_observations(algo[[1]], instance, 1))
-          SE      <- calc_se(x1,x2,alpha = alpha, dif=dif,  method = method, ...)
-          delta1  <- SE_$se - SE$se
-        }
-        else{
-          n2      <- n2 + 1
-          x2      <- c(x2, get_observations(algo[[2]], instance, 1))
-          SE      <- calc_se(x1,x2,alpha = alpha, dif=dif, method = method, ...)
-          delta2 <- SE_$se - SE$se
-        }
+      if (cl.workers < ncpus){
+        cl.nreps_boot <- parallel::makeCluster(ncpus)
+        doParallel::registerDoParallel(cl.nreps_boot)
+        local.cluster <- TRUE
       }
     }
-
-    delta  <- SE$se
-    opt.rt <- SE$opt.rt
-
   }
-  output<-list(x1     = x1,
-               x2     = x2,
-               x.est  = SE$est,
-               x.CI   = SE$ci,
-               n1     = n1,
-               n2     = n2,
-               se     = SE$se,
-               delta  = delta,
-               seed   = seed,
-               dif    = dif)
+
+  # generate initial samples and estimates of improvement for each algorithm
+  x1j      <- get_observations(algorithm1, instance, nstart - 1)
+  x2j      <- get_observations(algorithm2, instance, nstart - 1)
+  SE       <- calc_se(x1 = x1j, x2 = x2j, dif = dif,
+                      method = "boot", boot.R = boot.R)
+
+  x1j      <- c(x1j, get_observations(algorithm1, instance, 1))
+  SE.prime <- calc_se(x1 = x1j, x2 = x2j, dif = dif,
+                      method = "boot", boot.R = boot.R)
+  delta1   <- SE$se - SE.prime$se
+  n1j      <- nstart
+
+  x2j      <- c(x2j, get_observations(algorithm2, instance, 1))
+  SE       <- calc_se(x1 = x1j, x2 = x2j, dif = dif,
+                      method = "boot", boot.R = boot.R)
+  delta2   <- SE.prime$se - SE$se
+  n2j      <- nstart
+
+
+  while(SE$se > se.max & (n1j + n2j) < nmax){
+    SE.prime <- SE
+    if (delta1 > delta2){                 # sample algorithm 1
+      x1j      <- c(x1j, get_observations(algorithm1, instance, 1))
+      SE       <- calc_se(x1 = x1j, x2 = x2j, dif = dif,
+                          method = "boot", boot.R = boot.R)
+      delta1   <- SE.prime$se - SE$se
+      n1j      <- n1j + 1
+    } else{                               # sample algorithm 2
+      x2j      <- c(x2j, get_observations(algorithm2, instance, 1))
+      SE       <- calc_se(x1 = x1j, x2 = x2j, dif = dif,
+                          method = "boot", boot.R = boot.R)
+      delta2   <- SE.prime$se - SE$se
+      n2j      <- n2j + 1
+    }
+  }
+
+  # unregister cluster if needed
+  if (local.cluster) { stopCluster(cl.nreps_boot) }
+
+  output <- list(x1j     = x1j,
+                 x2j     = x2j,
+                 phi.est = SE$x.est,
+                 se      = SE$se,
+                 n1j     = n1j,
+                 n2j     = n2j,
+                 r.opt   = n1j / n2j,
+                 seed    = seed,
+                 dif     = dif)
 
   return(output)
 }
