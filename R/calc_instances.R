@@ -91,12 +91,12 @@ calc_instances <- function(ninstances  = NULL,        # number of instances
 
   }
 
-  output     <- list(ninstances  = ceiling(ss$n),
-                     power       = ss$power,
-                     d           = ss$delta / ss$sd,
-                     sig.level   = ss$sig.level,
-                     alternative = alternative,
-                     test.type   = test.type)
+  output <- list(ninstances  = ceiling(ss$n),
+                 power       = ss$power,
+                 d           = ss$delta / ss$sd,
+                 sig.level   = ss$sig.level,
+                 alternative = alternative,
+                 test.type   = test.type)
 
   return(output)
 }

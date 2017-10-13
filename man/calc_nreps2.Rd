@@ -22,7 +22,7 @@ See Section \emph{Problems and Algorithms} for details.}
 difference between the two algorithms. See Section
 \emph{Types of Differences} for details.}
 
-\item{dif}{name of the difference for which the SE is desired. Accepts "perc"
+\item{dif}{type of difference to be used. Accepts "perc"
 (for percent differences) or "simple" (for simple differences)}
 
 \item{method}{methodo to use for estimating the standard error. Accepts

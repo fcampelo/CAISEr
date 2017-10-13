@@ -1,0 +1,259 @@
+#' Run a full experiment
+#'
+#' Design and run a full experiment - calculate the required number of
+#' instances, run the algorithms on each problem instance using the iterative
+#' approach based on optimal sample size ratios, and return the results of the
+#' experiment. This routing builds upon [calc_instances()] and [calc_nreps2()],
+#' so refer to the documentation of these two functions for details.
+#'
+#' @section Instance List:
+#' Parameter `Instance.list` must contain a list of instance objects, where
+#' each field is itself a list, as defined in Section _Instances and Algorithms
+#' of the documentation of _[calc_nreps()]. In summary, each element of
+#' `Instance.list` is an `instance`, i.e., a named list containing all relevant
+#' parameters that define the problem instance. This list must contain at least
+#' the field `instance$name`, with the name of the problem instance function,
+#' that is, a routine that calculates y = f(x). If the instance requires
+#' additionalparameters, these must also be provided as named fields.
+#'
+#' @section Algorithms:
+#' Parameters `algorithm1` and `algorithm2` must each be a named list
+#' containing all relevant parameters that define the algorithm to be applied
+#' for solving the problem instance. In what follows we use `algorithm` to
+#' refer to both `algorithm1` and `algorithm2`
+#'
+#' `algorithm` must contain a `algorithm$name` field (the name
+#' of the function that calls the algorithm) and any other elements/parameters
+#' that `algorithm$name` requires (e.g., stop criteria, operator names and
+#' parameters, etc.).
+#'
+#' The function defined by the routine `algorithm$name` must have the
+#' following structure: supposing that the list in `algorithm` has
+#' fields `algorithm$name = myalgo` and
+#' `algorithm$par1 = "a", algorithm$par2 = 5`, then:
+#'
+#'    \preformatted{
+#'          myalgo <- function(par1, par2, instance, ...){
+#'                # do stuff
+#'                # ...
+#'                return(results)
+#'          }
+#'    }
+#'
+#' That is, it must be able to run if called as:
+#'
+#'    \preformatted{
+#'          # remove '$name' field from list of arguments
+#'          # and include the problem definition as field 'instance'
+#'          myargs          <- algorithm[names(algorithm) != "name"]
+#'          myargs$instance <- instance
+#'
+#'          # call function
+#'          do.call(algorithm$name,
+#'                  args = myargs)
+#'    }
+#'
+#' The `algorithm$name` routine must return a list object containing (at
+#' least) the performance value of the final solution obtained after a given
+#' run, in a field named `value` (e.g., `result$value`) .
+#'
+#' @section Initial Number of Observations:
+#' In the **general case** the initial number of observations / algorithm /
+#' instance (`nstart`) should be relatively high. For the parametric case
+#' we recommend ~20 if outliers are not expected, ~50 (at least) if that
+#' assumption cannot be made. For the bootstrap approch we recommend using at
+#' least 20. However, if some distributional assumptions can be
+#' made - particularly low skewness of the population of algorithm results on
+#' the test instances), then `nstart` can in principle be as small as 5 (if the
+#' output of the algorithm were known to be normal, it could be 1).
+#'
+#' In general, higher sample sizes are the price to pay for abandoning
+#' distributional assumptions. Use lower values of `nstart` with caution.
+#'
+#' @section Types of Differences:
+#' Parameter `dif` informs the type of difference in performance to be used
+#' for the estimation (mu1 and mu2 represent the mean performance of each
+#' algorithm on the problem instance):
+#'
+#' - If `dif == "perc"` it estimates (mu2 - mu1) / mu1.
+#' - If `dif == "simple"` it estimates mu2 - mu1.
+#'
+#' @section Sample Sizes for Nonparametric Methods:
+#' If the parameter `test.type` is set to either `Wilcoxon` or `Binomial`, this
+#' routine approximates the number of instances using the ARE of these tests
+#' in relation to the paired t.test, using the formulas:
+#'   - \deqn{n.wilcox = n.ttest / 0.86 = 1.163 * n.ttest}
+#'   - \deqn{n.binom = n.ttest / 0.637 = 1.570 * n.ttest}
+#'
+#' @param instance.list list object containing the definitions of the
+#'    _available_ instances. May or may not be exhausted in the experiment.
+#'    To estimate the number of required instances, see [calc_instances()].
+#'    For more detail on the definition of each instance, see [calc_nreps2()].
+#' @param algorithm1 a list object containing the definitions of algorithm 1.
+#'    See [calc_nreps2()] for details.
+#' @param algorithm2 a list object containing the definitions of algorithm 2.
+#'    See [calc_nreps2()] for details.
+#' @param power (desired) test power. See [calc_instances()] for details.
+#' @param d minimally relevant effect size (MRES, expressed as a standardized
+#'        effect size, i.e., "deviation from H0" / "standard deviation").
+#'        See [calc_instances()] for details.
+#' @param sig.level significance level (alpha) for the experiment.
+#'        See [calc_instances()] for details.
+#' @param alternative type of alternative hypothesis ("two.sided" or
+#'        "one.sided"). See [calc_instances()] for details.
+#' @param test.type type of test ("t.test", "wilcoxon", "binomial").
+#'        See [calc_instances()] for details.
+#' @param se.max desired upper limit for the standard error of the estimated
+#'        difference between the two algorithms on each instance.
+#'        See [calc_nreps2()] for details.
+#' @param dif type of difference to be used on each instance. Accepts "perc"
+#'        (for percent differences) or "simple" (for simple differences).
+#'        See [calc_nreps2()] for details.
+#' @param method method to use for estimating the standard errors. Accepts
+#'        "param" (for parametric) or "boot" (for bootstrap).
+#'        See [calc_nreps2()] for details.
+#' @param nstart initial number of algorithm runs for each algorithm in each
+#'        instance. See [calc_nreps2()] for details.
+#' @param nmax maximum total allowed sample size in each instance
+#'        See [calc_nreps2()] for details.
+#' @param seed seed for the random number generator
+#' @param boot.R number of bootstrap resamples. See [calc_nreps2()] for details.
+#' @param ncpus number of cores to use. See [calc_nreps2()] for details.
+#'
+#' @return a list object containing the full input configuration plus the
+#' following fields:
+#' \itemize{
+#'    \item \code{data.raw} - data frame containing all observations generated
+#'    \item \code{data.summary} - data frame summarizing the experiment.
+#'    \item \code{N} - number of instances sampled
+#'    \item \code{N.star} - number of instances required
+#'    \item \code{instances.sampled} - names of the instances sampled
+#'    \item \code{Underpowered} - flag: TRUE if N < N.star
+#' }
+#'
+#' @author Felipe Campelo (\email{fcampelo@@ufmg.br})
+#'
+#' @references
+#' - F. Campelo, F. Takahashi:
+#'    Sample size estimation for power and accuracy in the experimental
+#'    comparison of algorithms (submitted, 2017).
+#' - P. Mathews.
+#'    Sample size calculations: Practical methods for engineers and scientists.
+#'    Mathews Malnar and Bailey, 2010.
+#' -  A.C. Davison, D.V. Hinkley:
+#'    Bootstrap methods and their application. Cambridge University Press (1997)
+#' -  E.C. Fieller:
+#'     Some problems in interval estimation. Journal of the Royal Statistical
+#'     Society. Series B (Methodological) 16(2), 175–185 (1954)
+#' - V. Franz:
+#'    Ratios: A short guide to confidence limits and proper use (2007).
+#'    https://arxiv.org/pdf/0710.2024v1.pdf
+#' - D.C. Montgomery, C.G. Runger:
+#'    Applied Statistics and Probability for Engineers, 6th edn. Wiley (2013)
+#'
+#' @export
+
+run_experiment <- function(instance.list,    # instance parameters
+                           algorithm1,       # algorithm parameters
+                           algorithm2,       # algorithm parameters
+                           power ,           # power
+                           d,                # MRES
+                           sig.level = 0.05,          # significance level
+                           alternative = "two.sided", # type of H1
+                           test.type = "t.test",      # type of test
+                           se.max,           # desired (max) standard error
+                           dif,              # difference ("simple", "perc"),
+                           method = "param", # method ("param", "boot")
+                           nstart = 20,      # initial number of samples
+                           nmax   = Inf,     # maximum allowed sample size
+                           seed   = NULL,    # seed for PRNG
+                           boot.R = 999,     # number of bootstrap resamples
+                           ncpus  = 1)       # number of cores to use
+{
+
+  # ========== Error catching to be performed by specific routines ========== #
+
+  # Capture input parameters
+  var.input.pars <- as.list(sys.call())
+
+  # set PRNG seed
+  if (is.null(seed)) {
+    seed <- .Random.seed #i.e., do not change anything
+  }
+  set.seed(seed)
+
+  # Set up doParallel
+  available.cores <- parallel::detectCores()
+  if (ncpus >= available.cores){
+    cat("\n Warning: ncpus too large, we only have ", available.cores,
+            " cores. Using ", ncores - 1, " cores for run_experiment().")
+    ncpus <- available.cores - 1
+  }
+  cl.CAISEr <- parallel::makeCluster(ncpus)
+  doParallel::registerDoParallel(cl.CAISEr)
+
+  # Calculate N*
+  ninstances <- calc_instances(power       = power,
+                               d           = d,
+                               sig.level   = sig.level,
+                               alternative = alternative,
+                               test.type   = test.type)
+  N.star     <- ninstances$ninstances
+
+  # Randomize order of presentation for available instances
+  n.available   <- length(instance.list)
+  instance.list <- instance.list[sample.int(n.available)]
+
+  # Initialize output structures
+  data.raw <- data.frame(Algorithm   = character(0),
+                         Instance    = character(0),
+                         Observation = numeric(0))
+  data.summary <- data.frame(Instance = character(0),
+                             phi.j    = numeric(0),
+                             std.err  = numeric(0),
+                             n1j      = numeric(0),
+                             n2j      = numeric(0))
+
+
+  for (i in 1:min(N.star, n.available)){
+    instance <- instance.list[[i]]
+    # Sample the algorithms on this instance
+    res_j <- calc_nreps2(instance = instance,
+                         algorithm1 = algorithm1, algorithm2 = algorithm2,
+                         se.max = se.max, dif = dif, method = method,
+                         nstart = nstart, nmax = nmax, boot.R = boot.R,
+                         ncpus = ncpus)
+
+    # Update result dataframes
+    nj    <- res_j$n1j + res_j$n2j
+    raw_j <- data.frame(Algorithm   = c(rep(algorithm1$name, res_j$n1j),
+                                        rep(algorithm2$name, res_j$n2j)),
+                        Instance    = rep(instance$name, nj),
+                        Observation = c(res_j$x1j, res_j$x2j),
+                        stringsAsFactors = FALSE)
+    data.raw <- rbind(data.raw, raw_j)
+
+    sum_j <- data.frame(Instance = instance$name,
+                        phi.j    = res_j$phi.est,
+                        std.err  = res_j$se,
+                        n1j      = res_j$n1j,
+                        n2j      = res_j$n2j,
+                        stringsAsFactors = FALSE)
+
+    data.summary <- rbind(data.summary, sum_j)
+  }
+
+  # unregister parallel cluster
+  stopCluster(cl.CAISEr)
+
+  # Assemble output
+  output <- list(Configuration = var.input.pars,
+                 data.raw = data.raw,
+                 data.summary = data.summary,
+                 N = min(N.star, n.available),
+                 N.star = N.star,
+                 instances.sampled = unique(data.summary$Instance),
+                 Underpowered = (N.star > n.available))
+
+  return(output)
+}

@@ -88,7 +88,7 @@
 #' @param se.max desired upper limit for the standard error of the estimated
 #'        difference between the two algorithms. See Section
 #'        _Types of Differences_ for details.
-#' @param dif name of the difference for which the SE is desired. Accepts "perc"
+#' @param dif type of difference to be used. Accepts "perc"
 #'          (for percent differences) or "simple" (for simple differences)
 #' @param method methodo to use for estimating the standard error. Accepts
 #'          "param" (for parametric) or "boot" (for bootstrap)
