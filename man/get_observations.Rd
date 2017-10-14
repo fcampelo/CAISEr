@@ -21,6 +21,14 @@ vector of observed performance values
 \description{
 Call algorithm routine for the solution of a problem instance
 }
+\examples{
+algorithm <- list(FUN = "dummyalgo", alias = "myalgo",
+                  distribution.fun = "rnorm",
+                  distribution.pars = list(mean = 50, sd = 10))
+instance <- list(FUN = "dummyinstance")
+x <- get_observations(algorithm, instance, n = 1000)
+hist(x)
+}
 \seealso{
 \link{run_nreps2}
 }

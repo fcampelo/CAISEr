@@ -12,24 +12,30 @@
 #' of the documentation of _[calc_nreps()]. In summary, each element of
 #' `Instance.list` is an `instance`, i.e., a named list containing all relevant
 #' parameters that define the problem instance. This list must contain at least
-#' the field `instance$name`, with the name of the problem instance function,
+#' the field `instance$FUN`, with the name of the problem instance function,
 #' that is, a routine that calculates y = f(x). If the instance requires
-#' additionalparameters, these must also be provided as named fields.
+#' additional parameters, these must also be provided as named fields.
+#' An additional field, "instance$alias", can be used to
+#' provide the instance with a unique identifier (e.g., when using an
+#' instance generator).
 #'
 #' @section Algorithms:
-#' Parameters `algorithm1` and `algorithm2` must each be a named list
-#' containing all relevant parameters that define the algorithm to be applied
-#' for solving the problem instance. In what follows we use `algorithm` to
-#' refer to both `algorithm1` and `algorithm2`
+#' Parameter `Algorithm.list` must contain a list of instance objects, where
+#' each field is itself a list, as defined in Section _Instances and Algorithms
+#' of the documentation of _[calc_nreps()]. In summary, each element of
+#' `Algorithm.list` is an `algorithm`, i.e., a named list containing all
+#' relevant parameters that define the algorithm.
 #'
-#' `algorithm` must contain a `algorithm$name` field (the name
+#' An `algorithm` must contain a `algorithm$FUN` field (the name
 #' of the function that calls the algorithm) and any other elements/parameters
-#' that `algorithm$name` requires (e.g., stop criteria, operator names and
-#' parameters, etc.).
+#' that `algorithm$FUN` requires (e.g., stop criteria, operator names and
+#' parameters, etc.). An additional field, "algorithm$alias", can be used to
+#' provide the algorithm with a unique identifier (e.g., when comparing two
+#' different configurations of the same algorithm).
 #'
-#' The function defined by the routine `algorithm$name` must have the
+#' The function defined by the routine `algorithm$FUN` must have the
 #' following structure: supposing that the list in `algorithm` has
-#' fields `algorithm$name = myalgo` and
+#' fields `algorithm$FUN = myalgo` and
 #' `algorithm$par1 = "a", algorithm$par2 = 5`, then:
 #'
 #'    \preformatted{
@@ -43,17 +49,17 @@
 #' That is, it must be able to run if called as:
 #'
 #'    \preformatted{
-#'          # remove '$name' field from list of arguments
+#'          # remove '$FUN' field from list of arguments
 #'          # and include the problem definition as field 'instance'
-#'          myargs          <- algorithm[names(algorithm) != "name"]
+#'          myargs          <- algorithm[names(algorithm) != "FUN"]
 #'          myargs$instance <- instance
 #'
 #'          # call function
-#'          do.call(algorithm$name,
+#'          do.call(algorithm$FUN,
 #'                  args = myargs)
 #'    }
 #'
-#' The `algorithm$name` routine must return a list object containing (at
+#' The `algorithm$FUN` routine must return a list object containing (at
 #' least) the performance value of the final solution obtained after a given
 #' run, in a field named `value` (e.g., `result$value`) .
 #'
@@ -85,14 +91,13 @@
 #'   - \deqn{n.wilcox = n.ttest / 0.86 = 1.163 * n.ttest}
 #'   - \deqn{n.binom = n.ttest / 0.637 = 1.570 * n.ttest}
 #'
-#' @param instance.list list object containing the definitions of the
-#'    _available_ instances. May or may not be exhausted in the experiment.
-#'    To estimate the number of required instances, see [calc_instances()].
-#'    For more detail on the definition of each instance, see [calc_nreps2()].
-#' @param algorithm1 a list object containing the definitions of algorithm 1.
-#'    See [calc_nreps2()] for details.
-#' @param algorithm2 a list object containing the definitions of algorithm 2.
-#'    See [calc_nreps2()] for details.
+#' @param Instance.list list object containing the definitions of the
+#'    _available_ instances. this list may (or may not) be exhausted in the
+#'    experiment. To estimate the number of required instances,
+#'    see [calc_instances()]. For more detail on the definition of each
+#'    instance, see [calc_nreps2()].
+#' @param Algorithm.list list object containing the definitions of the
+#'    algorithms to be compared. See [calc_nreps2()] for details.
 #' @param power (desired) test power. See [calc_instances()] for details.
 #' @param d minimally relevant effect size (MRES, expressed as a standardized
 #'        effect size, i.e., "deviation from H0" / "standard deviation").
@@ -152,10 +157,10 @@
 #'    Applied Statistics and Probability for Engineers, 6th edn. Wiley (2013)
 #'
 #' @export
+#'
 
-run_experiment <- function(instance.list,    # instance parameters
-                           algorithm1,       # algorithm parameters
-                           algorithm2,       # algorithm parameters
+run_experiment <- function(Instance.list,    # instance parameters
+                           Algorithm.list,   # algorithm parameters
                            power ,           # power
                            d,                # MRES
                            sig.level = 0.05,          # significance level
@@ -165,7 +170,7 @@ run_experiment <- function(instance.list,    # instance parameters
                            dif,              # difference ("simple", "perc"),
                            method = "param", # method ("param", "boot")
                            nstart = 20,      # initial number of samples
-                           nmax   = Inf,     # maximum allowed sample size
+                           nmax   = 1000,    # maximum allowed sample size
                            seed   = NULL,    # seed for PRNG
                            boot.R = 999,     # number of bootstrap resamples
                            ncpus  = 1)       # number of cores to use
@@ -186,11 +191,23 @@ run_experiment <- function(instance.list,    # instance parameters
   available.cores <- parallel::detectCores()
   if (ncpus >= available.cores){
     cat("\n Warning: ncpus too large, we only have ", available.cores,
-            " cores. Using ", ncores - 1, " cores for run_experiment().")
+        " cores. Using ", ncores - 1, " cores for run_experiment().")
     ncpus <- available.cores - 1
   }
   cl.CAISEr <- parallel::makeCluster(ncpus)
   doParallel::registerDoParallel(cl.CAISEr)
+
+  # Fill up algorithm and instance aliases if needed
+  for (i in 1:length(Algorithm.list)){
+    if (!("alias" %in% names(Algorithm.list[[i]]))) {
+      Algorithm.list[[i]]$alias <- Algorithm.list[[i]]$FUN
+    }
+  }
+  for (i in 1:length(Instance.list)){
+    if (!("alias" %in% names(Instance.list[[i]]))) {
+      Instance.list[[i]]$alias <- Instance.list[[i]]$FUN
+    }
+  }
 
   # Calculate N*
   ninstances <- calc_instances(power       = power,
@@ -202,7 +219,7 @@ run_experiment <- function(instance.list,    # instance parameters
 
   # Randomize order of presentation for available instances
   n.available   <- length(instance.list)
-  instance.list <- instance.list[sample.int(n.available)]
+  instance.list <- Instance.list[sample.int(n.available)]
 
   # Initialize output structures
   data.raw <- data.frame(Algorithm   = character(0),
@@ -216,24 +233,25 @@ run_experiment <- function(instance.list,    # instance parameters
 
 
   for (i in 1:min(N.star, n.available)){
-    instance <- instance.list[[i]]
+    instance <- Instance.list[[i]]
     # Sample the algorithms on this instance
     res_j <- calc_nreps2(instance = instance,
-                         algorithm1 = algorithm1, algorithm2 = algorithm2,
+                         algorithm1 = Algorithm.list[[1]],
+                         algorithm2 = Algorithm.list[[2]],
                          se.max = se.max, dif = dif, method = method,
                          nstart = nstart, nmax = nmax, boot.R = boot.R,
                          ncpus = ncpus)
 
     # Update result dataframes
     nj    <- res_j$n1j + res_j$n2j
-    raw_j <- data.frame(Algorithm   = c(rep(algorithm1$name, res_j$n1j),
-                                        rep(algorithm2$name, res_j$n2j)),
-                        Instance    = rep(instance$name, nj),
+    raw_j <- data.frame(Algorithm   = c(rep(algorithm1$alias, res_j$n1j),
+                                        rep(algorithm2$alias, res_j$n2j)),
+                        Instance    = rep(instance$alias, nj),
                         Observation = c(res_j$x1j, res_j$x2j),
                         stringsAsFactors = FALSE)
     data.raw <- rbind(data.raw, raw_j)
 
-    sum_j <- data.frame(Instance = instance$name,
+    sum_j <- data.frame(Instance = instance$alias,
                         phi.j    = res_j$phi.est,
                         std.err  = res_j$se,
                         n1j      = res_j$n1j,

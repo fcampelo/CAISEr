@@ -11,9 +11,18 @@
 #' @return vector of observed performance values
 #'
 #' @seealso \link{run_nreps2}
+#'
 #' @author Felipe Campelo (\email{fcampelo@@ufmg.br})
 #'
+#' @examples
+#' algorithm <- list(FUN = "dummyalgo", alias = "myalgo",
+#'                   distribution.fun = "rnorm",
+#'                   distribution.pars = list(mean = 50, sd = 10))
+#' instance <- list(FUN = "dummyinstance")
+#' x <- get_observations(algorithm, instance, n = 1000)
+#' hist(x)
 
+# TESTED
 get_observations <- function(algo,        # algorithm parameters
                              instance,    # problem parameters
                              n = 1)       # number of observations to generate.
@@ -26,15 +35,16 @@ get_observations <- function(algo,        # algorithm parameters
   # ==================================== #
 
 
-  # remove '$name' field from list of arguments
+  # remove '$FUN' field from list of arguments
   # and include the problem definition as field 'instance'
-  myargs          <- algo[names(algo) != "name"]
+  myargs          <- algo[names(algo) != "FUN"]
+  myargs          <- myargs[names(myargs) != "alias"]
   myargs$instance <- instance
 
   # Get observation(s)
   f <- numeric(n)
   for (i in 1:n){
-    result <- do.call(algo$name,
+    result <- do.call(algo$FUN,
                       myargs)
     f[i] <- result$value
   }

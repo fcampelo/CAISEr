@@ -5,7 +5,7 @@
 \title{Determine sample sizes for a pair of algorithms on a problem instance}
 \usage{
 nreps_param(instance, algorithm1, algorithm2, se.max, dif, nstart = 20,
-  nmax = Inf, seed = NULL)
+  nmax = 1000, seed = NULL)
 }
 \arguments{
 \item{instance}{a list object containing the definitions of the problem
@@ -62,7 +62,7 @@ instructions given below.
 
 \code{instance} is a named list containing all relevant parameters that
 define the problem instance. This list must contain at least the field
-\code{instance$name}, with the name of the problem instance function, that is, a
+\code{instance$FUN}, with the name of the problem instance function, that is, a
 routine that calculates y = f(x). If the instance requires additional
 parameters, these must also be provided as named fields.
 
@@ -71,14 +71,14 @@ containing all relevant parameters that define the algorithm to be applied
 for solving the problem instance. In what follows we use \code{algorithm} to
 refer to both \code{algorithm1} and \code{algorithm2}
 
-\code{algorithm} must contain a \code{algorithm$name} field (the name
+\code{algorithm} must contain a \code{algorithm$FUN} field (the name
 of the function that calls the algorithm) and any other elements/parameters
-that \code{algorithm$name} requires (e.g., stop criteria, operator names and
+that \code{algorithm$FUN} requires (e.g., stop criteria, operator names and
 parameters, etc.).
 
-The function defined by the routine \code{algorithm$name} must have the
+The function defined by the routine \code{algorithm$FUN} must have the
 following structure: supposing that the list in \code{algorithm} has
-fields \code{algorithm$name = myalgo} and
+fields \code{algorithm$FUN = myalgo} and
 \code{algorithm$par1 = "a", algorithm$par2 = 5}, then:
 
 \preformatted{
@@ -92,17 +92,17 @@ fields \code{algorithm$name = myalgo} and
 That is, it must be able to run if called as:
 
 \preformatted{
-         # remove '$name' field from list of arguments
+         # remove '$FUN' field from list of arguments
          # and include the problem definition as field 'instance'
-         myargs          <- algorithm[names(algorithm) != "name"]
+         myargs          <- algorithm[names(algorithm) != "FUN"]
          myargs$instance <- instance
 
          # call function
-         do.call(algorithm$name,
+         do.call(algorithm$FUN,
                  args = myargs)
    }
 
-The \code{algorithm$name} routine must return a list containing (at
+The \code{algorithm$FUN} routine must return a list containing (at
 least) the performance value of the final solution obtained, in a field named
 \code{value} (e.g., \code{result$value}) after a given run.
 }
@@ -153,6 +153,30 @@ Applied Statistics and Probability for Engineers, 6th edn. Wiley (2013)
 }
 }
 
+\examples{
+# Example 1: uses dummy algorithms and a dummy instance to illustrate the
+# use of nreps_param
+algorithm1 <- list(FUN = "dummyalgo", alias = "algo1",
+                   distribution.fun = "rnorm",
+                   distribution.pars = list(mean = 10, sd = 1))
+algorithm2 <- list(FUN = "dummyalgo", alias = "algo2",
+                   distribution.fun = "rnorm",
+                   distribution.pars = list(mean = 20, sd = 4))
+instance <- list(FUN = "dummyinstance")
+
+# Theoretical n1, n2 for an SE = 0.5 on the simple difference: 20, 80
+my.reps  <- nreps_param(instance, algorithm1, algorithm2,
+                        se.max = 0.5, dif = "simple", seed = 1234)
+cat("n1j   =", my.reps$n1j, "\\nn2j   =", my.reps$n2j,
+    "\\nphi_j =", my.reps$phi.est, "\\nse    =", my.reps$se)
+
+# Theoretical n1, n2 for an SE = 0.05 on the percent difference: 31, 87
+my.reps  <- nreps_param(instance, algorithm1, algorithm2,
+                        se.max = 0.05, dif = "perc",
+                        nstart = 10, seed = 1234)
+cat("n1j   =", my.reps$n1j, "\\nn2j   =", my.reps$n2j,
+    "\\nphi_j =", my.reps$phi.est, "\\nse    =", my.reps$se)
+}
 \author{
 Felipe Campelo (\email{fcampelo@ufmg.br}),
 Fernanda Takahashi (\email{fernandact@ufmg.br})

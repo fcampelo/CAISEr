@@ -4,22 +4,20 @@
 \alias{run_experiment}
 \title{Run a full experiment}
 \usage{
-run_experiment(instance.list, algorithm1, algorithm2, power, d,
-  sig.level = 0.05, alternative = "two.sided", test.type = "t.test",
-  se.max, dif, method = "param", nstart = 20, nmax = Inf, seed = NULL,
+run_experiment(Instance.list, Algorithm.list, power, d, sig.level = 0.05,
+  alternative = "two.sided", test.type = "t.test", se.max, dif,
+  method = "param", nstart = 20, nmax = 1000, seed = NULL,
   boot.R = 999, ncpus = 1)
 }
 \arguments{
-\item{instance.list}{list object containing the definitions of the
-\emph{available} instances. May or may not be exhausted in the experiment.
-To estimate the number of required instances, see \code{\link[=calc_instances]{calc_instances()}}.
-For more detail on the definition of each instance, see \code{\link[=calc_nreps2]{calc_nreps2()}}.}
+\item{Instance.list}{list object containing the definitions of the
+\emph{available} instances. this list may (or may not) be exhausted in the
+experiment. To estimate the number of required instances,
+see \code{\link[=calc_instances]{calc_instances()}}. For more detail on the definition of each
+instance, see \code{\link[=calc_nreps2]{calc_nreps2()}}.}
 
-\item{algorithm1}{a list object containing the definitions of algorithm 1.
-See \code{\link[=calc_nreps2]{calc_nreps2()}} for details.}
-
-\item{algorithm2}{a list object containing the definitions of algorithm 2.
-See \code{\link[=calc_nreps2]{calc_nreps2()}} for details.}
+\item{Algorithm.list}{list object containing the definitions of the
+algorithms to be compared. See \code{\link[=calc_nreps2]{calc_nreps2()}} for details.}
 
 \item{power}{(desired) test power. See \code{\link[=calc_instances]{calc_instances()}} for details.}
 
@@ -86,26 +84,32 @@ each field is itself a list, as defined in Section _Instances and Algorithms
 of the documentation of _\code{\link[=calc_nreps]{calc_nreps()}}. In summary, each element of
 \code{Instance.list} is an \code{instance}, i.e., a named list containing all relevant
 parameters that define the problem instance. This list must contain at least
-the field \code{instance$name}, with the name of the problem instance function,
+the field \code{instance$FUN}, with the name of the problem instance function,
 that is, a routine that calculates y = f(x). If the instance requires
-additionalparameters, these must also be provided as named fields.
+additional parameters, these must also be provided as named fields.
+An additional field, "instance$alias", can be used to
+provide the instance with a unique identifier (e.g., when using an
+instance generator).
 }
 
 \section{Algorithms}{
 
-Parameters \code{algorithm1} and \code{algorithm2} must each be a named list
-containing all relevant parameters that define the algorithm to be applied
-for solving the problem instance. In what follows we use \code{algorithm} to
-refer to both \code{algorithm1} and \code{algorithm2}
+Parameter \code{Algorithm.list} must contain a list of instance objects, where
+each field is itself a list, as defined in Section _Instances and Algorithms
+of the documentation of _\code{\link[=calc_nreps]{calc_nreps()}}. In summary, each element of
+\code{Algorithm.list} is an \code{algorithm}, i.e., a named list containing all
+relevant parameters that define the algorithm.
 
-\code{algorithm} must contain a \code{algorithm$name} field (the name
+An \code{algorithm} must contain a \code{algorithm$FUN} field (the name
 of the function that calls the algorithm) and any other elements/parameters
-that \code{algorithm$name} requires (e.g., stop criteria, operator names and
-parameters, etc.).
+that \code{algorithm$FUN} requires (e.g., stop criteria, operator names and
+parameters, etc.). An additional field, "algorithm$alias", can be used to
+provide the algorithm with a unique identifier (e.g., when comparing two
+different configurations of the same algorithm).
 
-The function defined by the routine \code{algorithm$name} must have the
+The function defined by the routine \code{algorithm$FUN} must have the
 following structure: supposing that the list in \code{algorithm} has
-fields \code{algorithm$name = myalgo} and
+fields \code{algorithm$FUN = myalgo} and
 \code{algorithm$par1 = "a", algorithm$par2 = 5}, then:
 
 \preformatted{
@@ -119,17 +123,17 @@ fields \code{algorithm$name = myalgo} and
 That is, it must be able to run if called as:
 
 \preformatted{
-         # remove '$name' field from list of arguments
+         # remove '$FUN' field from list of arguments
          # and include the problem definition as field 'instance'
-         myargs          <- algorithm[names(algorithm) != "name"]
+         myargs          <- algorithm[names(algorithm) != "FUN"]
          myargs$instance <- instance
 
          # call function
-         do.call(algorithm$name,
+         do.call(algorithm$FUN,
                  args = myargs)
    }
 
-The \code{algorithm$name} routine must return a list object containing (at
+The \code{algorithm$FUN} routine must return a list object containing (at
 least) the performance value of the final solution obtained after a given
 run, in a field named \code{value} (e.g., \code{result$value}) .
 }

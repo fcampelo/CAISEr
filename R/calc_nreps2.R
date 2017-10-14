@@ -13,7 +13,7 @@
 #'
 #' `instance` is a named list containing all relevant parameters that
 #' define the problem instance. This list must contain at least the field
-#' `instance$name`, with the name of the problem instance function, that is, a
+#' `instance$FUN`, with the name of the problem instance function, that is, a
 #' routine that calculates y = f(x). If the instance requires additional
 #' parameters, these must also be provided as named fields.
 #'
@@ -22,14 +22,14 @@
 #' for solving the problem instance. In what follows we use `algorithm` to
 #' refer to both `algorithm1` and `algorithm2`
 #'
-#' `algorithm` must contain a `algorithm$name` field (the name
+#' `algorithm` must contain a `algorithm$FUN` field (the name
 #' of the function that calls the algorithm) and any other elements/parameters
-#' that `algorithm$name` requires (e.g., stop criteria, operator names and
+#' that `algorithm$FUN` requires (e.g., stop criteria, operator names and
 #' parameters, etc.).
 #'
-#' The function defined by the routine `algorithm$name` must have the
+#' The function defined by the routine `algorithm$FUN` must have the
 #' following structure: supposing that the list in `algorithm` has
-#' fields `algorithm$name = myalgo` and
+#' fields `algorithm$FUN = myalgo` and
 #' `algorithm$par1 = "a", algorithm$par2 = 5`, then:
 #'
 #'    \preformatted{
@@ -43,17 +43,17 @@
 #' That is, it must be able to run if called as:
 #'
 #'    \preformatted{
-#'          # remove '$name' field from list of arguments
+#'          # remove '$FUN' field from list of arguments
 #'          # and include the problem definition as field 'instance'
-#'          myargs          <- algorithm[names(algorithm) != "name"]
+#'          myargs          <- algorithm[names(algorithm) != "FUN"]
 #'          myargs$instance <- instance
 #'
 #'          # call function
-#'          do.call(algorithm$name,
+#'          do.call(algorithm$FUN,
 #'                  args = myargs)
 #'    }
 #'
-#' The `algorithm$name` routine must return a list containing (at
+#' The `algorithm$FUN` routine must return a list containing (at
 #' least) the performance value of the final solution obtained, in a field named
 #' `value` (e.g., `result$value`) after a given run.
 #'
@@ -135,6 +135,20 @@
 #'    Applied Statistics and Probability for Engineers, 6th edn. Wiley (2013)
 #'
 #' @export
+#'
+#' @examples
+#' # Example 1: uses dummy algorithms and a dummy instance to illustrate the
+#' # use of calc_nreps2
+#' algorithm1 <- list(FUN = "dummyalgo", alias = "algo1",
+#'                    distribution.fun = "rnorm",
+#'                    distribution.pars = list(mean = 10, sd = 1))
+#' algorithm2 <- list(FUN = "dummyalgo", alias = "algo2",
+#'                    distribution.fun = "rnorm",
+#'                    distribution.pars = list(mean = 50, sd = 10))
+#' instance <- list(FUN = "dummyinstance")
+#' my.reps  <- calc_nreps2(instance, algorithm1, algorithm2,
+#'                         se.max = 0.1, dif = "perc", seed = 123)
+#'
 
 calc_nreps2 <- function(instance,         # instance parameters
                         algorithm1,       # algorithm parameters
@@ -143,7 +157,7 @@ calc_nreps2 <- function(instance,         # instance parameters
                         dif,              # difference ("simple", "perc"),
                         method = "param", # method ("param", "boot")
                         nstart = 20,      # initial number of samples
-                        nmax   = Inf,     # maximum allowed sample size
+                        nmax   = 1000,    # maximum allowed sample size
                         seed   = NULL,    # seed for PRNG
                         boot.R = 999,     # number of bootstrap resamples
                         ncpus  = 1)       # number of cores to use
@@ -152,10 +166,10 @@ calc_nreps2 <- function(instance,         # instance parameters
   # ========== Error catching ========== #
   assertthat::assert_that(
     is.list(instance),
-    assertthat::has_name(instance, "name"),
+    assertthat::has_name(instance, "FUN"),
     is.list(algorithm1), is.list(algorithm2),
-    assertthat::has_name(algorithm1, "name"),
-    assertthat::has_name(algorithm2, "name"),
+    assertthat::has_name(algorithm1, "FUN"),
+    assertthat::has_name(algorithm2, "FUN"),
     is.numeric(se.max) && length(se.max) == 1,
     dif %in% c("simple", "perc"),
     method %in% c("param", "boot"),

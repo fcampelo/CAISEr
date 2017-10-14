@@ -49,6 +49,18 @@ comparison of algorithms (submitted, 2017).
 }
 }
 
+\examples{
+# two vectors of normally distributed observations
+set.seed(1234)
+x1 <- rnorm(100, 5, 1)  # mean = 5, sd = 1
+x2 <- rnorm(200, 10, 2) # mean = 10, sd = 2
+
+# Theoretical SE for simple difference: 0.1732051
+calc_se(x1, x2, dif = "simple", method = "param")
+
+# Theoretical (Fieller, no covariance) SE for percent differences: 0.04
+calc_se(x1, x2, dif = "perc", method = "boot")
+}
 \author{
 Felipe Campelo (\email{fcampelo@ufmg.br}),
 Fernanda Takahashi (\email{fernandact@ufmg.br})
