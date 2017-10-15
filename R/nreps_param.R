@@ -181,8 +181,10 @@ nreps_param <- function(instance,         # instance parameters
   # set PRNG seed
   if (is.null(seed)) {
     seed <- .Random.seed #i.e., do not change anything
+  } else {
+    set.seed(seed)
   }
-  set.seed(seed)
+
 
   # generate initial samples
   n1j <- nstart # initial number of observations

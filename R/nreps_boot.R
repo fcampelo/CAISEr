@@ -184,8 +184,10 @@ nreps_boot <- function(instance,         # instance parameters
   # set PRNG seed
   if (is.null(seed)) {
     seed <- .Random.seed #i.e., do not change anything
+  } else {
+    set.seed(seed)
   }
-  set.seed(seed)
+
 
   # # Set up doParallel       #//DoParallel
   # local.cluster <- FALSE
