@@ -148,7 +148,7 @@
 #' # Theoretical n1, n2 for an SE = 0.05 on the percent difference: 31, 87
 #' my.reps  <- nreps_param(instance, algorithm1, algorithm2,
 #'                         se.max = 0.05, dif = "perc",
-#'                         nstart = 10, seed = 1234)
+#'                         nstart = 10, seed = 123)
 #' cat("n1j   =", my.reps$n1j, "\nn2j   =", my.reps$n2j,
 #'     "\nphi_j =", my.reps$phi.est, "\nse    =", my.reps$se)
 

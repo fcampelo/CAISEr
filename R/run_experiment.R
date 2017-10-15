@@ -123,7 +123,7 @@
 #'        See [calc_nreps2()] for details.
 #' @param seed seed for the random number generator
 #' @param boot.R number of bootstrap resamples. See [calc_nreps2()] for details.
-#' @param ncpus number of cores to use. See [calc_nreps2()] for details.
+#' # @param ncpus number of cores to use. See [calc_nreps2()] for details. #//DoParallel
 #'
 #' @return a list object containing the full input configuration plus the
 #' following fields:
@@ -158,6 +158,9 @@
 #'
 #' @export
 #'
+#' @examples
+#'
+
 
 run_experiment <- function(Instance.list,    # instance parameters
                            Algorithm.list,   # algorithm parameters
@@ -172,8 +175,8 @@ run_experiment <- function(Instance.list,    # instance parameters
                            nstart = 20,      # initial number of samples
                            nmax   = 1000,    # maximum allowed sample size
                            seed   = NULL,    # seed for PRNG
-                           boot.R = 999,     # number of bootstrap resamples
-                           ncpus  = 1)       # number of cores to use
+                           boot.R = 999)     # number of bootstrap resamples
+                           #ncpus  = 1)       # number of cores to use
 {
 
   # ========== Error catching to be performed by specific routines ========== #
@@ -187,15 +190,15 @@ run_experiment <- function(Instance.list,    # instance parameters
   }
   set.seed(seed)
 
-  # Set up doParallel
-  available.cores <- parallel::detectCores()
-  if (ncpus >= available.cores){
-    cat("\n Warning: ncpus too large, we only have ", available.cores,
-        " cores. Using ", ncores - 1, " cores for run_experiment().")
-    ncpus <- available.cores - 1
-  }
-  cl.CAISEr <- parallel::makeCluster(ncpus)
-  doParallel::registerDoParallel(cl.CAISEr)
+  # # Set up doParallel    #//DoParallel
+  # available.cores <- parallel::detectCores()
+  # if (ncpus >= available.cores){
+  #   cat("\n Warning: ncpus too large, we only have ", available.cores,
+  #       " cores. Using ", available.cores - 1, " cores for run_experiment().")
+  #   ncpus <- available.cores - 1
+  # }
+  # cl.CAISEr <- parallel::makeCluster(ncpus)
+  # doParallel::registerDoParallel(cl.CAISEr)
 
   # Fill up algorithm and instance aliases if needed
   for (i in 1:length(Algorithm.list)){
@@ -239,8 +242,8 @@ run_experiment <- function(Instance.list,    # instance parameters
                          algorithm1 = Algorithm.list[[1]],
                          algorithm2 = Algorithm.list[[2]],
                          se.max = se.max, dif = dif, method = method,
-                         nstart = nstart, nmax = nmax, boot.R = boot.R,
-                         ncpus = ncpus)
+                         nstart = nstart, nmax = nmax, boot.R = boot.R)
+                         # ncpus = ncpus) #//DoParallel
 
     # Update result dataframes
     nj    <- res_j$n1j + res_j$n2j
@@ -261,8 +264,8 @@ run_experiment <- function(Instance.list,    # instance parameters
     data.summary <- rbind(data.summary, sum_j)
   }
 
-  # unregister parallel cluster
-  stopCluster(cl.CAISEr)
+  # unregister parallel cluster   #//DoParallel
+  # stopCluster(cl.CAISEr)
 
   # Assemble output
   output <- list(Configuration = var.input.pars,

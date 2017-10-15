@@ -19,6 +19,8 @@
 #' @param x2 vector of observations
 #' @param dif name of the difference for which the SE is desired. Accepts
 #'            "simple" (simple differences) or "perc" (percent differences).
+#' @param ... other parameters (used only for compatibility with calls to
+#'            [se_boot()], unused in this function)
 #'
 #' @return estimated standard error
 #'
@@ -39,7 +41,8 @@
 # TESTED
 se_param <- function(x1,  # vector of observations
                      x2,  # vector of observations
-                     dif) # type of statistic
+                     dif, # type of statistic
+                     ...)
 {
 
     # ========== Error catching ========== #

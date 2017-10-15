@@ -18,7 +18,14 @@
 #'
 #' @author Felipe Campelo (\email{fcampelo@@ufmg.br})
 #'
+#' @examples
+#' set.seed(1234)
+#' x1 <- rnorm(25, 5, 1)
+#' x2 <- runif(35, 8, 10)
+#' calc_ropt(x1, x2, "simple")
+#' calc_ropt(x1, x2, "perc")
 
+# TESTED
 calc_ropt <- function(x1,   # vector of observations
                       x2,   # vector of observations
                       dif)  # type of statistic

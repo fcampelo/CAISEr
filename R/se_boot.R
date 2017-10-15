@@ -46,20 +46,22 @@ se_boot <- function(x1,           # vector of observations
     dif %in% c('simple', 'perc'))
   # ==================================== #
 
-  # Estimators
-  if (dif == "simple") {
-    phi <- function(x1, x2){ mean(x2) - mean(x1) }
-  } else if (dif == "perc") {
-    phi <- function(x1, x2){ (mean(x2) - mean(x1)) / mean(x1) }
-  } else stop ("dif option", dif, "not recognized.")
-
   # Perform bootstrap
-  phi.hat <- foreach(i = 1:boot.R, .combine = c) %dopar%
+  phi.hat <- numeric(boot.R)
+  for(i in 1:boot.R)
   {
     x1.b <- sample(x1, size = length(x1), replace = TRUE)
     x2.b <- sample(x2, size = length(x2), replace = TRUE)
-    phi(x1 = x1.b, x2 = x2.b)
+    phi.hat[i] <- calc_phi(x1 = x1.b, x2 = x2.b, dif = dif)
   }
+
+  #//DoParallel
+  # phi.hat <- foreach(i = 1:boot.R, .combine = c) %dopar%
+  # {
+  #   x1.b <- sample(x1, size = length(x1), replace = TRUE)
+  #   x2.b <- sample(x2, size = length(x2), replace = TRUE)
+  #   phi(x1 = x1.b, x2 = x2.b)
+  # }
 
   # Return standard error
   return(sd(phi.hat))

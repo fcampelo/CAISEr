@@ -13,11 +13,11 @@ according to a given distribution, e.g., "rnorm", "runif", "rexp" etc.}
 
 \item{distribution.pars}{list of named parameters required by the function
 in \code{distribution.fun}. Parameter \code{n} (number of points to
-generate) is unnecessary (this routine always returns a single value) and is
-therefore unnecessary.}
+generate) is unnecessary (this routine always considers \code{n = 1}).}
 
 \item{instance}{instance parameters. This parameter is always ignored, and
-was only included for compatibility with \code{run_nreps}.}
+was only included for compatibility with \code{run_nreps2} and other \code{nreps}
+functions.}
 }
 \value{
 a list object with a single field \code{$value}, containing a value

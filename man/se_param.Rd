@@ -4,7 +4,7 @@
 \alias{se_param}
 \title{Parametric standard errors}
 \usage{
-se_param(x1, x2, dif)
+se_param(x1, x2, dif, ...)
 }
 \arguments{
 \item{x1}{vector of observations}
@@ -13,6 +13,9 @@ se_param(x1, x2, dif)
 
 \item{dif}{name of the difference for which the SE is desired. Accepts
 "simple" (simple differences) or "perc" (percent differences).}
+
+\item{...}{other parameters (used only for compatibility with calls to
+\code{\link[=se_boot]{se_boot()}}, unused in this function)}
 }
 \value{
 estimated standard error

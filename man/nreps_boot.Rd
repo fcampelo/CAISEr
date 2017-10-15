@@ -139,7 +139,7 @@ algorithm on the problem instance):
 
 \examples{
 # Example 1: uses dummy algorithms and a dummy instance to illustrate the
-# use of nreps_param
+# use of nreps_boot
 algorithm1 <- list(FUN = "dummyalgo", alias = "algo1",
                    distribution.fun = "rnorm",
                    distribution.pars = list(mean = 10, sd = 1))
@@ -149,15 +149,17 @@ algorithm2 <- list(FUN = "dummyalgo", alias = "algo2",
 instance <- list(FUN = "dummyinstance")
 
 # Theoretical n1, n2 for an SE = 0.5 on the simple difference: 20, 80
+# (using the parametric approach - bootstrap ratios may vary)
 my.reps  <- nreps_boot(instance, algorithm1, algorithm2,
-                        se.max = 0.5, dif = "simple", seed = 1234)
+                        se.max = 0.5, dif = "simple", seed = 4321)
 cat("n1j   =", my.reps$n1j, "\\nn2j   =", my.reps$n2j,
     "\\nphi_j =", my.reps$phi.est, "\\nse    =", my.reps$se)
 
 # Theoretical n1, n2 for an SE = 0.05 on the percent difference: 31, 87
+# (using the parametric approach - bootstrap ratios may vary)
 my.reps  <- nreps_boot(instance, algorithm1, algorithm2,
                         se.max = 0.05, dif = "perc",
-                        nstart = 10, seed = 1234)
+                        nstart = 10, seed = 4321)
 cat("n1j   =", my.reps$n1j, "\\nn2j   =", my.reps$n2j,
     "\\nphi_j =", my.reps$phi.est, "\\nse    =", my.reps$se)
 

@@ -14,6 +14,8 @@
 #'
 #' @export
 #'
+
+# TESTED
 plot.caiser.powercurve <- function(object,...)
 {
 

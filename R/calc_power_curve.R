@@ -16,6 +16,7 @@
 #' @examples
 #' my.cpc <- calc_power_curve(ninstances = 10)
 #' summary(my.cpc)
+#' plot(my.cpc)
 #'
 #'
 #' @export

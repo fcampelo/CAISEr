@@ -97,7 +97,7 @@
 #' @param nmax maximum total allowed sample size.
 #' @param seed seed for the random number generator
 #' @param boot.R number of bootstrap resamples
-#' @param ncpus number of cores to use
+#' #@param ncpus number of cores to use (under development.) #//DoParallel
 #'
 #' @return a list object containing the following items:
 #' \itemize{
@@ -137,19 +137,39 @@
 #' @export
 #'
 #' @examples
-#' # Example 1: uses dummy algorithms and a dummy instance to illustrate the
-#' # use of calc_nreps2
+#' # Uses dummy algorithms and a dummy instance to illustrate the
+#' # use of nreps_boot
 #' algorithm1 <- list(FUN = "dummyalgo", alias = "algo1",
 #'                    distribution.fun = "rnorm",
 #'                    distribution.pars = list(mean = 10, sd = 1))
 #' algorithm2 <- list(FUN = "dummyalgo", alias = "algo2",
 #'                    distribution.fun = "rnorm",
-#'                    distribution.pars = list(mean = 50, sd = 10))
+#'                    distribution.pars = list(mean = 20, sd = 4))
 #' instance <- list(FUN = "dummyinstance")
-#' my.reps  <- calc_nreps2(instance, algorithm1, algorithm2,
-#'                         se.max = 0.1, dif = "perc", seed = 123)
 #'
+#' # Theoretical results for an SE = 0.5 on the simple difference:
+#' # phi = 10; n1 = 20; n2 = 80
+#' # (using the parametric approach)
+#' my.reps  <- calc_nreps2(instance, algorithm1, algorithm2,
+#'                         se.max = 0.5, dif = "simple", seed = 1234)
+#' cat("n1j   =", my.reps$n1j, "\nn2j   =", my.reps$n2j,
+#'     "\nphi_j =", my.reps$phi.est, "\nse    =", my.reps$se)
+#'
+#' # Using the bootstrap approach
+#' algorithm3 <- list(FUN = "dummyalgo", alias = "algo3",
+#'                    distribution.fun = "rchisq",
+#'                    distribution.pars = list(df = 2, ncp = 3))
+#'
+#' my.reps  <- calc_nreps2(instance, algorithm1, algorithm3,
+#'                         se.max = 0.05, dif = "perc",
+#'                         method = "boot", seed = 1234,
+#'                         nstart = 20)
+#' cat("n1j   =", my.reps$n1j, "\nn2j   =", my.reps$n2j,
+#'     "\nphi_j =", my.reps$phi.est, "\nse    =", my.reps$se)
+#'
+#' @export
 
+# TESTED
 calc_nreps2 <- function(instance,         # instance parameters
                         algorithm1,       # algorithm parameters
                         algorithm2,       # algorithm parameters
@@ -159,8 +179,8 @@ calc_nreps2 <- function(instance,         # instance parameters
                         nstart = 20,      # initial number of samples
                         nmax   = 1000,    # maximum allowed sample size
                         seed   = NULL,    # seed for PRNG
-                        boot.R = 999,     # number of bootstrap resamples
-                        ncpus  = 1)       # number of cores to use
+                        boot.R = 999)     # number of bootstrap resamples
+#                        ncpus  = 1)       # number of cores to use #//DoParallel
 {
 
   # ========== Error catching ========== #
@@ -177,8 +197,8 @@ calc_nreps2 <- function(instance,         # instance parameters
     is.infinite(nmax) || assertthat::is.count(nmax),
     nmax >= 2 * nstart,
     is.null(seed) || assertthat::is.count(seed),
-    assertthat::is.count(boot.R), boot.R > 1,
-    assertthat::is.count(ncpus))
+    assertthat::is.count(boot.R), boot.R > 1)
+#    assertthat::is.count(ncpus)) #//DoParallel
   # ==================================== #
 
   # set PRNG seed
@@ -187,40 +207,72 @@ calc_nreps2 <- function(instance,         # instance parameters
   }
   set.seed(seed)
 
-  # Set up doParallel
-  local.cluster <- FALSE
-  if (ncpus > 1){
-    cl.workers <- getDoParWorkers()
-    if (cl.workers < ncpus){
-      available.cores <- parallel::detectCores()
-      if (ncpus >= available.cores){
-        warning("ncpus too large, we only have ", available.cores, " cores. ",
-                "Using ", ncores - 1, " cores.")
-        ncpus <- available.cores - 1
-      }
-      if (cl.workers < ncpus){
-        cl.calc_nreps2 <- parallel::makeCluster(ncpus)
-        doParallel::registerDoParallel(cl.calc_nreps2)
-        local.cluster <- TRUE
-      }
+  # # Set up doParallel       #//DoParallel
+  # local.cluster <- FALSE
+  # if (ncpus > 1){
+  #   cl.workers <- getDoParWorkers()
+  #   if (cl.workers < ncpus){
+  #     available.cores <- parallel::detectCores()
+  #     if (ncpus >= available.cores){
+  #       warning("ncpus too large, we only have ", available.cores, " cores. ",
+  #               "Using ", available.cores - 1, " cores.")
+  #       ncpus <- available.cores - 1
+  #     }
+  #     if (cl.workers < ncpus){
+  #       cl.calc_nreps2 <- parallel::makeCluster(ncpus)
+  #       doParallel::registerDoParallel(cl.calc_nreps2)
+  #       local.cluster <- TRUE
+  #     }
+  #   }
+  # }
+
+  # generate initial samples
+  n1j <- nstart # initial number of observations
+  n2j <- nstart # initial number of observations
+  x1j <- get_observations(algorithm1, instance, n1j)
+  x2j <- get_observations(algorithm2, instance, n2j)
+
+  SE <- calc_se(x1 = x1j, x2 = x2j,
+                dif = dif, method = method, boot.R = boot.R)
+
+  while(SE$se > se.max & (n1j + n2j) < nmax){
+    r.opt <- calc_ropt(x1 = x1j, x2 = x2j, dif = dif)
+    if (n1j / n2j < r.opt) {   # sample algorithm 1
+      x1j <- c(x1j, get_observations(algorithm1, instance, 1))
+      n1j <- n1j + 1
+    } else {                  # sample algorithm 2
+      x2j <- c(x2j, get_observations(algorithm2, instance, 1))
+      n2j <- n2j + 1
     }
+    SE <- calc_se(x1 = x1j, x2 = x2j,
+                  dif = dif, method = method, boot.R = boot.R)
   }
 
-  if (method == "param"){
-    output <- nreps_param(instance = instance,
-                          algorithm1 = algorithm1, algorithm2 = algorithm2,
-                          se.max = se.max, dif = dif, nstart = nstart,
-                          nmax = nmax, seed = seed)
-  } else if (method == "boot"){
-    output <- nreps_param(instance = instance,
-                          algorithm1 = algorithm1, algorithm2 = algorithm2,
-                          se.max = se.max, dif = dif, nstart = nstart,
-                          nmax = nmax, seed = seed, boot.R = boot.R,
-                          ncpus = ncpus)
-  }
+  output <- list(x1j     = x1j,
+                 x2j     = x2j,
+                 phi.est = SE$x.est,
+                 se      = SE$se,
+                 n1j     = n1j,
+                 n2j     = n2j,
+                 seed    = seed,
+                 dif     = dif)
 
   # unregister cluster if needed
-  if (local.cluster) { stopCluster(cl.calc_nreps2) }
+  #if (local.cluster) { stopCluster(cl.calc_nreps2) } #//DoParallel
 
   return(output)
+
+
+  # if (method == "param"){
+  #   output <- nreps_param(instance = instance,
+  #                         algorithm1 = algorithm1, algorithm2 = algorithm2,
+  #                         se.max = se.max, dif = dif, nstart = nstart,
+  #                         nmax = nmax, seed = seed)
+  # } else if (method == "boot"){
+  #   output <- nreps_boot(instance = instance,
+  #                         algorithm1 = algorithm1, algorithm2 = algorithm2,
+  #                         se.max = se.max, dif = dif, nstart = nstart,
+  #                         nmax = nmax, seed = seed, boot.R = boot.R,
+  #                         ncpus = ncpus)
+  # }
 }

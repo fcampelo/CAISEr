@@ -8,16 +8,19 @@
 #' according to a given distribution, e.g., "rnorm", "runif", "rexp" etc.
 #' @param distribution.pars list of named parameters required by the function
 #' in \code{distribution.fun}. Parameter \code{n} (number of points to
-#' generate) is unnecessary (this routine always returns a single value) and is
-#' therefore unnecessary.
+#' generate) is unnecessary (this routine always considers `n = 1`).
 #' @param instance instance parameters. This parameter is always ignored, and
-#' was only included for compatibility with \code{run_nreps}.
+#' was only included for compatibility with \code{run_nreps2} and other `nreps`
+#' functions.
 #'
 #' @return a list object with a single field \code{$value}, containing a value
 #' distributed according to \code{distribution.fun} and \code{distribution.pars}.
 #'
 #' @author Felipe Campelo (\email{fcampelo@@ufmg.br})
 #'
+#' @export
+
+# TESTED
 dummyalgo <- function(distribution.fun = "rnorm",
                       distribution.pars = list(mean = 0, sd = 1),
                       instance)
@@ -35,6 +38,8 @@ dummyalgo <- function(distribution.fun = "rnorm",
 
 #' Dummy instance (for testing only) - a function that does nothing and returns
 #' nothing
+#' @export
+# TESTED
 dummyinstance <- function(){
   # do nothing
 }

@@ -96,7 +96,7 @@
 #' @param nmax maximum total allowed sample size.
 #' @param seed seed for the random number generator
 #' @param boot.R number of bootstrap resamples
-#' @param ncpus number of cores to use
+#' # @param ncpus number of cores to use #//DoParallel
 #'
 #' @return a list object containing the following items:
 #' \itemize{
@@ -150,7 +150,6 @@
 #' cat("n1j   =", my.reps$n1j, "\nn2j   =", my.reps$n2j,
 #'     "\nphi_j =", my.reps$phi.est, "\nse    =", my.reps$se)
 #'
-#' @export
 
 # TESTED
 nreps_boot <- function(instance,         # instance parameters
@@ -161,8 +160,8 @@ nreps_boot <- function(instance,         # instance parameters
                        nstart = 20,      # initial number of samples
                        nmax   = 1000,    # maximum allowed sample size
                        seed   = NULL,    # seed for PRNG
-                       boot.R = 999,     # number of bootstrap resamples
-                       ncpus  = 1)       # number of cores to use
+                       boot.R = 999)     # number of bootstrap resamples
+                       #ncpus  = 1)       # number of cores to use  #//DoParallel
 {
 
   # ========== Error catching ========== #
@@ -178,8 +177,8 @@ nreps_boot <- function(instance,         # instance parameters
     is.infinite(nmax) || assertthat::is.count(nmax),
     nmax >= 2 * nstart,
     is.null(seed) || assertthat::is.count(seed),
-    assertthat::is.count(boot.R), boot.R > 1,
-    assertthat::is.count(ncpus))
+    assertthat::is.count(boot.R), boot.R > 1)
+    #assertthat::is.count(ncpus))
   # ==================================== #
 
   # set PRNG seed
@@ -188,24 +187,24 @@ nreps_boot <- function(instance,         # instance parameters
   }
   set.seed(seed)
 
-  # Set up doParallel
-  local.cluster <- FALSE
-  if (ncpus > 1){
-    cl.workers <- getDoParWorkers()
-    if (cl.workers < ncpus){
-      available.cores <- parallel::detectCores()
-      if (ncpus >= available.cores){
-        warning("ncpus too large, we only have ", available.cores, " cores. ",
-                "Using ", ncores - 1, " cores.")
-        ncpus <- available.cores - 1
-      }
-      if (cl.workers < ncpus){
-        cl.nreps_boot <- parallel::makeCluster(ncpus)
-        doParallel::registerDoParallel(cl.nreps_boot)
-        local.cluster <- TRUE
-      }
-    }
-  }
+  # # Set up doParallel       #//DoParallel
+  # local.cluster <- FALSE
+  # if (ncpus > 1){
+  #   cl.workers <- getDoParWorkers()
+  #   if (cl.workers < ncpus){
+  #     available.cores <- parallel::detectCores()
+  #     if (ncpus >= available.cores){
+  #       warning("ncpus too large, we only have ", available.cores, " cores. ",
+  #               "Using ", available.cores - 1, " cores.")
+  #       ncpus <- available.cores - 1
+  #     }
+  #     if (cl.workers < ncpus){
+  #       cl.nreps_boot <- parallel::makeCluster(ncpus)
+  #       doParallel::registerDoParallel(cl.nreps_boot)
+  #       local.cluster <- TRUE
+  #     }
+  #   }
+  # }
 
   # generate initial samples and estimates of improvement for each algorithm
   x1j      <- get_observations(algorithm1, instance, nstart - 1)
@@ -248,8 +247,8 @@ nreps_boot <- function(instance,         # instance parameters
     if(!(max(n1j,n2j) %% 10)) cat("\nn1j =", n1j, ", n2j =", n2j)
   }
 
-  # unregister cluster if needed
-  if (local.cluster) { stopCluster(cl.nreps_boot) }
+  # unregister cluster if needed     #//DoParallel
+  # if (local.cluster) { stopCluster(cl.nreps_boot) }
 
   output <- list(x1j     = x1j,
                  x2j     = x2j,

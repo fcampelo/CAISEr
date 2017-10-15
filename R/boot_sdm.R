@@ -11,7 +11,7 @@
 #'
 #' @param x vector of observations
 #' @param boot.R (optional) number of bootstrap resamples
-#' @param ncpus (optional) number of cores to use
+#' #@param ncpus (optional) number of cores to use #//DoParallel
 #' @param seed seed for the PRNG
 #'
 #' @return vector of boostrap estimates of the sample mean
@@ -28,28 +28,30 @@
 #' my.sdm <- boot_sdm(x)
 #' qqnorm(my.sdm, pch = 20)
 #'
+#' Convergence of the SDM for a normal
 #' X <- rchisq(1000, df = 3)
 #' x1 <- rchisq(10, df = 3)
 #' x2 <- rchisq(20, df = 3)
 #' x3 <- rchisq(40, df = 3)
 #' par(mfrow = c(2, 2))
 #' plot(density(X), main = "Estimated pop distribution");
-#' hist(boot_sdm(x2), breaks = 25, main = "SDM, n = 10")
-#' hist(boot_sdm(x3), breaks = 25, main = "SDM, n = 20")
-#' hist(boot_sdm(x4), breaks = 25, main = "SDM, n = 40")
+#' hist(boot_sdm(x1), breaks = 25, main = "SDM, n = 10")
+#' hist(boot_sdm(x2), breaks = 25, main = "SDM, n = 20")
+#' hist(boot_sdm(x3), breaks = 25, main = "SDM, n = 40")
 #' par(mfrow = c(1, 1))
 
+# TESTED
 boot_sdm <- function(x,             # vector of observations
                      boot.R = 999,  # number of bootstrap resamples
-                     ncpus  = 1,    # number of cores to use
+                     #ncpus  = 1,    # number of cores to use   #//DoParallel
                      seed   = NULL) # PRNG seed
 {
 
   # ========== Error catching ========== #
   assertthat::assert_that(
     is.numeric(x), length(x) > 1,
-    assertthat::is.count(boot.R), boot.R > 1,
-    assertthat::is.count(ncpus))
+    assertthat::is.count(boot.R), boot.R > 1)
+    #assertthat::is.count(ncpus)) #//doParallel
   # ==================================== #
 
   # set PRNG seed
@@ -58,33 +60,39 @@ boot_sdm <- function(x,             # vector of observations
   }
   set.seed(seed)
 
-  # Set up doParallel
-  local.cluster <- FALSE
-  if (ncpus > 1){
-    cl.workers <- getDoParWorkers()
-    if (cl.workers < ncpus){
-      available.cores <- parallel::detectCores()
-      if (ncpus >= available.cores){
-        warning("ncpus too large, we only have ", available.cores, " cores. ",
-                "Using ", ncores - 1, " cores.")
-        ncpus <- available.cores - 1
-      }
-      if (cl.workers < ncpus){
-        cl.boot_sdm <- parallel::makeCluster(ncpus)
-        doParallel::registerDoParallel(cl.boot_sdm)
-        local.cluster <- TRUE
-      }
-    }
-  }
+  # # Set up doParallel   #//DoParallel
+  # local.cluster <- FALSE
+  # if (ncpus > 1){
+  #   cl.workers <- getDoParWorkers()
+  #   if (cl.workers < ncpus){
+  #     available.cores <- parallel::detectCores()
+  #     if (ncpus >= available.cores){
+  #       warning("ncpus too large, we only have ", available.cores, " cores. ",
+  #               "Using ", available.cores - 1, " cores.")
+  #       ncpus <- available.cores - 1
+  #     }
+  #     if (cl.workers < ncpus){
+  #       cl.boot_sdm <- parallel::makeCluster(ncpus)
+  #       doParallel::registerDoParallel(cl.boot_sdm)
+  #       local.cluster <- TRUE
+  #     }
+  #   }
+  # }
 
   # Perform bootstrap
-  x.boot <- foreach(i = 1:boot.R, .combine = c) %dopar%
-  {
-    xbar <- mean(sample(x, size = length(x), replace = TRUE))
+  x.boot <- numeric(boot.R)
+  for(i in 1:boot.R){
+    x.boot[i] <- mean(sample(x, size = length(x), replace = TRUE))
   }
 
-  # unregister cluster if needed
-  if (local.cluster) { stopCluster(cl.boot_sdm) }
+  #//DoParallel
+  # x.boot <- foreach(i = 1:boot.R, .combine = c) %dopar%
+  # {
+  #   xbar <- mean(sample(x, size = length(x), replace = TRUE))
+  # }
+
+  # unregister cluster if needed          #//DoParallel
+  # if (local.cluster) { stopCluster(cl.boot_sdm) }
 
   # Return standard error
   return(x.boot)
