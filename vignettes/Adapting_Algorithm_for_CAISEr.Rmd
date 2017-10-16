@@ -159,6 +159,7 @@ my.results <- run_experiment(Instance.list = Instance.list,
                              sig.level = 0.05,
                              se.max = 0.1,
                              dif = "perc",
+                             nstart = 10,
                              nmax   = 200,
                              seed   = 1234)
 ```
