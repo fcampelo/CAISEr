@@ -239,7 +239,13 @@ calc_nreps2 <- function(instance,         # instance parameters
                 dif = dif, method = method, boot.R = boot.R)
 
   while(SE$se > se.max & (n1j + n2j) < nmax){
+    # Echo something for the user
+    if (!(n1j + n2j) %% nstart) cat(".")
+
+    # Calculate optimal ratio
     r.opt <- calc_ropt(x1 = x1j, x2 = x2j, dif = dif)
+
+    # Sample according to r.opt
     if (n1j / n2j < r.opt) {   # sample algorithm 1
       x1j <- c(x1j, get_observations(algorithm1, instance, 1))
       n1j <- n1j + 1
@@ -247,11 +253,10 @@ calc_nreps2 <- function(instance,         # instance parameters
       x2j <- c(x2j, get_observations(algorithm2, instance, 1))
       n2j <- n2j + 1
     }
+
+    # Recalculate SE
     SE <- calc_se(x1 = x1j, x2 = x2j,
                   dif = dif, method = method, boot.R = boot.R)
-
-    # Echo something for the user
-    if (!(n1j + n2j) %% nstart) cat(".")
   }
 
   output <- list(x1j     = x1j,
