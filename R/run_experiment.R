@@ -307,6 +307,8 @@ run_experiment <- function(Instance.list,    # instance parameters
                         stringsAsFactors = FALSE)
 
     data.summary <- rbind(data.summary, sum_j)
+
+    cat("   n1j =", res_j$n1j, "; n2j =", res_j$n2j)
   }
 
   # unregister parallel cluster   #//DoParallel
