@@ -94,8 +94,8 @@ algo1 <- function(H, instance){
   # Run algorithm on "instance"
   algo.preset <- MOEADr::preset_moead("original")
   algo.preset$decomp$H <- H
-  algo.preset$stopcrit[[1]]$maxiter <- 7500 * length(fattr$pars$x$upper)
-  algo.preset
+  algo.preset$stopcrit[[1]]$name <- "maxeval"
+  algo.preset$stopcrit[[1]]$maxeval <- 7500 * length(fattr$pars$x$upper)
   out <- MOEADr::moead(preset = algo.preset, problem = problem, 
                        showpars = list(show.iters = "none"))
 
@@ -124,7 +124,8 @@ algo2 <- function(H, instance){
   # Run algorithm on "instance"
   algo.preset <- MOEADr::preset_moead("moead.de") # <--- HERE: this is the only difference
   algo.preset$decomp$H <- H
-  algo.preset$stopcrit[[1]]$maxiter <- 7500 * length(fattr$pars$x$upper)
+  algo.preset$stopcrit[[1]]$name <- "maxeval"
+  algo.preset$stopcrit[[1]]$maxeval <- 7500 * length(fattr$pars$x$upper)
   out <- MOEADr::moead(preset = algo.preset, problem = problem, 
                        showpars = list(show.iters = "none"))
 
@@ -156,7 +157,7 @@ my.results <- run_experiment(Instance.list = Instance.list,
                              power = 0.8,
                              d = 1,
                              sig.level = 0.05,
-                             se.max = 0.05,
+                             se.max = 0.1,
                              dif = "perc",
                              nmax   = 200,
                              seed   = 1234)

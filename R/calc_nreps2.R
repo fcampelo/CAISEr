@@ -249,6 +249,9 @@ calc_nreps2 <- function(instance,         # instance parameters
     }
     SE <- calc_se(x1 = x1j, x2 = x2j,
                   dif = dif, method = method, boot.R = boot.R)
+
+    # Echo something for the user
+    if (!(n1j + n2j) %% nstart) cat(".")
   }
 
   output <- list(x1j     = x1j,
