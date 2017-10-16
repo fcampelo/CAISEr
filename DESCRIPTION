@@ -1,8 +1,8 @@
 Package: CAISEr
 Type: Package
 Title: Comparison of Algorithms with Iterative Sample-size Estimation in R
-Version: 0.0.0.9100
-Date: 2017-10-11
+Version: 0.0.0.9110
+Date: 2017-10-15
 Authors@R: c(person("Felipe", "Campelo", email = "fcampelo@ufmg.br",
                     role = c("aut", "cre")),
                 person("Fernanda", "Takahashi", email = "fernandact@ufmg.br",
@@ -13,11 +13,12 @@ Description: Functions for performing experimental comparisons of algorithms
 License: GPL-2
 Depends: R (>= 3.4.0)
 Imports: assertthat (>= 0.1),
-         doParallel (>= 1.0.10)
 Suggests: MOEADr,
-          smoof
+          smoof,
+          knitr,
+          rmarkdown
 LazyData: TRUE
 Encoding: UTF-8
 RoxygenNote: 6.0.1
 Roxygen: list(markdown = TRUE)
-VignetteBuilder: pinp
+VignetteBuilder: knitr

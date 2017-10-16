@@ -1,0 +1,168 @@
+---
+title: "Adapting Algorithms for CAISEr"
+author: "Felipe Campelo"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Introduction
+This is a short guide to adapting existing algorithms and problem instances for 
+running an experiment using CAISEr. In this document, we cover:
+
+- Adaptation of existing algorithms
+- Definition of instance lists
+
+A general description of the CAISE methodology is available in our paper^[F. 
+Campelo, F. Takahashi, "Sample size estimation for power and accuracy in the 
+experimental comparison of  algorithms", under review.]
+
+## Assembling an instance list
+As stated in the documentation of both `run_experiment` and `calc_nreps2`, each 
+instance must be "_a named list containing all relevant parameters that 
+define the problem instance. This list must contain at least the field
+`instance$FUN`, with the name of the problem instance function, that is, a
+routine that calculates y = f(x). If the instance requires additional
+parameters, these must also be provided as named fields_". 
+
+In this document we assume that our problem class of interest is 
+well-represented by problems UF1 - UF7 available in package 
+[smoof](https://CRAN.R-project.org/package=smoof), for dimensions between 10 
+and 40. For these instances to work with the `MOEADr::moead()` routine some 
+manipulation is necessary, but the instance list in this case is simply a list 
+with each element containing the name of the routine as field `$FUN` (since 
+all function names are different, no need for aliases).
+
+```{r, cache=TRUE}
+suppressPackageStartupMessages(library(smoof))
+suppressPackageStartupMessages(library(MOEADr))
+
+### Build training instances and assemble instances list
+fname   <- paste0("UF_", 1:7)
+dims    <- c(10:40)
+allfuns <- expand.grid(fname, dims, stringsAsFactors = FALSE)
+
+# Assemble instances list
+Instance.list <- vector(nrow(allfuns), mode = "list")
+for (i in 1:length(Instance.list)){
+  Instance.list[[i]]$FUN <- paste0(allfuns[i,1], "_", allfuns[i,2])
+}
+
+# Build the instances in instances.list 
+# (so that they can be properly used)
+for (i in 1:nrow(allfuns)){
+  assign(x = Instance.list[[i]]$FUN,
+     value = MOEADr::make_vectorized_smoof(prob.name  = "UF",
+                    dimensions = allfuns[i, 2],
+                    id = as.numeric(strsplit(allfuns[i, 1], "_")[[1]][2])))
+}
+```
+
+## Adaptation of existing algorithms
+We will use the MOEA/D implementation available in the [MOEADr](https://CRAN.R-project.org/package=MOEADr) package as our base 
+algorithm, and assume that we are interested in comparing the performance of 
+two versions of this algorithm: the original MOEA/D and the MOEA/D-DE (see the 
+documentation of [MOEADr](https://CRAN.R-project.org/package=MOEADr) and 
+references therein for details of these methods.) as solvers of a particular 
+problem class (to be defined later in this document). The performance of each 
+algorithm on each instance will be measured according to an indicator known as 
+inverted generational distance (details 
+[here](http://ieeexplore.ieee.org/document/1197687/)).
+
+```{r, cache=TRUE}
+# Prepare function for algorithm 1:
+algo1 <- function(H, maxiter, instance){
+  # Input parameters: 
+  #     - H (for population size - see ?decomposition_sld for details)
+  #     - maxiter (maximum number of iterations - stop criterion)
+  #     - instance (instance to be solved)
+  # All other parameters set internally
+  
+  ## Adapt the instance to the MOEADr problem format
+  fdef    <- unlist(strsplit(instance$FUN, split = "_"))
+  uffun   <- smoof::makeUFFunction(dimensions = as.numeric(fdef[3]),
+                                   id         = as.numeric(fdef[2]))
+  fattr   <- attr(uffun, "par.set")
+  problem <- list(name       = instance$FUN,
+                  xmin       = fattr$pars$x$lower,
+                  xmax       = fattr$pars$x$upper,
+                  m          = attr(uffun, "n.objectives"))
+  
+  
+  # Run algorithm on "instance"
+  algo.preset <- MOEADr::preset_moead("original")
+  algo.preset$decomp$H <- H
+  algo.preset$stopcrit[[1]]$maxiter <- maxiter
+  algo.preset
+  out <- MOEADr::moead(preset = algo.preset, problem = problem, 
+                       showpars = list(show.iters = "none"))
+
+  # Read reference data and calculate IGD value
+  Yref  <- as.matrix(read.table(paste0("../inst/extdata/pf_data/",
+                                      fdef[1], fdef[2], ".dat")))
+  
+  # Return quality value as field "value" in the output list
+  return(list(value = MOEADr::calcIGD(Y = out$Y, Yref = Yref)))
+}
+
+
+# Algorithm 2 is essentially the same. 
+algo2 <- function(H, maxiter, instance){
+  ## Adapt the instance to the MOEADr problem format
+  fdef    <- unlist(strsplit(instance$FUN, split = "_"))
+  uffun   <- smoof::makeUFFunction(dimensions = as.numeric(fdef[3]),
+                                   id         = as.numeric(fdef[2]))
+  fattr   <- attr(uffun, "par.set")
+  problem <- list(name       = instance$FUN,
+                  xmin       = fattr$pars$x$lower,
+                  xmax       = fattr$pars$x$upper,
+                  m          = attr(uffun, "n.objectives"))
+  
+  
+  # Run algorithm on "instance"
+  algo.preset <- MOEADr::preset_moead("moead.de") # <--- HERE: this is the only difference
+  algo.preset$decomp$H <- H
+  algo.preset$stopcrit[[1]]$maxiter <- maxiter
+  out <- MOEADr::moead(preset = algo.preset, problem = problem, 
+                       showpars = list(show.iters = "none"))
+
+  # Read reference data and calculate IGD value
+  Yref  <- as.matrix(read.table(paste0("../inst/extdata/pf_data/",
+                                      fdef[1], fdef[2], ".dat")))
+  
+  # Return quality value as field "value" in the output list
+  return(list(value = MOEADr::calcIGD(Y = out$Y, Yref = Yref)))
+}
+
+
+# Assemble Algorithm.list
+Algorithm.list <- list(list(FUN = "algo1", alias = "Algorithm 1", 
+                            H = 99, maxiter = 200), 
+                       list(FUN = "algo2", alias = "Algorithm 2", 
+                            H = 99, maxiter = 200))
+```
+
+## Running an experiment using CAISEr
+
+With the definition above it is possible now to run a simple experiment 
+using the iterative sample size determination implemented in CAISEr. For 
+that, all we have to do is define the desired experimental parameters and 
+use `run_experiment()`:
+
+```{r, cache=TRUE}
+library(CAISEr)
+my.results <- run_experiment(Instance.list = Instance.list,
+                             Algorithm.list = Algorithm.list,
+                             power = 0.8,
+                             d = 1,
+                             sig.level = 0.01,
+                             se.max = 0.05,
+                             dif = "perc",
+                             nmax   = 200,
+                             seed   = 1234)
+```
+
+

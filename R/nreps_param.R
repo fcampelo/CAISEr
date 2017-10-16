@@ -47,6 +47,7 @@
 #'          # remove '$FUN' field from list of arguments
 #'          # and include the problem definition as field 'instance'
 #'          myargs          <- algorithm[names(algorithm) != "FUN"]
+#'          myargs          <- myargs[names(myargs) != "alias"]
 #'          myargs$instance <- instance
 #'
 #'          # call function

@@ -52,6 +52,7 @@
 #'          # remove '$FUN' field from list of arguments
 #'          # and include the problem definition as field 'instance'
 #'          myargs          <- algorithm[names(algorithm) != "FUN"]
+#'          myargs          <- myargs[names(myargs) != "alias"]
 #'          myargs$instance <- instance
 #'
 #'          # call function
@@ -291,8 +292,8 @@ run_experiment <- function(Instance.list,    # instance parameters
 
     # Update result dataframes
     nj    <- res_j$n1j + res_j$n2j
-    raw_j <- data.frame(Algorithm   = c(rep(algorithm1$alias, res_j$n1j),
-                                        rep(algorithm2$alias, res_j$n2j)),
+    raw_j <- data.frame(Algorithm = c(rep(Algorithm.list[[1]]$alias, res_j$n1j),
+                                     rep(Algorithm.list[[2]]$alias, res_j$n2j)),
                         Instance    = rep(instance$alias, nj),
                         Observation = c(res_j$x1j, res_j$x2j),
                         stringsAsFactors = FALSE)
