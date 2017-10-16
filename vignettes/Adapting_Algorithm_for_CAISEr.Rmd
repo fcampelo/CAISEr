@@ -74,10 +74,9 @@ inverted generational distance (details
 
 ```{r, cache=TRUE}
 # Prepare function for algorithm 1:
-algo1 <- function(H, maxiter, instance){
+algo1 <- function(H, instance){
   # Input parameters: 
   #     - H (for population size - see ?decomposition_sld for details)
-  #     - maxiter (maximum number of iterations - stop criterion)
   #     - instance (instance to be solved)
   # All other parameters set internally
   
@@ -95,7 +94,7 @@ algo1 <- function(H, maxiter, instance){
   # Run algorithm on "instance"
   algo.preset <- MOEADr::preset_moead("original")
   algo.preset$decomp$H <- H
-  algo.preset$stopcrit[[1]]$maxiter <- maxiter
+  algo.preset$stopcrit[[1]]$maxiter <- 7500 * length(fattr$pars$x$upper)
   algo.preset
   out <- MOEADr::moead(preset = algo.preset, problem = problem, 
                        showpars = list(show.iters = "none"))
@@ -110,7 +109,7 @@ algo1 <- function(H, maxiter, instance){
 
 
 # Algorithm 2 is essentially the same. 
-algo2 <- function(H, maxiter, instance){
+algo2 <- function(H, instance){
   ## Adapt the instance to the MOEADr problem format
   fdef    <- unlist(strsplit(instance$FUN, split = "_"))
   uffun   <- smoof::makeUFFunction(dimensions = as.numeric(fdef[3]),
@@ -125,7 +124,7 @@ algo2 <- function(H, maxiter, instance){
   # Run algorithm on "instance"
   algo.preset <- MOEADr::preset_moead("moead.de") # <--- HERE: this is the only difference
   algo.preset$decomp$H <- H
-  algo.preset$stopcrit[[1]]$maxiter <- maxiter
+  algo.preset$stopcrit[[1]]$maxiter <- 7500 * length(fattr$pars$x$upper)
   out <- MOEADr::moead(preset = algo.preset, problem = problem, 
                        showpars = list(show.iters = "none"))
 
@@ -139,10 +138,8 @@ algo2 <- function(H, maxiter, instance){
 
 
 # Assemble Algorithm.list
-Algorithm.list <- list(list(FUN = "algo1", alias = "Algorithm 1", 
-                            H = 99, maxiter = 200), 
-                       list(FUN = "algo2", alias = "Algorithm 2", 
-                            H = 99, maxiter = 200))
+Algorithm.list <- list(list(FUN = "algo1", alias = "Algorithm 1", H = 99), 
+                       list(FUN = "algo2", alias = "Algorithm 2", H = 99))
 ```
 
 ## Running an experiment using CAISEr
@@ -158,7 +155,7 @@ my.results <- run_experiment(Instance.list = Instance.list,
                              Algorithm.list = Algorithm.list,
                              power = 0.8,
                              d = 1,
-                             sig.level = 0.01,
+                             sig.level = 0.05,
                              se.max = 0.05,
                              dif = "perc",
                              nmax   = 200,
