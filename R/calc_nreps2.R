@@ -139,7 +139,7 @@
 #'
 #' @examples
 #' # Uses dummy algorithms and a dummy instance to illustrate the
-#' # use of nreps_boot
+#' # use of calc_nreps2
 #' algorithm1 <- list(FUN = "dummyalgo", alias = "algo1",
 #'                    distribution.fun = "rnorm",
 #'                    distribution.pars = list(mean = 10, sd = 1))

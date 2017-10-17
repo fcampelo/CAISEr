@@ -75,11 +75,11 @@ inverted generational distance (details
 ```{r, cache=TRUE}
 # Prepare function for algorithm 1:
 algo1 <- function(H, instance){
-  # Input parameters: 
+  # Input parameters:
   #     - H (for population size - see ?decomposition_sld for details)
   #     - instance (instance to be solved)
   # All other parameters set internally
-  
+
   ## Adapt the instance to the MOEADr problem format
   fdef    <- unlist(strsplit(instance$FUN, split = "_"))
   uffun   <- smoof::makeUFFunction(dimensions = as.numeric(fdef[3]),
@@ -89,26 +89,26 @@ algo1 <- function(H, instance){
                   xmin       = fattr$pars$x$lower,
                   xmax       = fattr$pars$x$upper,
                   m          = attr(uffun, "n.objectives"))
-  
-  
+
+
   # Run algorithm on "instance"
   algo.preset <- MOEADr::preset_moead("original")
   algo.preset$decomp$H <- H
   algo.preset$stopcrit[[1]]$name <- "maxeval"
-  algo.preset$stopcrit[[1]]$maxeval <- 7500 * length(fattr$pars$x$upper)
-  out <- MOEADr::moead(preset = algo.preset, problem = problem, 
+  algo.preset$stopcrit[[1]]$maxeval <- 2000 * fattr$pars$x$len
+  out <- MOEADr::moead(preset = algo.preset, problem = problem,
                        showpars = list(show.iters = "none"))
 
   # Read reference data and calculate IGD value
   Yref  <- as.matrix(read.table(paste0("../inst/extdata/pf_data/",
-                                      fdef[1], fdef[2], ".dat")))
-  
+                                       fdef[1], fdef[2], ".dat")))
+
   # Return quality value as field "value" in the output list
   return(list(value = MOEADr::calcIGD(Y = out$Y, Yref = Yref)))
 }
 
 
-# Algorithm 2 is essentially the same. 
+# Algorithm 2 is essentially the same.
 algo2 <- function(H, instance){
   ## Adapt the instance to the MOEADr problem format
   fdef    <- unlist(strsplit(instance$FUN, split = "_"))
@@ -119,20 +119,20 @@ algo2 <- function(H, instance){
                   xmin       = fattr$pars$x$lower,
                   xmax       = fattr$pars$x$upper,
                   m          = attr(uffun, "n.objectives"))
-  
-  
+
+
   # Run algorithm on "instance"
   algo.preset <- MOEADr::preset_moead("moead.de") # <--- HERE: this is the only difference
   algo.preset$decomp$H <- H
   algo.preset$stopcrit[[1]]$name <- "maxeval"
-  algo.preset$stopcrit[[1]]$maxeval <- 7500 * length(fattr$pars$x$upper)
-  out <- MOEADr::moead(preset = algo.preset, problem = problem, 
+  algo.preset$stopcrit[[1]]$maxeval <- 2000 * fattr$pars$x$len
+  out <- MOEADr::moead(preset = algo.preset, problem = problem,
                        showpars = list(show.iters = "none"))
 
   # Read reference data and calculate IGD value
   Yref  <- as.matrix(read.table(paste0("../inst/extdata/pf_data/",
-                                      fdef[1], fdef[2], ".dat")))
-  
+                                       fdef[1], fdef[2], ".dat")))
+
   # Return quality value as field "value" in the output list
   return(list(value = MOEADr::calcIGD(Y = out$Y, Yref = Yref)))
 }
@@ -151,7 +151,7 @@ that, all we have to do is define the desired experimental parameters and
 use `run_experiment()`:
 
 ```{r, cache=TRUE}
-library(CAISEr)
+#library(CAISEr)
 my.results <- run_experiment(Instance.list = Instance.list,
                              Algorithm.list = Algorithm.list,
                              power = 0.8,
@@ -164,4 +164,5 @@ my.results <- run_experiment(Instance.list = Instance.list,
                              seed   = 1234)
 ```
 
+After that we can interrogate the results and perform inference, if needed:
 
