@@ -13,8 +13,9 @@ vignette: >
 This is a short guide to adapting existing algorithms and problem instances for 
 running an experiment using CAISEr. In this document, we cover:
 
-- Adaptation of existing algorithms
 - Definition of instance lists
+- Adaptation of existing algorithms
+- Some stuff you can do with the results
 
 A general description of the CAISE methodology is available in our paper^[F. 
 Campelo, F. Takahashi, "Sample size estimation for power and accuracy in the 
@@ -70,7 +71,8 @@ references therein for details of these methods.) as solvers of a particular
 problem class (to be defined later in this document). The performance of each 
 algorithm on each instance will be measured according to an indicator known as 
 inverted generational distance (details 
-[here](http://ieeexplore.ieee.org/document/1197687/)).
+[here](http://ieeexplore.ieee.org/document/1197687/)). With this indicator, 
+_smaller = better_.
 
 ```{r, cache=TRUE}
 # Prepare function for algorithm 1:
@@ -127,15 +129,42 @@ use `run_experiment()`:
 #library(CAISEr)
 my.results <- run_experiment(Instance.list = Instance.list,
                              Algorithm.list = Algorithm.list,
-                             power = 0.8,
-                             d = 1,
-                             sig.level = 0.05,
-                             se.max = 0.1,
-                             dif = "perc",
-                             nstart = 10,
-                             nmax   = 200,
-                             seed   = 1234)
+                             power = 0.8,      # Desired power: 80%
+                             d = 0.5,          # to detect differences greater
+                                               # than 0.5 standard deviations
+                             sig.level = 0.05, # at a 95% confidence level. 
+                             se.max = 0.05,    # Measurement error: 5% 
+                             dif = "perc",     # on the paired percent 
+                                               # differences of means,
+                             method = "boot",  # calculated using bootstrap
+                             nstart = 20,      # Start with 20 runs/algo/inst
+                             nmax   = 200,     # and do no more than 200/inst
+                             seed   = 1234)    # PRNG seed (for reproducibility)
 ```
 
-After that we can interrogate the results and perform inference, if needed:
+After that we can interrogate the results and perform inference, if we are so 
+inclined. 
+For instance, we can check if our sample of paired differences in performance 
+is (at least approximately) Normal, so that we can assume a Normal sampling 
+distribution of the means and use a t test with a clean conscience:
+inference on the mean of the paired diffences in performance 
+can be easily done with a t test.
+
+```{r, cache=TRUE}
+# Take a look at the data summary:
+my.results$data.summary
+
+suppressPackageStartupMessages(library(car))
+qqPlot(my.results$data.summary$phi.j, pch = 20, las = 1)
+```
+
+It is interesting to notice that in most tested instances we see negative 
+values of `phi_j`, which suggests an advantage of the MOEA/D-De over the 
+original MOEA/D. MOEA/D-DE also seems to require smaller sample sizes in most 
+instances, suggesting a smaller variance of performance. The first observation 
+can be tested with a t test:
+
+```{r, cache=TRUE}
+t.test(my.results$data.summary$phi.j)
+```
 
