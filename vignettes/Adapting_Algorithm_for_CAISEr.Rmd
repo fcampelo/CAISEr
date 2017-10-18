@@ -9,7 +9,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-# Introduction
+## Introduction
 This is a short guide to adapting existing algorithms and problem instances for 
 running an experiment using CAISEr. In this document, we cover:
 
@@ -17,31 +17,37 @@ running an experiment using CAISEr. In this document, we cover:
 - Adaptation of existing algorithms
 - Some stuff you can do with the results
 
-A general description of the CAISE methodology is available in our paper^[F. 
+A general description of the CAISE methodology is available in our paper.^[F. 
 Campelo, F. Takahashi, "Sample size estimation for power and accuracy in the 
 experimental comparison of  algorithms", under review.]
 
 ## Assembling an instance list
 As stated in the documentation of both `run_experiment` and `calc_nreps2`, each 
-instance must be "_a named list containing all relevant parameters that 
+instance must be a named list containing all relevant parameters that 
 define the problem instance. This list must contain at least the field
 `instance$FUN`, with the name of the problem instance function, that is, a
-routine that calculates y = f(x). If the instance requires additional
-parameters, these must also be provided as named fields_". 
+routine that calculates $y = f(x)$. If the instance requires additional
+parameters, these must also be provided as named fields. Each instance can 
+also have an `alias`, a unique name to distinguish it from other instances. If 
+no alias is provided, the name of the function (`instance$FUN`) is used as the 
+instance ID.
 
-In this document we assume that our problem class of interest is 
-well-represented by problems UF1 - UF7 available in package 
-[smoof](https://CRAN.R-project.org/package=smoof), for dimensions between 10 
-and 40. For these instances to work with the `MOEADr::moead()` routine some 
+The `Instance.list` parameter for `run_experiment()` is simply a vector of these instance lists.
+
+To illustrate how to adapt existing implementations to this structure, we 
+assume that we are interested in comparing two multiobjective optimization 
+algorithms for a (hypothetical) problem class that is well-represented by 
+problems UF1 - UF7 (in dimensions between 10 and 40) from package 
+[smoof](https://CRAN.R-project.org/package=smoof), . For this implementation to work with the `MOEADr::moead()` routine (see next section) some 
 manipulation is necessary, but the instance list in this case is simply a list 
 with each element containing the name of the routine as field `$FUN` (since 
 all function names are different, no need for aliases).
 
-```{r, cache=TRUE}
+```{r}
 suppressPackageStartupMessages(library(smoof))
 suppressPackageStartupMessages(library(MOEADr))
 
-### Build training instances and assemble instances list
+### Build function names (instances: UF1 - UF7, dimensions 10 - 40)
 fname   <- paste0("UF_", 1:7)
 dims    <- c(10:40)
 allfuns <- expand.grid(fname, dims, stringsAsFactors = FALSE)
@@ -52,7 +58,7 @@ for (i in 1:length(Instance.list)){
   Instance.list[[i]]$FUN <- paste0(allfuns[i,1], "_", allfuns[i,2])
 }
 
-# Build the instances in instances.list 
+### Build the functions listed in Instance.list
 # (so that they can be properly used)
 for (i in 1:nrow(allfuns)){
   assign(x = Instance.list[[i]]$FUN,
@@ -62,70 +68,122 @@ for (i in 1:nrow(allfuns)){
 }
 ```
 
-## Adaptation of existing algorithms
+## Adaptation of an existing algorithm implementation
 We will use the MOEA/D implementation available in the [MOEADr](https://CRAN.R-project.org/package=MOEADr) package as our base 
 algorithm, and assume that we are interested in comparing the performance of 
 two versions of this algorithm: the original MOEA/D and the MOEA/D-DE (see the 
 documentation of [MOEADr](https://CRAN.R-project.org/package=MOEADr) and 
-references therein for details of these methods.) as solvers of a particular 
-problem class (to be defined later in this document). The performance of each 
-algorithm on each instance will be measured according to an indicator known as 
-inverted generational distance (details 
-[here](http://ieeexplore.ieee.org/document/1197687/)). With this indicator, 
+references therein for details of these methods) as solvers of the hypothetical 
+problem class represented by the available test instances. The performance of 
+each algorithm on each instance will be measured according to an indicator 
+known as _Inverted Generational Distance_ (IGD - details 
+[here](http://ieeexplore.ieee.org/document/1197687/)), for which 
 _smaller = better_.
 
-```{r, cache=TRUE}
-# Prepare function for algorithm 1:
-algorithm <- function(type, instance){
+As described in the documentation of both `run_experiment()` and 
+`calc_nreps2()`, an `algorithm` must contain an `algorithm$FUN` field (the name
+of the function that calls the algorithm) and any other elements/parameters
+that `algorithm$FUN` requires (e.g., stop criteria, operator names and
+parameters, etc.). An additional field, `algorithm$alias`, can be used to
+provide the algorithm with a unique identifier. 
+
+Supposing that the list in `algorithm` has fields `algorithm$FUN = myalgo`, `algorithm$par1 = "a"`, `algorithm$par2 = 5`, then the function in 
+`algorithm$FUN` must have the following structure:
+
+```
+myalgo <- function(par1, par2, instance, ...){
+  # do stuff
+  return(results)
+}
+```
+
+That is, it must be able to run if called as:
+
+```
+# remove '$FUN' and '$alias' field from list of arguments
+# and include the problem definition as field 'instance'
+myargs          <- algorithm[names(algorithm) != "FUN"]
+myargs          <- myargs[names(myargs) != "alias"]
+myargs$instance <- instance
+
+# call 'algorithm$FUN' with the arguments in 'myargs'
+do.call(algorithm$FUN, args = myargs)
+```
+
+Finally, the `algorithm$FUN` routine must return a list object containing (at
+least) the performance value of the final solution obtained after a given
+run, in a field named `value` (e.g., `result$value`) .
+
+To build the algorithm functions to be used in `run_experiment()`, we 
+encapsulate (almost) all algorithm parameters within a `myalgo()` function, 
+which receives only two inputs: the instance to be solved (i.e., one element 
+from `Instance.list`) and the specification of which version of the algorithm 
+is to be run (the _original MOEA/D_ or the _MOEA/D-DE_).
+
+```{r}
+# Prepare algorithm function to be used in run_experiment():
+myalgo <- function(type, instance){
   # Input parameters:
   #     - type (variant to use: "original" or "moead.de")
-  #     - instance (instance to be solved, e.g., Instance.list[[1]])
+  #     - instance (instance to be solved, e.g., instance = Instance.list[[i]])
   # All other parameters are set internally
 
-  ## Adapt the instance to the MOEADr problem format
-  fdef    <- unlist(strsplit(instance$FUN, split = "_"))
-  uffun   <- smoof::makeUFFunction(dimensions = as.numeric(fdef[3]),
-                                   id         = as.numeric(fdef[2]))
-  fattr   <- attr(uffun, "par.set")
-  problem <- list(name       = instance$FUN,
-                  xmin       = fattr$pars$x$lower,
-                  xmax       = fattr$pars$x$upper,
-                  m          = attr(uffun, "n.objectives"))
+  ## Extract instance information to build the MOEADr problem format
+  fdef  <- unlist(strsplit(instance$FUN, split = "_"))
+  uffun <- smoof::makeUFFunction(dimensions = as.numeric(fdef[3]),
+                                 id         = as.numeric(fdef[2]))
+  fattr <- attr(uffun, "par.set")
+  
+  ## Build MOEADr problem list
+  problem <- list(name = instance$FUN,
+                  xmin = fattr$pars$x$lower,
+                  xmax = fattr$pars$x$upper,
+                  m    = attr(uffun, "n.objectives"))
 
-
-  # Run algorithm on "instance"
+  ## Load presets for the algorithm provided in input 'type' and 
+  ## modify whatever is needed for this particular experiment
   algo.preset <- MOEADr::preset_moead(type)
-  algo.preset$decomp$H <- 99
-  algo.preset$stopcrit[[1]]$name <- "maxeval"
-  algo.preset$stopcrit[[1]]$maxeval <- 2000 * fattr$pars$x$len
+  algo.preset$decomp$H <- 99 # <-- set population size
+  algo.preset$stopcrit[[1]]$name <- "maxeval" # <-- type of stop criterion
+  algo.preset$stopcrit[[1]]$maxeval <- 2000 * fattr$pars$x$len # stop crit.
+  
+  ## Run algorithm on "instance"
   out <- MOEADr::moead(preset = algo.preset, problem = problem,
                        showpars = list(show.iters = "none"))
 
-  # Read reference data and calculate IGD value
+  ## Read reference data to calculate the IGD
   Yref  <- as.matrix(read.table(paste0("../inst/extdata/pf_data/",
                                        fdef[1], fdef[2], ".dat")))
+  IGD = MOEADr::calcIGD(Y = out$Y, Yref = Yref)
 
-  # Return quality value as field "value" in the output list
-  return(list(value = MOEADr::calcIGD(Y = out$Y, Yref = Yref)))
+  ## Return IGD as field "value" in the output list
+  return(list(value = IGD))
 }
+```
 
-# Assemble Algorithm.list
-Algorithm.list <- list(list(FUN   = "algorithm", 
+Finally, the `Algorithm.list` parameter must be assembled as a list of 
+algorithm objects (each containing fields `$FUN`, `$alias` and, in 
+this case, `$type`).
+
+```{r}
+# Assemble Algorithm.list. Notice that we need to provide an alias for each 
+# method, since both algorithms have the same '$FUN' argument.
+Algorithm.list <- list(list(FUN   = "myalgo", 
                             alias = "Algorithm 1", 
                             type  = "original"), 
-                       list(FUN   = "algorithm", 
-                            alias = "Algorithm 1", 
+                       list(FUN   = "myalgo", 
+                            alias = "Algorithm 2", 
                             type  = "moead.de"))
 ```
 
 ## Running an experiment using CAISEr
 
-With the definition above it is possible now to run a simple experiment 
+With the definitions above it is possible now to run an experiment 
 using the iterative sample size determination implemented in CAISEr. For 
 that, all we have to do is define the desired experimental parameters and 
 use `run_experiment()`:
 
-```{r, cache=TRUE}
+```{r, cache=TRUE, eval=TRUE}
 #library(CAISEr)
 my.results <- run_experiment(Instance.list = Instance.list,
                              Algorithm.list = Algorithm.list,
@@ -136,9 +194,9 @@ my.results <- run_experiment(Instance.list = Instance.list,
                              se.max = 0.05,    # Measurement error: 5% 
                              dif = "perc",     # on the paired percent 
                                                # differences of means,
-                             method = "boot",  # calculated using bootstrap
-                             nstart = 20,      # Start with 20 runs/algo/inst
-                             nmax   = 200,     # and do no more than 200/inst
+                             method = "boot",  # calculated using bootstrap.
+                             nstart = 15,      # Start with 20 runs/algo/inst
+                             nmax   = 200,     # and do no more than 200 runs/inst
                              seed   = 1234)    # PRNG seed (for reproducibility)
 ```
 
@@ -150,21 +208,62 @@ distribution of the means and use a t test with a clean conscience:
 inference on the mean of the paired diffences in performance 
 can be easily done with a t test.
 
-```{r, cache=TRUE}
+```{r, fig.align="center", fig.width=5, fig.height=5, fig.}
 # Take a look at the data summary:
 my.results$data.summary
 
 suppressPackageStartupMessages(library(car))
-qqPlot(my.results$data.summary$phi.j, pch = 20, las = 1)
+car::qqPlot(my.results$data.summary$phi.j, 
+            pch = 20, las = 1, 
+            ylab = "observed results", xlab = "theoretical quantiles")
 ```
 
-It is interesting to notice that in most tested instances we see negative 
-values of `phi_j`, which suggests an advantage of the MOEA/D-De over the 
-original MOEA/D. MOEA/D-DE also seems to require smaller sample sizes in most 
-instances, suggesting a smaller variance of performance. The first observation 
-can be tested with a t test:
+The normal QQ plot indicates that no expressive deviations of normality are 
+present, which gives us confidence in using the t test as our inferential 
+procedure of choice (as the sampling distribution of the means will be even more 
+"well-behaved" than the data distribution.
 
-```{r, cache=TRUE}
+It is also interesting to observe a few things from the summary table. First, 
+we observed negative values of `phi_j` in the majority of instances tested, 
+which suggests an advantage of the MOEA/D-De over the original MOEA/D (remember, 
+_smaller = better_ for the quality indicator used). The MOEA/D-DE seems to 
+require smaller sample sizes in most instances, suggesting a smaller variance of performance, which is also a desirable feature. Also, in three instances 
+(UF\_5\_28, UF\_3\_29 and UF_\5_\17) the maximum number of runs/instance 
+(`nmax = 200` in the `run_experiment()` call) was not enough to reduce the 
+standard error (our "measurement error" on the values of `phi_j`) below the 
+predefined threshold of $0.05$. There is no reason to worry in this particular 
+case, however, since the resulting standard errors were not particularly high, 
+and therefore their effect on the test power (resulting from the increased 
+uncertainty in the estimation of these particular `phi_j` values) will be insignificant.
+
+Since our observations `phi_j`  already express paired differences per instance, we can compare the two algorithms using a simple, one-sample t.test:
+
+```{r}
 t.test(my.results$data.summary$phi.j)
 ```
 
+which indicates a statistically significant advantage of the MOEA/D-DE over the 
+original MOEA/D ($p = 5.05\times10^{-5}, df=33$), with estimated mean 
+IGD gains of $34.53\%$ ($CI_{0.95} = [19.44\%,49.61\%]$) over the original 
+MOEA/D for instances belonging to the problem class of interest.
+
+These results could also be used to motivate further analyses. For instance, 
+we can observe in the summary table that the only two cases for which the 
+MOEA/D was substantially better than the MOEA/D-DE were for different 
+instantiations of problem UF\_5, which could suggest that some specific 
+feature of this problem jeopardizes the latter algorithm's search mechanism. 
+This could motivate research on which particular aspect of this problem results 
+in this loss of performance, and on how to improve the MOEA/D-DE.
+
+Finally, the full data of the experiment is contained in other fields contained 
+in the output list `my.results`, and the user is encouraged to explore these. 
+As an example, we can generate box plots and confidence intervals on the mean differences in performance for each sampled instance, which could again motivate further investigations.
+
+```{r}
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(ggplot2))
+
+myplot <- ggplot2::ggplot(my.results$data.raw, 
+                          aes(x = Instance, y = Observation, fill = Algorithm))
+myplot+geom_boxplot()
+```

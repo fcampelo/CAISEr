@@ -29,7 +29,7 @@
 #' An `algorithm` must contain a `algorithm$FUN` field (the name
 #' of the function that calls the algorithm) and any other elements/parameters
 #' that `algorithm$FUN` requires (e.g., stop criteria, operator names and
-#' parameters, etc.). An additional field, "algorithm$alias", can be used to
+#' parameters, etc.). An additional field, `algorithm$alias`, can be used to
 #' provide the algorithm with a unique identifier (e.g., when comparing two
 #' different configurations of the same algorithm).
 #'
@@ -49,7 +49,7 @@
 #' That is, it must be able to run if called as:
 #'
 #'    \preformatted{
-#'          # remove '$FUN' field from list of arguments
+#'          # remove '$FUN' and '$alias' from list of arguments
 #'          # and include the problem definition as field 'instance'
 #'          myargs          <- algorithm[names(algorithm) != "FUN"]
 #'          myargs          <- myargs[names(myargs) != "alias"]
@@ -308,7 +308,7 @@ run_experiment <- function(Instance.list,    # instance parameters
 
     data.summary <- rbind(data.summary, sum_j)
 
-    cat("   n1j =", res_j$n1j, "; n2j =", res_j$n2j)
+    cat("\t\tn1j =", res_j$n1j, ";\t\tn2j =", res_j$n2j)
   }
 
   # unregister parallel cluster   #//DoParallel
