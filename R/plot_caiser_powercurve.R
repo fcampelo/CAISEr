@@ -28,7 +28,7 @@ plot.caiser.powercurve <- function(object,...)
   myvals <- summary(object)
   d <- object$d
   power <- object$power
-  plot(d, power, type = "b", pch = 20, cex = 0.8, main = "Power curve")
+  plot(d, power, type = "b", pch = 20, cex = 0.8, main = "Power curve", las = 1)
   for (i in 1:nrow(myvals)){
     x <- myvals$d[i]
     y <- myvals$power[i]

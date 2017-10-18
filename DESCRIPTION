@@ -19,7 +19,8 @@ Suggests: MOEADr,
           rmarkdown,
           car,
           dplyr,
-          ggplot2
+          ggplot2,
+          xtable
 LazyData: TRUE
 Encoding: UTF-8
 RoxygenNote: 6.0.1

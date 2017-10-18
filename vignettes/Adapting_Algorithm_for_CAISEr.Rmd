@@ -132,7 +132,8 @@ myalgo <- function(type, instance){
   fdef  <- unlist(strsplit(instance$FUN, split = "_"))
   uffun <- smoof::makeUFFunction(dimensions = as.numeric(fdef[3]),
                                  id         = as.numeric(fdef[2]))
-  fattr <- attr(uffun, "par.set")
+  fattr    <- attr(uffun, "par.set")
+  prob.dim <- fattr$pars$x$len
   
   ## Build MOEADr problem list
   problem <- list(name = instance$FUN,
@@ -142,10 +143,14 @@ myalgo <- function(type, instance){
 
   ## Load presets for the algorithm provided in input 'type' and 
   ## modify whatever is needed for this particular experiment
+  
   algo.preset <- MOEADr::preset_moead(type)
   algo.preset$decomp$H <- 99 # <-- set population size
   algo.preset$stopcrit[[1]]$name <- "maxeval" # <-- type of stop criterion
-  algo.preset$stopcrit[[1]]$maxeval <- 2000 * fattr$pars$x$len # stop crit.
+  algo.preset$stopcrit[[1]]$maxeval <- 2000 * prob.dim # stop crit.
+  poly.ind <- which(sapply(algo.preset$variation,
+                           function(x){x$name == "polymut"}))
+  algo.preset$variation[[poly.ind]]$pm <- 1 / prob.dim # <--- pm = 1/d
   
   ## Run algorithm on "instance"
   out <- MOEADr::moead(preset = algo.preset, problem = problem,
@@ -205,8 +210,6 @@ inclined.
 For instance, we can check if our sample of paired differences in performance 
 is (at least approximately) Normal, so that we can assume a Normal sampling 
 distribution of the means and use a t test with a clean conscience:
-inference on the mean of the paired diffences in performance 
-can be easily done with a t test.
 
 ```{r, fig.align="center", fig.width=5, fig.height=5, fig.}
 # Take a look at the data summary:
@@ -221,11 +224,11 @@ car::qqPlot(my.results$data.summary$phi.j,
 The normal QQ plot indicates that no expressive deviations of normality are 
 present, which gives us confidence in using the t test as our inferential 
 procedure of choice (as the sampling distribution of the means will be even more 
-"well-behaved" than the data distribution.
+"well-behaved" than the data distribution).
 
 It is also interesting to observe a few things from the summary table. First, 
 we observed negative values of `phi_j` in the majority of instances tested, 
-which suggests an advantage of the MOEA/D-De over the original MOEA/D (remember, 
+which suggests an advantage of the MOEA/D-DE over the original MOEA/D (remember, 
 _smaller = better_ for the quality indicator used). The MOEA/D-DE seems to 
 require smaller sample sizes in most instances, suggesting a smaller variance of performance, which is also a desirable feature. Also, in three instances 
 (UF\_5\_28, UF\_3\_29 and UF_\5_\17) the maximum number of runs/instance 
