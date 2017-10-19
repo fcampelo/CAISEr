@@ -14,6 +14,8 @@
 #'
 #' @author Felipe Campelo (\email{fcampelo@@ufmg.br})
 #'
+#' @export
+#'
 #' @examples
 #' algorithm <- list(FUN = "dummyalgo", alias = "myalgo",
 #'                   distribution.fun = "rnorm",

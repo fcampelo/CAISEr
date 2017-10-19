@@ -19,6 +19,8 @@
 #'
 #' @author Felipe Campelo (\email{fcampelo@@ufmg.br})
 #'
+#' @export
+#'
 #' @examples
 #' # two vectors of normally distributed observations
 #' set.seed(1234)
