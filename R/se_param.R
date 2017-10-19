@@ -53,8 +53,8 @@ se_param <- function(x1,  # vector of observations
     # ==================================== #
 
     # Estimates
-    v1    <- var(x1)
-    v2    <- var(x2)
+    v1    <- stats::var(x1)
+    v2    <- stats::var(x2)
     xbar1 <- mean(x1)
     xbar2 <- mean(x2)
     n1    <- length(x1)

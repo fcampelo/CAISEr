@@ -21,6 +21,8 @@
 #'
 #' @author Felipe Campelo (\email{fcampelo@@ufmg.br})
 #'
+#' @export
+#'
 #' @examples
 #' x1 <- rnorm(25, 3, 0.5)
 #' x2 <- runif(15, 4, 6)

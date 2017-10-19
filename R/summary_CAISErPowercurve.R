@@ -1,4 +1,4 @@
-#' summary.caiser.powercurve
+#' summary.CAISErPowercurve
 #'
 #' S3 method for summarizing _caiser.powercurve_ objects (the output of
 #' [calc_power_curve()]).
@@ -16,12 +16,12 @@
 #'
 
 # TESTED
-summary.caiser.powercurve <- function(object,...)
+summary.CAISErPowercurve <- function(object,...)
 {
 
   # ========== Error catching ========== #
   assertthat::assert_that(
-    "caiser.powercurve" %in% class(object),
+    "CAISErPowercurve" %in% class(object),
     length(object$d) == length(object$power))
   # ==================================== #
 

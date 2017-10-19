@@ -31,6 +31,8 @@
 #' # Theoretical (Fieller, no covariance) SE for percent differences: 0.04
 #' se_boot(x1, x2, dif = "perc")
 
+# @param ncpus number of cores to use. #//DoParallel
+
 # TESTED
 se_boot <- function(x1,           # vector of observations
                     x2,           # vector of observations
@@ -64,5 +66,5 @@ se_boot <- function(x1,           # vector of observations
   # }
 
   # Return standard error
-  return(sd(phi.hat))
+  return(stats::sd(phi.hat))
 }

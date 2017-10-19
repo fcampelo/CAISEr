@@ -18,6 +18,8 @@
 #'
 #' @author Felipe Campelo (\email{fcampelo@@ufmg.br})
 #'
+#' @export
+#'
 #' @examples
 #' set.seed(1234)
 #' x1 <- rnorm(25, 5, 1)
@@ -39,8 +41,8 @@ calc_ropt <- function(x1,   # vector of observations
     dif %in% c('simple', 'perc'))
   # ==================================== #
 
-  s1 <- sd(x1)
-  s2 <- sd(x2)
+  s1 <- stats::sd(x1)
+  s2 <- stats::sd(x2)
   if (dif == "simple"){
     r.opt <- s1 / s2
   } else if (dif == "perc"){

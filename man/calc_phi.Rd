@@ -37,6 +37,12 @@ comparison of algorithms (submitted, 2017).
 }
 }
 
+\examples{
+x1 <- rnorm(25, 3, 0.5)
+x2 <- runif(15, 4, 6)
+calc_phi(x1, x2, "simple")
+calc_phi(x1, x2, "perc")
+}
 \author{
 Felipe Campelo (\email{fcampelo@ufmg.br})
 }

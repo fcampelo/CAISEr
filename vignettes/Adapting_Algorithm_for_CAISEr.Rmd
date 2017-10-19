@@ -188,7 +188,7 @@ using the iterative sample size determination implemented in CAISEr. For
 that, all we have to do is define the desired experimental parameters and 
 use `run_experiment()`:
 
-```{r, cache=TRUE, eval=TRUE}
+```{r, eval=FALSE}
 #library(CAISEr)
 my.results <- run_experiment(Instance.list = Instance.list,
                              Algorithm.list = Algorithm.list,
@@ -205,13 +205,17 @@ my.results <- run_experiment(Instance.list = Instance.list,
                              seed   = 1234)    # PRNG seed (for reproducibility)
 ```
 
+```{r, echo=FALSE}
+load("../inst/extdata/vignette_results.RData")
+```
+
 After that we can interrogate the results and perform inference, if we are so 
 inclined. 
 For instance, we can check if our sample of paired differences in performance 
 is (at least approximately) Normal, so that we can assume a Normal sampling 
 distribution of the means and use a t test with a clean conscience:
 
-```{r, fig.align="center", fig.width=5, fig.height=5, fig.}
+```{r, fig.align="center", fig.width=7, fig.height=5}
 # Take a look at the data summary:
 my.results$data.summary
 
@@ -227,46 +231,82 @@ procedure of choice (as the sampling distribution of the means will be even more
 "well-behaved" than the data distribution).
 
 It is also interesting to observe a few things from the summary table. First, 
-we observed negative values of `phi_j` in the majority of instances tested, 
+we observed negative values of `phi.j` in the majority of instances tested, 
 which suggests an advantage of the MOEA/D-DE over the original MOEA/D (remember, 
 _smaller = better_ for the quality indicator used). The MOEA/D-DE seems to 
 require smaller sample sizes in most instances, suggesting a smaller variance of performance, which is also a desirable feature. Also, in three instances 
 (UF\_5\_28, UF\_3\_29 and UF_\5_\17) the maximum number of runs/instance 
 (`nmax = 200` in the `run_experiment()` call) was not enough to reduce the 
-standard error (our "measurement error" on the values of `phi_j`) below the 
+standard error (our "measurement error" on the values of `phi.j`) below the 
 predefined threshold of $0.05$. There is no reason to worry in this particular 
 case, however, since the resulting standard errors were not particularly high, 
 and therefore their effect on the test power (resulting from the increased 
-uncertainty in the estimation of these particular `phi_j` values) will be insignificant.
+uncertainty in the estimation of these particular `phi.j` values) will be insignificant.
 
-Since our observations `phi_j`  already express paired differences per instance, we can compare the two algorithms using a simple, one-sample t.test:
+Since our observations `phi.j`  already express paired differences per instance, we can compare the two algorithms using a simple, one-sample t.test:
 
 ```{r}
 t.test(my.results$data.summary$phi.j)
 ```
 
 which indicates a statistically significant advantage of the MOEA/D-DE over the 
-original MOEA/D ($p = 5.05\times10^{-5}, df=33$), with estimated mean 
-IGD gains of $34.53\%$ ($CI_{0.95} = [19.44\%,49.61\%]$) over the original 
+original MOEA/D ($p = 2.90\times10^{-6}, df=33$), with estimated mean 
+IGD gains of $37.94\%$ ($CI_{0.95} = [24.22\%,51.66\%]$) over the original 
 MOEA/D for instances belonging to the problem class of interest.
 
 These results could also be used to motivate further analyses. For instance, 
 we can observe in the summary table that the only two cases for which the 
 MOEA/D was substantially better than the MOEA/D-DE were for different 
-instantiations of problem UF\_5, which could suggest that some specific 
+dimensions of problem UF\_5, which could suggest that some specific 
 feature of this problem jeopardizes the latter algorithm's search mechanism. 
 This could motivate research on which particular aspect of this problem results 
 in this loss of performance, and on how to improve the MOEA/D-DE.
 
-Finally, the full data of the experiment is contained in other fields contained 
-in the output list `my.results`, and the user is encouraged to explore these. 
-As an example, we can generate box plots and confidence intervals on the mean differences in performance for each sampled instance, which could again motivate further investigations.
+Finally, the full data of the experiment is contained in other fields of 
+the output list `my.results`, and the user is encouraged to explore these. 
+As an example, we can generate box plots and confidence intervals on the mean 
+performance of each algorithm on each sampled instance, which could 
+inspire new questions for the researcher.
 
-```{r}
+```{r,fig.width=7}
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(ggplot2))
 
 myplot <- ggplot2::ggplot(my.results$data.raw, 
                           aes(x = Instance, y = Observation, fill = Algorithm))
-myplot+geom_boxplot()
+myplot + geom_boxplot() + 
+  facet_wrap(~Algorithm) + 
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 55, hjust = 1, size = 5.5))
+```
+
+```{r, fig.width=7}
+# Calculate confidence intervals for each instance
+algos <- unique(my.results$data.raw$Algorithm)
+ninstances <- length(my.results$instances.sampled)
+CIs <- data.frame(instance  = rep(my.results$instances.sampled, times = 2),
+                  algorithm = rep(algos, each = ninstances),
+                  x.est     = 0, CI.l = 0, CI.u = 0)
+
+for (i in 1:ninstances){
+  tmpdata <- my.results$data.raw %>% 
+                   filter(Instance == my.results$instances.sampled[i])
+  myt1 <- t.test(tmpdata$Observation[tmpdata$Algorithm == algos[1]])
+  myt2 <- t.test(tmpdata$Observation[tmpdata$Algorithm == algos[2]])
+  
+  CIs[i,3:5] <- c(myt1$estimate, as.numeric(myt1$conf.int))
+  CIs[i + ninstances,3:5] <- c(myt2$estimate, as.numeric(myt2$conf.int))
+}
+
+# Plot individual confidence intervals for each instance
+myplot <- ggplot(CIs, aes(x = instance, 
+                          y = x.est, ymin = CI.l, ymax = CI.u,
+                          group = algorithm, colour = algorithm,
+                          fill = algorithm))
+myplot + 
+  geom_pointrange(position = position_dodge(width = 0.5), alpha = 0.5) + 
+  xlab("Instance") + ylab("IGD") + 
+  ggtitle("Estimated mean IGD", subtitle = "for each algorithm on each instance") + 
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 55, hjust = 1, size = 6))
 ```

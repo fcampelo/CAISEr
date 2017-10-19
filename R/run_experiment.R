@@ -9,7 +9,7 @@
 #' @section Instance List:
 #' Parameter `Instance.list` must contain a list of instance objects, where
 #' each field is itself a list, as defined in Section _Instances and Algorithms
-#' of the documentation of _[calc_nreps()]. In summary, each element of
+#' of the documentation of _[calc_nreps2()]. In summary, each element of
 #' `Instance.list` is an `instance`, i.e., a named list containing all relevant
 #' parameters that define the problem instance. This list must contain at least
 #' the field `instance$FUN`, with the name of the problem instance function,
@@ -21,8 +21,8 @@
 #'
 #' @section Algorithms:
 #' Parameter `Algorithm.list` must contain a list of instance objects, where
-#' each field is itself a list, as defined in Section _Instances and Algorithms
-#' of the documentation of _[calc_nreps()]. In summary, each element of
+#' each field is itself a list, as defined in Section _Instances and Algorithms_
+#' of the documentation of [calc_nreps2()]. In summary, each element of
 #' `Algorithm.list` is an `algorithm`, i.e., a named list containing all
 #' relevant parameters that define the algorithm.
 #'
@@ -65,11 +65,11 @@
 #' run, in a field named `value` (e.g., `result$value`) .
 #'
 #' @section Initial Number of Observations:
-#' In the **general case** the initial number of observations / algorithm /
+#' In the _general case_ the initial number of observations / algorithm /
 #' instance (`nstart`) should be relatively high. For the parametric case
-#' we recommend ~20 if outliers are not expected, ~50 (at least) if that
+#' we recommend ~15 if outliers are not expected, ~50 (at least) if that
 #' assumption cannot be made. For the bootstrap approch we recommend using at
-#' least 20. However, if some distributional assumptions can be
+#' least 15 or 20. However, if some distributional assumptions can be
 #' made - particularly low skewness of the population of algorithm results on
 #' the test instances), then `nstart` can in principle be as small as 5 (if the
 #' output of the algorithm were known to be normal, it could be 1).
@@ -89,8 +89,8 @@
 #' If the parameter `test.type` is set to either `Wilcoxon` or `Binomial`, this
 #' routine approximates the number of instances using the ARE of these tests
 #' in relation to the paired t.test, using the formulas:
-#'   - \deqn{n.wilcox = n.ttest / 0.86 = 1.163 * n.ttest}
-#'   - \deqn{n.binom = n.ttest / 0.637 = 1.570 * n.ttest}
+#'   - `n.wilcox = n.ttest / 0.86 = 1.163 * n.ttest`
+#'   - `n.binom = n.ttest / 0.637 = 1.570 * n.ttest`
 #'
 #' @param Instance.list list object containing the definitions of the
 #'    _available_ instances. this list may (or may not) be exhausted in the
@@ -100,8 +100,8 @@
 #' @param Algorithm.list list object containing the definitions of the
 #'    algorithms to be compared. See [calc_nreps2()] for details.
 #' @param power (desired) test power. See [calc_instances()] for details.
-#' @param d minimally relevant effect size (MRES, expressed as a standardized
-#'        effect size, i.e., "deviation from H0" / "standard deviation").
+#' @param d minimally relevant effect size (MRES), expressed as a standardized
+#'        effect size, i.e., "deviation from H0" / "standard deviation".
 #'        See [calc_instances()] for details.
 #' @param sig.level significance level (alpha) for the experiment.
 #'        See [calc_instances()] for details.
@@ -124,7 +124,6 @@
 #'        See [calc_nreps2()] for details.
 #' @param seed seed for the random number generator
 #' @param boot.R number of bootstrap resamples. See [calc_nreps2()] for details.
-#' # @param ncpus number of cores to use. See [calc_nreps2()] for details. #//DoParallel
 #'
 #' @return a list object containing the full input configuration plus the
 #' following fields:
@@ -193,6 +192,8 @@
 #'
 #' # Test assumption of normality (of the data)
 #' shapiro.test(my.results$data.summary$phi.j)
+
+# @param ncpus number of cores to use. See [calc_nreps2()] for details. #//DoParallel
 
 # TESTED
 run_experiment <- function(Instance.list,    # instance parameters
@@ -322,6 +323,8 @@ run_experiment <- function(Instance.list,    # instance parameters
                  N.star = N.star,
                  instances.sampled = unique(data.summary$Instance),
                  Underpowered = (N.star > n.available))
+
+  class(output) <- c("CAISEr", "list")
 
   return(output)
 }

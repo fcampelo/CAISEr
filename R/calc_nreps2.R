@@ -3,8 +3,7 @@
 #' Iteratively calculates the required sample sizes for two algorithms
 #' on a given problem instance, so that the standard error
 #' of the estimate of the difference (either simple or percent) in mean
-#' performance is controlled at a predefined level. This is a wrapper function
-#' for [nreps_boot()] and [nreps_param()]
+#' performance is controlled at a predefined level.
 #'
 #' @section Instances and Algorithms:
 #' Parameters `instance`, `algorithm1` and `algorithm2` must each

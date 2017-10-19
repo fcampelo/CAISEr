@@ -70,23 +70,23 @@ calc_instances <- function(ninstances  = NULL,        # number of instances
 
 
   if (is.null(ninstances)){ # Estimate sample size
-    ss <- power.t.test(n           = ninstances,
-                       delta       = d, sd = 1,
-                       sig.level   = sig.level,
-                       power       = power,
-                       type        = "paired",
-                       alternative = alternative,
-                       strict      = TRUE)
+    ss <- stats::power.t.test(n           = ninstances,
+                              delta       = d, sd = 1,
+                              sig.level   = sig.level,
+                              power       = power,
+                              type        = "paired",
+                              alternative = alternative,
+                              strict      = TRUE)
     ss$n <- ss$n * corr.factor
 
   } else if (is.null(power)){ # Estimate power
-    ss <- power.t.test(n           = ninstances / corr.factor,
-                       delta       = d, sd = 1,
-                       sig.level   = sig.level,
-                       power       = power,
-                       type        = "paired",
-                       alternative = alternative,
-                       strict      = TRUE)
+    ss <- stats::power.t.test(n           = ninstances / corr.factor,
+                              delta       = d, sd = 1,
+                              sig.level   = sig.level,
+                              power       = power,
+                              type        = "paired",
+                              alternative = alternative,
+                              strict      = TRUE)
     ss$n <- ninstances
 
   }

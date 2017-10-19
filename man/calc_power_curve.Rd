@@ -31,6 +31,7 @@ number of instances. See \code{\link[=calc_instances]{calc_instances()}} for det
 \examples{
 my.cpc <- calc_power_curve(ninstances = 10)
 summary(my.cpc)
+plot(my.cpc)
 
 
 }

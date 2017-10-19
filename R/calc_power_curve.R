@@ -50,6 +50,6 @@ calc_power_curve <- function(ninstances,         # number of instances
 
   output <- list(d     = D,
                  power = mypowers)
-  class(output) <- c("caiser.powercurve", "list")
+  class(output) <- c("CAISErPowercurve", "list")
   return(output)
 }

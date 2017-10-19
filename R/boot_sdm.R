@@ -18,6 +18,8 @@
 #'
 #' @author Felipe Campelo (\email{fcampelo@@ufmg.br})
 #'
+#' @export
+#'
 #' @examples
 #' x <- rnorm(15, mean = 4, sd = 1)
 #' my.sdm <- boot_sdm(x)
@@ -28,7 +30,7 @@
 #' my.sdm <- boot_sdm(x)
 #' qqnorm(my.sdm, pch = 20)
 #'
-#' Convergence of the SDM for a normal
+#' # Convergence of the SDM to a Normal distribution as sample size is increased
 #' X <- rchisq(1000, df = 3)
 #' x1 <- rchisq(10, df = 3)
 #' x2 <- rchisq(20, df = 3)

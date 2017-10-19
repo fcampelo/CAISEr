@@ -3,14 +3,14 @@
 #' Call algorithm routine for the solution of a problem instance
 #'
 #' @param instance a list object containing the definitions of the problem
-#'    instance. See [run_nreps2()] for details.
+#'    instance. See [calc_nreps2()] for details.
 #' @param algo a list object containing the definitions of the algorithm.
-#'    See [run_nreps2()] for details.
+#'    See [calc_nreps2()] for details.
 #' @param n number of observations to generate.
 #'
 #' @return vector of observed performance values
 #'
-#' @seealso \link{run_nreps2}
+#' @seealso \link{calc_nreps2}
 #'
 #' @author Felipe Campelo (\email{fcampelo@@ufmg.br})
 #'

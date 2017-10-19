@@ -5,7 +5,7 @@
 \title{Determine sample sizes for a pair of algorithms on a problem instance}
 \usage{
 calc_nreps2(instance, algorithm1, algorithm2, se.max, dif, method = "param",
-  nstart = 20, nmax = 1000, seed = NULL, boot.R = 999, ncpus = 1)
+  nstart = 20, nmax = 1000, seed = NULL, boot.R = 999)
 }
 \arguments{
 \item{instance}{a list object containing the definitions of the problem
@@ -35,9 +35,8 @@ See Section \emph{Initial Number of Observations} for details.}
 
 \item{seed}{seed for the random number generator}
 
-\item{boot.R}{number of bootstrap resamples}
-
-\item{ncpus}{number of cores to use}
+\item{boot.R}{number of bootstrap resamples
+#@param ncpus number of cores to use (under development.) #//DoParallel}
 }
 \value{
 a list object containing the following items:
@@ -58,8 +57,7 @@ a list object containing the following items:
 Iteratively calculates the required sample sizes for two algorithms
 on a given problem instance, so that the standard error
 of the estimate of the difference (either simple or percent) in mean
-performance is controlled at a predefined level. This is a wrapper function
-for \code{\link[=nreps_boot]{nreps_boot()}} and \code{\link[=nreps_param]{nreps_param()}}
+performance is controlled at a predefined level.
 }
 \section{Instances and Algorithms}{
 
@@ -102,6 +100,7 @@ That is, it must be able to run if called as:
          # remove '$FUN' field from list of arguments
          # and include the problem definition as field 'instance'
          myargs          <- algorithm[names(algorithm) != "FUN"]
+         myargs          <- myargs[names(myargs) != "alias"]
          myargs$instance <- instance
 
          # call function
@@ -142,7 +141,7 @@ algorithm on the problem instance):
 
 \examples{
 # Uses dummy algorithms and a dummy instance to illustrate the
-# use of nreps_boot
+# use of calc_nreps2
 algorithm1 <- list(FUN = "dummyalgo", alias = "algo1",
                    distribution.fun = "rnorm",
                    distribution.pars = list(mean = 10, sd = 1))
@@ -151,10 +150,11 @@ algorithm2 <- list(FUN = "dummyalgo", alias = "algo2",
                    distribution.pars = list(mean = 20, sd = 4))
 instance <- list(FUN = "dummyinstance")
 
-# Theoretical n1, n2 for an SE = 0.5 on the simple difference: 20, 80
+# Theoretical results for an SE = 0.5 on the simple difference:
+# phi = 10; n1 = 20; n2 = 80
 # (using the parametric approach)
 my.reps  <- calc_nreps2(instance, algorithm1, algorithm2,
-                        se.max = 0.5, dif = "simple", seed = 4321)
+                        se.max = 0.5, dif = "simple", seed = 1234)
 cat("n1j   =", my.reps$n1j, "\\nn2j   =", my.reps$n2j,
     "\\nphi_j =", my.reps$phi.est, "\\nse    =", my.reps$se)
 
@@ -162,10 +162,11 @@ cat("n1j   =", my.reps$n1j, "\\nn2j   =", my.reps$n2j,
 algorithm3 <- list(FUN = "dummyalgo", alias = "algo3",
                    distribution.fun = "rchisq",
                    distribution.pars = list(df = 2, ncp = 3))
+
 my.reps  <- calc_nreps2(instance, algorithm1, algorithm3,
                         se.max = 0.05, dif = "perc",
-                        method = "boot", seed = 1,
-                        ncpus = 2)
+                        method = "boot", seed = 1234,
+                        nstart = 20)
 cat("n1j   =", my.reps$n1j, "\\nn2j   =", my.reps$n2j,
     "\\nphi_j =", my.reps$phi.est, "\\nse    =", my.reps$se)
 

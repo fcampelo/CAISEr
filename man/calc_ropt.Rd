@@ -31,6 +31,13 @@ comparison of algorithms (submitted, 2017).
 }
 }
 
+\examples{
+set.seed(1234)
+x1 <- rnorm(25, 5, 1)
+x2 <- runif(35, 8, 10)
+calc_ropt(x1, x2, "simple")
+calc_ropt(x1, x2, "perc")
+}
 \author{
 Felipe Campelo (\email{fcampelo@ufmg.br})
 }

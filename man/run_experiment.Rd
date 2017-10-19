@@ -7,7 +7,7 @@
 run_experiment(Instance.list, Algorithm.list, power, d, sig.level = 0.05,
   alternative = "two.sided", test.type = "t.test", se.max, dif,
   method = "param", nstart = 20, nmax = 1000, seed = NULL,
-  boot.R = 999, ncpus = 1)
+  boot.R = 999)
 }
 \arguments{
 \item{Instance.list}{list object containing the definitions of the
@@ -21,8 +21,8 @@ algorithms to be compared. See \code{\link[=calc_nreps2]{calc_nreps2()}} for det
 
 \item{power}{(desired) test power. See \code{\link[=calc_instances]{calc_instances()}} for details.}
 
-\item{d}{minimally relevant effect size (MRES, expressed as a standardized
-effect size, i.e., "deviation from H0" / "standard deviation").
+\item{d}{minimally relevant effect size (MRES), expressed as a standardized
+effect size, i.e., "deviation from H0" / "standard deviation".
 See \code{\link[=calc_instances]{calc_instances()}} for details.}
 
 \item{sig.level}{significance level (alpha) for the experiment.
@@ -55,8 +55,6 @@ See \code{\link[=calc_nreps2]{calc_nreps2()}} for details.}
 \item{seed}{seed for the random number generator}
 
 \item{boot.R}{number of bootstrap resamples. See \code{\link[=calc_nreps2]{calc_nreps2()}} for details.}
-
-\item{ncpus}{number of cores to use. See \code{\link[=calc_nreps2]{calc_nreps2()}} for details.}
 }
 \value{
 a list object containing the full input configuration plus the
@@ -81,7 +79,7 @@ so refer to the documentation of these two functions for details.
 
 Parameter \code{Instance.list} must contain a list of instance objects, where
 each field is itself a list, as defined in Section _Instances and Algorithms
-of the documentation of _\code{\link[=calc_nreps]{calc_nreps()}}. In summary, each element of
+of the documentation of _\code{\link[=calc_nreps2]{calc_nreps2()}}. In summary, each element of
 \code{Instance.list} is an \code{instance}, i.e., a named list containing all relevant
 parameters that define the problem instance. This list must contain at least
 the field \code{instance$FUN}, with the name of the problem instance function,
@@ -95,15 +93,15 @@ instance generator).
 \section{Algorithms}{
 
 Parameter \code{Algorithm.list} must contain a list of instance objects, where
-each field is itself a list, as defined in Section _Instances and Algorithms
-of the documentation of _\code{\link[=calc_nreps]{calc_nreps()}}. In summary, each element of
+each field is itself a list, as defined in Section \emph{Instances and Algorithms}
+of the documentation of \code{\link[=calc_nreps2]{calc_nreps2()}}. In summary, each element of
 \code{Algorithm.list} is an \code{algorithm}, i.e., a named list containing all
 relevant parameters that define the algorithm.
 
 An \code{algorithm} must contain a \code{algorithm$FUN} field (the name
 of the function that calls the algorithm) and any other elements/parameters
 that \code{algorithm$FUN} requires (e.g., stop criteria, operator names and
-parameters, etc.). An additional field, "algorithm$alias", can be used to
+parameters, etc.). An additional field, \code{algorithm$alias}, can be used to
 provide the algorithm with a unique identifier (e.g., when comparing two
 different configurations of the same algorithm).
 
@@ -123,9 +121,10 @@ fields \code{algorithm$FUN = myalgo} and
 That is, it must be able to run if called as:
 
 \preformatted{
-         # remove '$FUN' field from list of arguments
+         # remove '$FUN' and '$alias' from list of arguments
          # and include the problem definition as field 'instance'
          myargs          <- algorithm[names(algorithm) != "FUN"]
+         myargs          <- myargs[names(myargs) != "alias"]
          myargs$instance <- instance
 
          # call function
@@ -140,11 +139,11 @@ run, in a field named \code{value} (e.g., \code{result$value}) .
 
 \section{Initial Number of Observations}{
 
-In the \strong{general case} the initial number of observations / algorithm /
+In the \emph{general case} the initial number of observations / algorithm /
 instance (\code{nstart}) should be relatively high. For the parametric case
-we recommend ~20 if outliers are not expected, ~50 (at least) if that
+we recommend ~15 if outliers are not expected, ~50 (at least) if that
 assumption cannot be made. For the bootstrap approch we recommend using at
-least 20. However, if some distributional assumptions can be
+least 15 or 20. However, if some distributional assumptions can be
 made - particularly low skewness of the population of algorithm results on
 the test instances), then \code{nstart} can in principle be as small as 5 (if the
 output of the algorithm were known to be normal, it could be 1).
@@ -170,11 +169,46 @@ If the parameter \code{test.type} is set to either \code{Wilcoxon} or \code{Bino
 routine approximates the number of instances using the ARE of these tests
 in relation to the paired t.test, using the formulas:
 \itemize{
-\item \deqn{n.wilcox = n.ttest / 0.86 = 1.163 * n.ttest}
-\item \deqn{n.binom = n.ttest / 0.637 = 1.570 * n.ttest}
+\item \code{n.wilcox = n.ttest / 0.86 = 1.163 * n.ttest}
+\item \code{n.binom = n.ttest / 0.637 = 1.570 * n.ttest}
 }
 }
 
+\examples{
+# Example using dummy algorithms and instances. See ?dummyalgo for details.
+# In this case all instances are the same, so we expect all cases to return
+# a percent difference of approx. phi.j = 1.0 and sample sizes of
+# approx. n1 = 31, n2 = 87
+algorithm1 <- list(FUN = "dummyalgo", alias = "algo1",
+                   distribution.fun = "rnorm",
+                   distribution.pars = list(mean = 10, sd = 1))
+algorithm2 <- list(FUN = "dummyalgo", alias = "algo2",
+                   distribution.fun = "rnorm",
+                   distribution.pars = list(mean = 20, sd = 4))
+algolist <- list(algorithm1, algorithm2)
+instlist <- vector(100, mode = "list")
+for (i in 1:100) instlist[[i]] <- list(FUN = "dummyinstance",
+                                       alias = paste0("Inst. ", i))
+
+my.results <- run_experiment(Instance.list = instlist,
+                             Algorithm.list = algolist,
+                             power = 0.8,
+                             d = 1,
+                             sig.level = 0.01,
+                             se.max = 0.05,
+                             dif = "perc",
+                             nmax   = 200,
+                             seed   = 1234)
+
+# Take a look at the summary table
+my.results$data.summary
+
+# To perform inference on the results:
+t.test(my.results$data.summary$phi.j, conf.level = 0.95)
+
+# Test assumption of normality (of the data)
+shapiro.test(my.results$data.summary$phi.j)
+}
 \references{
 \itemize{
 \item F. Campelo, F. Takahashi:
