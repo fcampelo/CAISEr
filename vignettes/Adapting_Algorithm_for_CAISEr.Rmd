@@ -268,29 +268,36 @@ As an example, we can generate box plots and confidence intervals on the mean
 performance of each algorithm on each sampled instance, which could 
 inspire new questions for the researcher.
 
-```{r,fig.width=7}
+```{r,fig.width=7,fig.height=7}
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(ggridges))
 
-myplot <- ggplot2::ggplot(my.results$data.raw, 
-                          aes(x = Instance, y = Observation, fill = Algorithm))
-myplot + geom_boxplot() + 
-  facet_wrap(~Algorithm) + 
-  theme(legend.position = "bottom",
-        axis.text.x = element_text(angle = 55, hjust = 1, size = 5.5))
+# Adjust instance names for plotting
+mydata <- my.results$data.raw
+mydata$Instance <- gsub(pattern = "UF\\_", replacement = "UF", mydata$Instance)
+mydata$Instance <- gsub(pattern = "\\_", replacement = " (", mydata$Instance)
+mydata$Instance <- sapply(mydata$Instance, FUN = function(x){paste0(x, ")")})
+
+ggplot2::ggplot(mydata, 
+                aes(x = Observation, y = Instance, fill = Algorithm)) + 
+  ggridges::geom_density_ridges(alpha = 0.7) + 
+  ggplot2::theme(legend.position = "bottom")
+  
+
 ```
 
 ```{r, fig.width=7}
 # Calculate confidence intervals for each instance
-algos <- unique(my.results$data.raw$Algorithm)
+algos <- unique(mydata$Algorithm)
 ninstances <- length(my.results$instances.sampled)
-CIs <- data.frame(instance  = rep(my.results$instances.sampled, times = 2),
+CIs <- data.frame(instance  = rep(unique(mydata$Instance, times = 2)),
                   algorithm = rep(algos, each = ninstances),
                   x.est     = 0, CI.l = 0, CI.u = 0)
 
 for (i in 1:ninstances){
-  tmpdata <- my.results$data.raw %>% 
-                   filter(Instance == my.results$instances.sampled[i])
+  tmpdata <- mydata %>% 
+    filter(Instance == unique(mydata$Instance)[i])
   myt1 <- t.test(tmpdata$Observation[tmpdata$Algorithm == algos[1]])
   myt2 <- t.test(tmpdata$Observation[tmpdata$Algorithm == algos[2]])
   
@@ -299,14 +306,15 @@ for (i in 1:ninstances){
 }
 
 # Plot individual confidence intervals for each instance
-myplot <- ggplot(CIs, aes(x = instance, 
-                          y = x.est, ymin = CI.l, ymax = CI.u,
-                          group = algorithm, colour = algorithm,
-                          fill = algorithm))
+myplot <- ggplot2::ggplot(CIs, aes(x = instance, 
+                                   y = x.est, ymin = CI.l, ymax = CI.u,
+                                   group = algorithm, colour = algorithm,
+                                   fill = algorithm))
 myplot + 
-  geom_pointrange(position = position_dodge(width = 0.5), alpha = 0.5) + 
-  xlab("Instance") + ylab("IGD") + 
-  ggtitle("Estimated mean IGD", subtitle = "for each algorithm on each instance") + 
-  theme(legend.position = "bottom",
-        axis.text.x = element_text(angle = 55, hjust = 1, size = 6))
+  ggplot2::geom_pointrange(position = position_dodge(width = 0.5), alpha = 0.5) + 
+  ggplot2::xlab("Instance") + ggplot2::ylab("IGD") + 
+  ggplot2::ggtitle("Estimated mean IGD", 
+                   subtitle = "for each algorithm on each instance") + 
+  ggplot2::theme(legend.position = "bottom",
+                 axis.text.x = element_text(angle = 55, hjust = 1, size = 6))
 ```
