@@ -1,8 +1,8 @@
 Package: CAISEr
 Type: Package
 Title: Comparison of Algorithms with Iterative Sample-size Estimation in R
-Version: 0.1
-Date: 2017-10-19
+Version: 0.1.0.9001
+Date: 2017-10-20
 Authors@R: c(person("Felipe", "Campelo", email = "fcampelo@ufmg.br",
                     role = c("aut", "cre")),
                 person("Fernanda", "Takahashi", email = "fernandact@ufmg.br",
@@ -20,7 +20,7 @@ Suggests: MOEADr,
           car,
           dplyr,
           ggplot2,
-          xtable
+          ggjoy
 LazyData: TRUE
 Encoding: UTF-8
 RoxygenNote: 6.0.1
