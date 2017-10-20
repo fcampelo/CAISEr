@@ -311,7 +311,7 @@ myplot <- ggplot2::ggplot(CIs, aes(x = instance,
                                    group = algorithm, colour = algorithm,
                                    fill = algorithm))
 myplot + 
-  ggplot2::geom_pointrange(position = position_dodge(width = 0.5), alpha = 0.5) + 
+  ggplot2::geom_pointrange(position = position_dodge(width = 0.5), alpha = 0.7) + 
   ggplot2::xlab("Instance") + ggplot2::ylab("IGD") + 
   ggplot2::ggtitle("Estimated mean IGD", 
                    subtitle = "for each algorithm on each instance") + 
