@@ -282,9 +282,9 @@ mydata$Instance <- sapply(mydata$Instance, FUN = function(x){paste0(x, ")")})
 ggplot2::ggplot(mydata, 
                 aes(x = Observation, y = Instance, fill = Algorithm)) + 
   ggridges::geom_density_ridges(alpha = 0.7) + 
+  ggplot2::ggtitle("Estimated IGD distribution", 
+                   subtitle = "for each algorithm on each instance") + 
   ggplot2::theme(legend.position = "bottom")
-  
-
 ```
 
 ```{r, fig.width=7}
