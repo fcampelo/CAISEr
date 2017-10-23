@@ -217,7 +217,7 @@ distribution of the means and use a t test with a clean conscience:
 
 ```{r, fig.align="center", fig.width=7, fig.height=5}
 # Take a look at the data summary:
-my.results$data.summary
+print(my.results)
 
 suppressPackageStartupMessages(library(car))
 car::qqPlot(my.results$data.summary$phi.j, 

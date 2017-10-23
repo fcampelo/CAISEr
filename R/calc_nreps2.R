@@ -97,6 +97,8 @@
 #' @param nmax maximum total allowed sample size.
 #' @param seed seed for the random number generator
 #' @param boot.R number of bootstrap resamples
+#' @param force.balanced logical flag to force the use of balanced sampling for
+#'        the algorithms on each instance
 #' #@param ncpus number of cores to use (under development.) #//DoParallel
 #'
 #' @return a list object containing the following items:
@@ -179,7 +181,8 @@ calc_nreps2 <- function(instance,         # instance parameters
                         nstart = 20,      # initial number of samples
                         nmax   = 1000,    # maximum allowed sample size
                         seed   = NULL,    # seed for PRNG
-                        boot.R = 999)     # number of bootstrap resamples
+                        boot.R = 999,     # number of bootstrap resamples
+                        force.balanced = FALSE) # force balanced sampling
 #                        ncpus  = 1)       # number of cores to use #//DoParallel
 {
 
@@ -197,7 +200,8 @@ calc_nreps2 <- function(instance,         # instance parameters
     is.infinite(nmax) || assertthat::is.count(nmax),
     nmax >= 2 * nstart,
     is.null(seed) || assertthat::is.count(seed),
-    assertthat::is.count(boot.R), boot.R > 1)
+    assertthat::is.count(boot.R), boot.R > 1,
+    is.logical(force.balanced), length(force.balanced) == 1)
 #    assertthat::is.count(ncpus)) #//DoParallel
   # ==================================== #
 
@@ -244,11 +248,12 @@ calc_nreps2 <- function(instance,         # instance parameters
     # Calculate optimal ratio
     r.opt <- calc_ropt(x1 = x1j, x2 = x2j, dif = dif)
 
-    # Sample according to r.opt
-    if (n1j / n2j < r.opt) {   # sample algorithm 1
+    # Sample according to r.opt *OR* sample both if force.balanced == TRUE
+    if (n1j / n2j <= r.opt || force.balanced) {   # sample algorithm 1
       x1j <- c(x1j, get_observations(algorithm1, instance, 1))
       n1j <- n1j + 1
-    } else {                  # sample algorithm 2
+    }
+    if (n1j / n2j > r.opt || force.balanced) {   # sample algorithm 1
       x2j <- c(x2j, get_observations(algorithm2, instance, 1))
       n2j <- n2j + 1
     }

@@ -124,6 +124,8 @@
 #'        See [calc_nreps2()] for details.
 #' @param seed seed for the random number generator
 #' @param boot.R number of bootstrap resamples. See [calc_nreps2()] for details.
+#' @param force.balanced logical flag to force the use of balanced sampling for
+#'        the algorithms on each instance
 #'
 #' @return a list object containing the full input configuration plus the
 #' following fields:
@@ -209,7 +211,8 @@ run_experiment <- function(Instance.list,    # instance parameters
                            nstart = 20,      # initial number of samples
                            nmax   = 1000,    # maximum allowed sample size
                            seed   = NULL,    # seed for PRNG
-                           boot.R = 999)     # number of bootstrap resamples
+                           boot.R = 999,     # number of bootstrap resamples
+                           force.balanced = FALSE) # force balanced sampling
                            #ncpus  = 1)       # number of cores to use
 {
 
@@ -288,7 +291,8 @@ run_experiment <- function(Instance.list,    # instance parameters
                          algorithm1 = Algorithm.list[[1]],
                          algorithm2 = Algorithm.list[[2]],
                          se.max = se.max, dif = dif, method = method,
-                         nstart = nstart, nmax = nmax, boot.R = boot.R)
+                         nstart = nstart, nmax = nmax, boot.R = boot.R,
+                         force.balanced = force.balanced)
                          # ncpus = ncpus) #//DoParallel
 
     # Update result dataframes

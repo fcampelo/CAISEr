@@ -5,7 +5,8 @@
 \title{Determine sample sizes for a pair of algorithms on a problem instance}
 \usage{
 calc_nreps2(instance, algorithm1, algorithm2, se.max, dif, method = "param",
-  nstart = 20, nmax = 1000, seed = NULL, boot.R = 999)
+  nstart = 20, nmax = 1000, seed = NULL, boot.R = 999,
+  force.balanced = FALSE)
 }
 \arguments{
 \item{instance}{a list object containing the definitions of the problem
@@ -35,7 +36,10 @@ See Section \emph{Initial Number of Observations} for details.}
 
 \item{seed}{seed for the random number generator}
 
-\item{boot.R}{number of bootstrap resamples
+\item{boot.R}{number of bootstrap resamples}
+
+\item{force.balanced}{logical flag to force the use of balanced sampling for
+the algorithms on each instance
 #@param ncpus number of cores to use (under development.) #//DoParallel}
 }
 \value{
