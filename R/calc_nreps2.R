@@ -245,17 +245,23 @@ calc_nreps2 <- function(instance,         # instance parameters
     # Echo something for the user
     if (!(n1j + n2j) %% nstart) cat(".")
 
-    # Calculate optimal ratio
-    r.opt <- calc_ropt(x1 = x1j, x2 = x2j, dif = dif)
-
-    # Sample according to r.opt *OR* sample both if force.balanced == TRUE
-    if (n1j / n2j <= r.opt || force.balanced) {   # sample algorithm 1
+    if (force.balanced) {
       x1j <- c(x1j, get_observations(algorithm1, instance, 1))
-      n1j <- n1j + 1
-    }
-    if (n1j / n2j > r.opt || force.balanced) {   # sample algorithm 1
       x2j <- c(x2j, get_observations(algorithm2, instance, 1))
+      n1j <- n1j + 1
       n2j <- n2j + 1
+    } else {
+      # Calculate optimal ratio
+      r.opt <- calc_ropt(x1 = x1j, x2 = x2j, dif = dif)
+
+      # Sample according to r.opt
+      if (n1j / n2j < r.opt) {    # sample algorithm 1
+        x1j <- c(x1j, get_observations(algorithm1, instance, 1))
+        n1j <- n1j + 1
+      } else {                    # sample algorithm 2
+        x2j <- c(x2j, get_observations(algorithm2, instance, 1))
+        n2j <- n2j + 1
+      }
     }
 
     # Recalculate SE
