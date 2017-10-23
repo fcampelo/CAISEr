@@ -219,7 +219,7 @@ run_experiment <- function(Instance.list,    # instance parameters
   # ========== Error catching to be performed by specific routines ========== #
 
   # Capture input parameters
-  var.input.pars <- as.list(sys.call())
+  var.input.pars <- as.list(sys.call())[-1]
 
   # set PRNG seed
   if (is.null(seed)) {
