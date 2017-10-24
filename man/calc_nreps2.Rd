@@ -174,6 +174,15 @@ my.reps  <- calc_nreps2(instance, algorithm1, algorithm3,
 cat("n1j   =", my.reps$n1j, "\\nn2j   =", my.reps$n2j,
     "\\nphi_j =", my.reps$phi.est, "\\nse    =", my.reps$se)
 
+# Forcing equal sample sizes
+# Theoretical results for an SE = 0.5 on the simple difference:
+# phi = 10; n1 = n2 = 68
+my.reps  <- calc_nreps2(instance, algorithm1, algorithm2,
+                        se.max = 0.5, dif = "simple", seed = 1234,
+                        force.balanced = TRUE)
+cat("n1j   =", my.reps$n1j, "\\nn2j   =", my.reps$n2j,
+    "\\nphi_j =", my.reps$phi.est, "\\nse    =", my.reps$se)
+
 }
 \references{
 \itemize{
