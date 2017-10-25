@@ -1,2 +1,2 @@
-# CAISEr 0.1.0
+# CAISEr 0.2.0
 * Initial release on CRAN
