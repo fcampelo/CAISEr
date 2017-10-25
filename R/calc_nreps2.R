@@ -164,7 +164,6 @@
 #' cat("n1j   =", my.reps$n1j, "\nn2j   =", my.reps$n2j,
 #'     "\nphi_j =", my.reps$phi.est, "\nse    =", my.reps$se)
 #'
-#'
 #' \dontrun{
 #' # Using the bootstrap approach
 #' algorithm3 <- list(FUN = "dummyalgo", alias = "algo3",
