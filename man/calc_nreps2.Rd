@@ -5,7 +5,7 @@
 \title{Determine sample sizes for a pair of algorithms on a problem instance}
 \usage{
 calc_nreps2(instance, algorithm1, algorithm2, se.max, dif, method = "param",
-  nstart = 20, nmax = 1000, seed = NULL, boot.R = 999,
+  nstart = 20, nmax = 200, seed = NULL, boot.R = 999,
   force.balanced = FALSE)
 }
 \arguments{
@@ -162,6 +162,15 @@ my.reps  <- calc_nreps2(instance, algorithm1, algorithm2,
 cat("n1j   =", my.reps$n1j, "\\nn2j   =", my.reps$n2j,
     "\\nphi_j =", my.reps$phi.est, "\\nse    =", my.reps$se)
 
+# Forcing equal sample sizes:
+my.reps  <- calc_nreps2(instance, algorithm1, algorithm2,
+                        se.max = 0.5, dif = "simple", seed = 1234,
+                        force.balanced = TRUE)
+cat("n1j   =", my.reps$n1j, "\\nn2j   =", my.reps$n2j,
+    "\\nphi_j =", my.reps$phi.est, "\\nse    =", my.reps$se)
+
+
+\dontrun{
 # Using the bootstrap approach
 algorithm3 <- list(FUN = "dummyalgo", alias = "algo3",
                    distribution.fun = "rchisq",
@@ -173,15 +182,7 @@ my.reps  <- calc_nreps2(instance, algorithm1, algorithm3,
                         nstart = 20)
 cat("n1j   =", my.reps$n1j, "\\nn2j   =", my.reps$n2j,
     "\\nphi_j =", my.reps$phi.est, "\\nse    =", my.reps$se)
-
-# Forcing equal sample sizes
-# Theoretical results for an SE = 0.5 on the simple difference:
-# phi = 10; n1 = n2 = 68
-my.reps  <- calc_nreps2(instance, algorithm1, algorithm2,
-                        se.max = 0.5, dif = "simple", seed = 1234,
-                        force.balanced = TRUE)
-cat("n1j   =", my.reps$n1j, "\\nn2j   =", my.reps$n2j,
-    "\\nphi_j =", my.reps$phi.est, "\\nse    =", my.reps$se)
+}
 
 }
 \references{

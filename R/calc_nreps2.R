@@ -157,6 +157,15 @@
 #' cat("n1j   =", my.reps$n1j, "\nn2j   =", my.reps$n2j,
 #'     "\nphi_j =", my.reps$phi.est, "\nse    =", my.reps$se)
 #'
+#' # Forcing equal sample sizes:
+#' my.reps  <- calc_nreps2(instance, algorithm1, algorithm2,
+#'                         se.max = 0.5, dif = "simple", seed = 1234,
+#'                         force.balanced = TRUE)
+#' cat("n1j   =", my.reps$n1j, "\nn2j   =", my.reps$n2j,
+#'     "\nphi_j =", my.reps$phi.est, "\nse    =", my.reps$se)
+#'
+#'
+#' \dontrun{
 #' # Using the bootstrap approach
 #' algorithm3 <- list(FUN = "dummyalgo", alias = "algo3",
 #'                    distribution.fun = "rchisq",
@@ -168,15 +177,7 @@
 #'                         nstart = 20)
 #' cat("n1j   =", my.reps$n1j, "\nn2j   =", my.reps$n2j,
 #'     "\nphi_j =", my.reps$phi.est, "\nse    =", my.reps$se)
-#'
-#' # Forcing equal sample sizes
-#' # Theoretical results for an SE = 0.5 on the simple difference:
-#' # phi = 10; n1 = n2 = 68
-#' my.reps  <- calc_nreps2(instance, algorithm1, algorithm2,
-#'                         se.max = 0.5, dif = "simple", seed = 1234,
-#'                         force.balanced = TRUE)
-#' cat("n1j   =", my.reps$n1j, "\nn2j   =", my.reps$n2j,
-#'     "\nphi_j =", my.reps$phi.est, "\nse    =", my.reps$se)
+#' }
 #'
 #' @export
 
@@ -188,7 +189,7 @@ calc_nreps2 <- function(instance,         # instance parameters
                         dif,              # difference ("simple", "perc"),
                         method = "param", # method ("param", "boot")
                         nstart = 20,      # initial number of samples
-                        nmax   = 1000,    # maximum allowed sample size
+                        nmax   = 200,    # maximum allowed sample size
                         seed   = NULL,    # seed for PRNG
                         boot.R = 999,     # number of bootstrap resamples
                         force.balanced = FALSE) # force balanced sampling
