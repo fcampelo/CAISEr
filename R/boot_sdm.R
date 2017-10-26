@@ -14,7 +14,7 @@
 #' #@param ncpus (optional) number of cores to use #//DoParallel
 #' @param seed seed for the PRNG
 #'
-#' @return vector of boostrap estimates of the sample mean
+#' @return vector of bootstrap estimates of the sample mean
 #'
 #' @author Felipe Campelo (\email{fcampelo@@ufmg.br})
 #'

@@ -26,7 +26,7 @@ difference between the two algorithms. See Section
 \item{dif}{type of difference to be used. Accepts "perc"
 (for percent differences) or "simple" (for simple differences)}
 
-\item{method}{methodo to use for estimating the standard error. Accepts
+\item{method}{method to use for estimating the standard error. Accepts
 "param" (for parametric) or "boot" (for bootstrap)}
 
 \item{nstart}{initial number of algorithm runs for each algorithm.
@@ -122,7 +122,7 @@ least) the performance value of the final solution obtained, in a field named
 In the \strong{general case} the initial number of observations / algorithm /
 instance (\code{nstart}) should be relatively high. For the parametric case
 we recommend ~20 if outliers are not expected, ~50 (at least) if that
-assumption cannot be made. For the bootstrap approch we recommend using at
+assumption cannot be made. For the bootstrap approach we recommend using at
 least 20. However, if some distributional assumptions can be
 made - particularly low skewness of the population of algorithm results on
 the test instances), then \code{nstart} can in principle be as small as 5 (if the
@@ -201,7 +201,7 @@ Society. Series B (Methodological) 16(2), 175–185 (1954)
 Ratios: A short guide to confidence limits and proper use (2007).
 https://arxiv.org/pdf/0710.2024v1.pdf
 \item D.C. Montgomery, C.G. Runger:
-Applied Statistics and Probability for Engineers, 6th edn. Wiley (2013)
+Applied Statistics and Probability for Engineers, 6th ed. Wiley (2013)
 }
 }
 \author{

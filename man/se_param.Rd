@@ -33,7 +33,7 @@ Society. Series B (Methodological) 16(2), 175–185 (1954)
 Ratios: A short guide to confidence limits and proper use (2007).
 https://arxiv.org/pdf/0710.2024v1.pdf
 \item D.C. Montgomery, C.G. Runger:
-Applied Statistics and Probability for Engineers, 6th edn. Wiley (2013)
+Applied Statistics and Probability for Engineers, 6th ed. Wiley (2013)
 \item F. Campelo, F. Takahashi:
 Sample size estimation for power and accuracy in the experimental
 comparison of algorithms (submitted, 2017).

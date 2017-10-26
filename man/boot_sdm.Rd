@@ -15,7 +15,7 @@ boot_sdm(x, boot.R = 999, seed = NULL)
 \item{seed}{seed for the PRNG}
 }
 \value{
-vector of boostrap estimates of the sample mean
+vector of bootstrap estimates of the sample mean
 }
 \description{
 Bootstraps the sampling distribution of the means for a given vector of observations

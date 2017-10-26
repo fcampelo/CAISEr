@@ -61,7 +61,7 @@
 #' In the **general case** the initial number of observations / algorithm /
 #' instance (`nstart`) should be relatively high. For the parametric case
 #' we recommend ~20 if outliers are not expected, ~50 (at least) if that
-#' assumption cannot be made. For the bootstrap approch we recommend using at
+#' assumption cannot be made. For the bootstrap approach we recommend using at
 #' least 20. However, if some distributional assumptions can be
 #' made - particularly low skewness of the population of algorithm results on
 #' the test instances), then `nstart` can in principle be as small as 5 (if the
@@ -90,7 +90,7 @@
 #'        _Types of Differences_ for details.
 #' @param dif type of difference to be used. Accepts "perc"
 #'          (for percent differences) or "simple" (for simple differences)
-#' @param method methodo to use for estimating the standard error. Accepts
+#' @param method method to use for estimating the standard error. Accepts
 #'          "param" (for parametric) or "boot" (for bootstrap)
 #' @param nstart initial number of algorithm runs for each algorithm.
 #'      See Section _Initial Number of Observations_ for details.
@@ -134,7 +134,7 @@
 #'    Ratios: A short guide to confidence limits and proper use (2007).
 #'    https://arxiv.org/pdf/0710.2024v1.pdf
 #' - D.C. Montgomery, C.G. Runger:
-#'    Applied Statistics and Probability for Engineers, 6th edn. Wiley (2013)
+#'    Applied Statistics and Probability for Engineers, 6th ed. Wiley (2013)
 #'
 #' @export
 #'

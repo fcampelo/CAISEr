@@ -2,7 +2,7 @@
 % Please edit documentation in R/calc_instances.R
 \name{calc_instances}
 \alias{calc_instances}
-\title{Calcultes number of instances for the comparison of two algorithms}
+\title{Calculates number of instances for the comparison of two algorithms}
 \usage{
 calc_instances(ninstances = NULL, power = NULL, d, sig.level = 0.05,
   alternative = "two.sided", test.type = "t.test")
@@ -26,7 +26,7 @@ effect size, i.e., "deviation from H0" / "standard deviation")}
 a list object containing the following items:
 \itemize{
 \item \code{ninstances} - number of instances
-\item \code{power} - the power of the comparision
+\item \code{power} - the power of the comparison
 \item \code{d} - the effect size
 \item \code{sig.level} - significance level
 \item \code{alternative} - type of alternative hypothesis
@@ -41,7 +41,7 @@ the power of a comparison of two algorithms
 This routine uses the closed formula of the t-test to calculate the number
 of instances required for a comparison of two algorithms, considering a
 desired power, standardized effect size, and significance level.
-for cases where the number of instaces is predefined, it can return the
+for cases where the number of instances is predefined, it can return the
 test power instead.
 }
 \section{Sample Sizes for Nonparametric Methods}{
