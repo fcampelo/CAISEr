@@ -2,7 +2,7 @@
 * Initial release.
 
 ## Test environments
-* local OS X 10.12.6 (x86_64-apple-darwin15.6.0 (64-bit)), R 3.4.0
+* local OS X 10.12.6, R 3.4.0, 3.4.2
 * Ubuntu 14.04.5 LTS (on travis-ci v 3.1.0), R version 3.4.2
 * win-builder (release and devel)
 
