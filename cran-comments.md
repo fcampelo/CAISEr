@@ -1,5 +1,6 @@
 ## Changes and notes
-* Initial release.
+* Fixed title to Title Case, as requested.
+* Removed redundant "in R" from the title, as requested.
 
 ## Test environments
 * local OS X 10.12.6, R 3.4.0, 3.4.2
