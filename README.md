@@ -23,8 +23,8 @@ library(devtools)
 devtools::install_github("fcampelo/CAISEr")
 ```
 
-The package will also be available (hopefully soon) for installation directly 
-from the CRAN repository, using:
+The most recent CRAN release of the package is also available for installation directly 
+from the R prompt, using:
 
 ```
 install.packages("CAISEr")
@@ -33,7 +33,6 @@ install.packages("CAISEr")
 For instructions and examples of use, please take a look at the vignette 
 _Adapting Algorithms for CAISEr_, and at the package documentation, particularly 
 that of functions `run_experiment()` and `run_nreps2()`.
-
 
 Please send any bug reports, questions, suggestions, chocolate (to 
 Fernanda) or beers (to Felipe - we can always hope!) directly to the package 
