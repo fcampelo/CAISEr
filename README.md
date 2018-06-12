@@ -32,7 +32,7 @@ install.packages("CAISEr")
 
 For instructions and examples of use, please take a look at the vignette 
 _Adapting Algorithms for CAISEr_, and at the package documentation, particularly 
-that of functions `run_experiment()` and `run_nreps2()`.
+functions `run_experiment()` and `run_nreps2()`.
 
 Please send any bug reports, questions, suggestions, chocolate (to 
 Fernanda) or beers (to Felipe - we can always hope!) directly to the package 

@@ -178,6 +178,23 @@
 #'     "\nphi_j =", my.reps$phi.est, "\nse    =", my.reps$se)
 #' }
 #'
+#'
+#' \dontrun{
+#' # Example for a 21-city TSP instance using 2 configurations of SANN
+#' algorithm1 <- list(FUN  = "my.SANN", alias = "algo1",
+#'                    Temp = 2000, budget = 10000)
+#' algorithm2 <- list(FUN  = "my.SANN", alias = "algo2",
+#'                    Temp = 4000, budget = 10000)
+#' instance <- list(FUN    = "TSP.dist",
+#'                  mydist = datasets::eurodist)
+#' my.reps  <- calc_nreps2(instance, algorithm1, algorithm2,
+#'                         se.max = 0.01, dif = "perc",
+#'                         method = "param", seed = 1234,
+#'                         nstart = 20)
+#' cat("n1j   =", my.reps$n1j, "\nn2j   =", my.reps$n2j,
+#'     "\nphi_j =", my.reps$phi.est, "\nse    =", my.reps$se)
+#' }
+#'
 #' @export
 
 # TESTED

@@ -44,3 +44,46 @@ dummyinstance <- function(){
   # do nothing
 }
 
+
+#' Simulated annealing (for testing/examples)
+#' Adapted from stats::optim
+#' @export
+my.SANN <- function(Temp, budget, instance){
+
+  dist.mat <- as.matrix(instance$mydist)
+
+  # Define perturbation function: 2-opt swap
+  gen.seq <- function(x, ...){ #
+    idx   <- seq(2, nrow(dist.mat) - 1)
+    chgpt <- sample(idx, size = 2, replace = FALSE)
+    tmp <- x[chgpt[1]]
+    x[chgpt[1]] <- x[chgpt[2]]
+    x[chgpt[2]] <- tmp
+    return(x)
+  }
+
+  # random initial solution
+  sq <- sample.int(n = nrow(dist.mat), replace = FALSE)
+  sq <- c(sq, sq[1])
+
+  # run optimizer
+  res <- stats::optim(sq, fn = TSP.dist, gen.seq, method = "SANN",
+                      mydist = instance$mydist,
+                      control = list(maxit = budget,
+                                     temp = Temp,
+                                     trace = FALSE,
+                                     REPORT = 500))
+  return(res)
+}
+
+
+#' TSP instance generator (for testing/examples)
+#' Adapted from stats::optim
+#' @export
+TSP.dist <- function(x, mydist){
+  distmat <- as.matrix(mydist)
+  x2      <- stats::embed(x, 2)
+  y       <- sum(distmat[cbind(x2[, 2], x2[, 1])])
+
+  return(y)
+}

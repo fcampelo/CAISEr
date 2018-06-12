@@ -1,9 +1,9 @@
 ## Changes and notes
-* Fixed title to Title Case, as requested.
-* Removed redundant "in R" from the title, as requested.
+* Fixed minor bug in print function
+* Added new example (plus associated functions) to calc_nreps2
 
 ## Test environments
-* local OS X 10.12.6, R 3.4.0, 3.4.2
+* local OS X 10.12.6, R 3.5.0
 * Ubuntu 14.04.5 LTS (on travis-ci v 3.1.0), R version 3.4.2
 * win-builder (release and devel)
 
