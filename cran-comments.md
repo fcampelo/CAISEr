@@ -1,6 +1,7 @@
 ## Changes and notes
 * Fixed minor bug in print function
-* Added new example (plus associated functions) to calc_nreps2
+* Added new example (plus associated functions) to `calc_nreps2()`
+* Improved summary and plot functions for CAISErPowercurve objects
 
 ## Test environments
 * local OS X 10.12.6, R 3.5.0

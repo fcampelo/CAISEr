@@ -47,6 +47,10 @@ dummyinstance <- function(){
 
 #' Simulated annealing (for testing/examples)
 #' Adapted from stats::optim
+#' @param Temp controls the "SANN" method. It is the starting temperature for
+#'             the cooling schedule.
+#' @param budget stop criterion: total number of function evaluations
+#' @param instance instance object (see [calc_nreps2()] for details)
 #' @export
 my.SANN <- function(Temp, budget, instance){
 
@@ -79,6 +83,8 @@ my.SANN <- function(Temp, budget, instance){
 
 #' TSP instance generator (for testing/examples)
 #' Adapted from stats::optim
+#' @param x a valid closed route for the TSP instance
+#' @param mydist object of class _dist_ defining the TSP instance
 #' @export
 TSP.dist <- function(x, mydist){
   distmat <- as.matrix(mydist)
