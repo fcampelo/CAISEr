@@ -1,5 +1,6 @@
 # CAISER 0.2.2
 * Added new example and use case to `calc_nreps2()`
+* Improved plot and summary functions for `CAISErPowercurve` objects.
 
 # CAISEr 0.2.1
 * Minor fixes, particularly in printing function.
