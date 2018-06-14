@@ -5,7 +5,7 @@
 \title{Calculate the power curve for an experiment}
 \usage{
 calc_power_curve(ninstances, sig.level = 0.05, alternative = "two.sided",
-  test.type = "t.test", npoints = 100)
+  test.type = "t.test", d.range = c(0.1, 2), npoints = 100)
 }
 \arguments{
 \item{ninstances}{the number of instances to be used in the experiment.}
@@ -16,6 +16,9 @@ calc_power_curve(ninstances, sig.level = 0.05, alternative = "two.sided",
 "one.sided")}
 
 \item{test.type}{type of test ("t.test", "wilcoxon", "binomial")}
+
+\item{d.range}{vector \code{c(dmin, dmax)} with range of effect sizes to consider
+for the power calculations.}
 
 \item{npoints}{number of points for the power curve.}
 }

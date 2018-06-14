@@ -2,6 +2,7 @@
 * Fixed minor bug in print function
 * Added new example (plus associated functions) to `calc_nreps2()`
 * Improved summary and plot functions for CAISErPowercurve objects
+* Added options to `calc_power_curve()` to determine the range of effect sizes to consider.
 
 ## Test environments
 * local OS X 10.12.6, R 3.5.0

@@ -5,6 +5,8 @@
 #'
 #'
 #' @inheritParams calc_instances
+#' @param d.range vector `c(dmin, dmax)` with range of effect sizes to consider
+#'        for the power calculations.
 #' @param npoints number of points for the power curve.
 #'
 #' @return an object of class `caiser.powercurve` containing fields
@@ -25,6 +27,7 @@ calc_power_curve <- function(ninstances,         # number of instances
                              sig.level   = 0.05, # significance level
                              alternative = "two.sided", # type of H1
                              test.type   = "t.test",
+                             d.range     = c(0.1, 2),
                              npoints     = 100)    # type of test
 {
 
@@ -33,10 +36,13 @@ calc_power_curve <- function(ninstances,         # number of instances
 
   # ========== Error catching ========== #
   assertthat::assert_that(assertthat::is.count(npoints),
-                          npoints > 1)
+                          npoints > 1,
+                          is.numeric(d.range),
+                          length(d.range) == 2,
+                          d.range[1] < d.range[2])
   # ==================================== #
 
-  D <- seq(from = 0.1, to = 2, length.out = npoints)
+  D <- seq(from = d.range[1], to = d.range[2], length.out = npoints)
 
   mypowers <- unlist(lapply(D,
                             FUN = function(x){
