@@ -19,7 +19,9 @@ instance, see \code{\link[=calc_nreps2]{calc_nreps2()}}.}
 \item{Algorithm.list}{list object containing the definitions of the
 algorithms to be compared. See \code{\link[=calc_nreps2]{calc_nreps2()}} for details.}
 
-\item{power}{(desired) test power. See \code{\link[=calc_instances]{calc_instances()}} for details.}
+\item{power}{(desired) test power. See \code{\link[=calc_instances]{calc_instances()}} for details.
+Any value equal to or greater than one will force the method to use all
+available instances in \code{Instance.list}.}
 
 \item{d}{minimally relevant effect size (MRES), expressed as a standardized
 effect size, i.e., "deviation from H0" / "standard deviation".
@@ -75,7 +77,7 @@ following fields:
 Design and run a full experiment - calculate the required number of
 instances, run the algorithms on each problem instance using the iterative
 approach based on optimal sample size ratios, and return the results of the
-experiment. This routing builds upon \code{\link[=calc_instances]{calc_instances()}} and \code{\link[=calc_nreps2]{calc_nreps2()}},
+experiment. This routine builds upon \code{\link[=calc_instances]{calc_instances()}} and \code{\link[=calc_nreps2]{calc_nreps2()}},
 so refer to the documentation of these two functions for details.
 }
 \section{Instance List}{

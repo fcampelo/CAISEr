@@ -3,7 +3,7 @@
 #' Design and run a full experiment - calculate the required number of
 #' instances, run the algorithms on each problem instance using the iterative
 #' approach based on optimal sample size ratios, and return the results of the
-#' experiment. This routing builds upon [calc_instances()] and [calc_nreps2()],
+#' experiment. This routine builds upon [calc_instances()] and [calc_nreps2()],
 #' so refer to the documentation of these two functions for details.
 #'
 #' @section Instance List:
@@ -100,6 +100,8 @@
 #' @param Algorithm.list list object containing the definitions of the
 #'    algorithms to be compared. See [calc_nreps2()] for details.
 #' @param power (desired) test power. See [calc_instances()] for details.
+#'    Any value equal to or greater than one will force the method to use all
+#'    available instances in `Instance.list`.
 #' @param d minimally relevant effect size (MRES), expressed as a standardized
 #'        effect size, i.e., "deviation from H0" / "standard deviation".
 #'        See [calc_instances()] for details.
@@ -213,7 +215,7 @@ run_experiment <- function(Instance.list,    # instance parameters
                            seed   = NULL,    # seed for PRNG
                            boot.R = 999,     # number of bootstrap resamples
                            force.balanced = FALSE) # force balanced sampling
-                           #ncpus  = 1)       # number of cores to use
+#ncpus  = 1)       # number of cores to use
 {
 
   # ========== Error catching to be performed by specific routines ========== #
@@ -252,16 +254,21 @@ run_experiment <- function(Instance.list,    # instance parameters
   }
 
   # Calculate N*
-  ninstances <- calc_instances(power       = power,
-                               d           = d,
-                               sig.level   = sig.level,
-                               alternative = alternative,
-                               test.type   = test.type)
-  N.star     <- ninstances$ninstances
+  n.available <- length(Instance.list)
 
-  # Randomize order of presentation for available instances
-  n.available   <- length(Instance.list)
-  Instance.list <- Instance.list[sample.int(n.available)]
+  if (power >= 1) {
+    N.star <- n.available
+  } else {
+    ninstances <- calc_instances(power       = power,
+                                 d           = d,
+                                 sig.level   = sig.level,
+                                 alternative = alternative,
+                                 test.type   = test.type)
+    N.star <- ninstances$ninstances
+
+    # Randomize order of presentation for available instances
+    Instance.list <- Instance.list[sample.int(n.available)]
+    }
 
   # Echo some information for the user
   cat("CAISEr running")
@@ -293,12 +300,12 @@ run_experiment <- function(Instance.list,    # instance parameters
                          se.max = se.max, dif = dif, method = method,
                          nstart = nstart, nmax = nmax, boot.R = boot.R,
                          force.balanced = force.balanced)
-                         # ncpus = ncpus) #//DoParallel
+    # ncpus = ncpus) #//DoParallel
 
     # Update result dataframes
     nj    <- res_j$n1j + res_j$n2j
     raw_j <- data.frame(Algorithm = c(rep(Algorithm.list[[1]]$alias, res_j$n1j),
-                                     rep(Algorithm.list[[2]]$alias, res_j$n2j)),
+                                      rep(Algorithm.list[[2]]$alias, res_j$n2j)),
                         Instance    = rep(instance$alias, nj),
                         Observation = c(res_j$x1j, res_j$x2j),
                         stringsAsFactors = FALSE)
