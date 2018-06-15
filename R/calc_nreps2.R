@@ -99,7 +99,9 @@
 #' @param boot.R number of bootstrap resamples
 #' @param force.balanced logical flag to force the use of balanced sampling for
 #'        the algorithms on each instance
-#' #@param ncpus number of cores to use (under development.) #//DoParallel
+#' @param save.to.file logical flag: should the results be saved to a file
+#'        in the current working directory?
+#'
 #'
 #' @return a list object containing the following items:
 #' \itemize{
@@ -208,8 +210,8 @@ calc_nreps2 <- function(instance,         # instance parameters
                         nmax   = 200,    # maximum allowed sample size
                         seed   = NULL,    # seed for PRNG
                         boot.R = 999,     # number of bootstrap resamples
-                        force.balanced = FALSE) # force balanced sampling
-#                        ncpus  = 1)       # number of cores to use #//DoParallel
+                        force.balanced = FALSE, # force balanced sampling
+                        save.to.file  = FALSE) # save results to tmp file
 {
 
   # ========== Error catching ========== #
@@ -227,8 +229,8 @@ calc_nreps2 <- function(instance,         # instance parameters
     nmax >= 2 * nstart,
     is.null(seed) || assertthat::is.count(seed),
     assertthat::is.count(boot.R), boot.R > 1,
-    is.logical(force.balanced), length(force.balanced) == 1)
-#    assertthat::is.count(ncpus)) #//DoParallel
+    is.logical(force.balanced), length(force.balanced) == 1,
+    is.logical(save.to.file), length(save.to.file) == 1)
   # ==================================== #
 
   # set PRNG seed
@@ -279,6 +281,7 @@ calc_nreps2 <- function(instance,         # instance parameters
                   dif = dif, method = method, boot.R = boot.R)
   }
 
+  # Assemble output list
   output <- list(x1j     = x1j,
                  x2j     = x2j,
                  phi.est = SE$x.est,
@@ -288,22 +291,24 @@ calc_nreps2 <- function(instance,         # instance parameters
                  seed    = seed,
                  dif     = dif)
 
-  # unregister cluster if needed
-  #if (local.cluster) { stopCluster(cl.calc_nreps2) } #//DoParallel
+  # Save to file if required
+  if (save.to.file){
+    # Get folder
+    if(!dir.exists("./nreps_files")) dir.create("./nreps_files")
 
+    # Get a unique filename
+    filename <- paste0("./nreps_files/nreps_file_",
+                       gsub(":", "-", as.character(Sys.time())),
+                       "_",
+                       paste(sample(c(letters, LETTERS), size = 10),
+                             collapse = ""),
+                       ".rds")
+    filename <- gsub(" ", "-", filename)
+
+    # save output to file
+    saveRDS(output, file = filename)
+  }
+
+  # Return output
   return(output)
-
-
-  # if (method == "param"){
-  #   output <- nreps_param(instance = instance,
-  #                         algorithm1 = algorithm1, algorithm2 = algorithm2,
-  #                         se.max = se.max, dif = dif, nstart = nstart,
-  #                         nmax = nmax, seed = seed)
-  # } else if (method == "boot"){
-  #   output <- nreps_boot(instance = instance,
-  #                         algorithm1 = algorithm1, algorithm2 = algorithm2,
-  #                         se.max = se.max, dif = dif, nstart = nstart,
-  #                         nmax = nmax, seed = seed, boot.R = boot.R,
-  #                         ncpus = ncpus)
-  # }
 }

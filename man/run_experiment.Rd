@@ -7,7 +7,8 @@
 run_experiment(Instance.list, Algorithm.list, power, d, sig.level = 0.05,
   alternative = "two.sided", test.type = "t.test", se.max, dif,
   method = "param", nstart = 20, nmax = 1000, seed = NULL,
-  boot.R = 999, force.balanced = FALSE, ncpus = 1)
+  boot.R = 999, force.balanced = FALSE, ncpus = 1,
+  save.partial.results = FALSE)
 }
 \arguments{
 \item{Instance.list}{list object containing the definitions of the
@@ -62,6 +63,9 @@ See \code{\link[=calc_nreps2]{calc_nreps2()}} for details.}
 the algorithms on each instance}
 
 \item{ncpus}{number of cores to use}
+
+\item{save.partial.results}{logical flag: should individual instance results
+be saved to file?}
 }
 \value{
 a list object containing the full input configuration plus the
@@ -205,7 +209,8 @@ my.results <- run_experiment(Instance.list = instlist,
                              se.max = 0.05,
                              dif = "perc",
                              nmax   = 200,
-                             seed   = 1234)
+                             seed   = 1234,
+                             ncpus  = 2)
 
 # Take a look at the summary table
 my.results$data.summary

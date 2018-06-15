@@ -6,7 +6,7 @@
 \usage{
 calc_nreps2(instance, algorithm1, algorithm2, se.max, dif, method = "param",
   nstart = 20, nmax = 200, seed = NULL, boot.R = 999,
-  force.balanced = FALSE)
+  force.balanced = FALSE, save.to.file = FALSE)
 }
 \arguments{
 \item{instance}{a list object containing the definitions of the problem
@@ -39,8 +39,10 @@ See Section \emph{Initial Number of Observations} for details.}
 \item{boot.R}{number of bootstrap resamples}
 
 \item{force.balanced}{logical flag to force the use of balanced sampling for
-the algorithms on each instance
-#@param ncpus number of cores to use (under development.) #//DoParallel}
+the algorithms on each instance}
+
+\item{save.to.file}{logical flag: should the results be saved to a file
+in the current working directory?}
 }
 \value{
 a list object containing the following items:

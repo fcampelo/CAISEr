@@ -129,6 +129,8 @@
 #' @param force.balanced logical flag to force the use of balanced sampling for
 #'        the algorithms on each instance
 #' @param ncpus number of cores to use
+#' @param save.partial.results logical flag: should individual instance results
+#'        be saved to file?
 #'
 #' @return a list object containing the full input configuration plus the
 #' following fields:
@@ -187,7 +189,8 @@
 #'                              se.max = 0.05,
 #'                              dif = "perc",
 #'                              nmax   = 200,
-#'                              seed   = 1234)
+#'                              seed   = 1234,
+#'                              ncpus  = 2)
 #'
 #' # Take a look at the summary table
 #' my.results$data.summary
@@ -216,7 +219,8 @@ run_experiment <- function(Instance.list,    # instance parameters
                            seed   = NULL,    # seed for PRNG
                            boot.R = 999,     # number of bootstrap resamples
                            force.balanced = FALSE, # force balanced sampling
-                           ncpus  = 1)       # number of cores to use
+                           ncpus  = 1,       # number of cores to use
+                           save.partial.results = FALSE) # save tmp files?
 {
 
   # ========== Error catching to be performed by specific routines ========== #
@@ -301,6 +305,7 @@ run_experiment <- function(Instance.list,    # instance parameters
                                       nmax           = nmax,
                                       boot.R         = boot.R,
                                       force.balanced = force.balanced,
+                                      save.to.file   = save.partial.results,
                                       mc.cores       = ncpus,
                                       mc.preschedule = FALSE)
 
@@ -337,13 +342,13 @@ run_experiment <- function(Instance.list,    # instance parameters
   data.summary <- do.call(rbind, data.summary)
 
   # Assemble output
-  output <- list(Configuration = var.input.pars,
-                 data.raw = data.raw,
-                 data.summary = data.summary,
-                 N = min(N.star, n.available),
-                 N.star = N.star,
+  output <- list(Configuration     = var.input.pars,
+                 data.raw          = data.raw,
+                 data.summary      = data.summary,
+                 N                 = min(N.star, n.available),
+                 N.star            = N.star,
                  instances.sampled = unique(data.summary$Instance),
-                 Underpowered = (N.star > n.available))
+                 Underpowered      = (N.star > n.available))
 
   class(output) <- c("CAISEr", "list")
 

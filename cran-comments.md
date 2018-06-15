@@ -6,6 +6,7 @@
 * Added option in `run_experiment()` to force the use of all available instances.
 * `run_experiment()` can now be run in parallel using multiple cores.
 * Added packages _parallel_ and _pbmcapply_ to **Imports**.
+* Added option to `run_experiment()` and `calc_nreps2()` to save results to file
 
 ## Test environments
 * local OS X 10.12.6, R 3.5.0
