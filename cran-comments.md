@@ -4,6 +4,8 @@
 * Improved summary and plot functions for CAISErPowercurve objects
 * Added options to `calc_power_curve()` to determine the range of effect sizes to consider.
 * Added option in `run_experiment()` to force the use of all available instances.
+* `run_experiment()` can now be run in parallel using multiple cores.
+* Added packages _parallel_ and _pbmcapply_ to **Imports**.
 
 ## Test environments
 * local OS X 10.12.6, R 3.5.0

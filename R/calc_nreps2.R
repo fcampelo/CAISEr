@@ -233,30 +233,14 @@ calc_nreps2 <- function(instance,         # instance parameters
 
   # set PRNG seed
   if (is.null(seed)) {
+    if (!exists(".Random.seed")) stats::runif(1)
     seed <- .Random.seed #i.e., do not change anything
   } else{
     set.seed(seed)
   }
 
-
-  # # Set up doParallel       #//DoParallel
-  # local.cluster <- FALSE
-  # if (ncpus > 1){
-  #   cl.workers <- getDoParWorkers()
-  #   if (cl.workers < ncpus){
-  #     available.cores <- parallel::detectCores()
-  #     if (ncpus >= available.cores){
-  #       warning("ncpus too large, we only have ", available.cores, " cores. ",
-  #               "Using ", available.cores - 1, " cores.")
-  #       ncpus <- available.cores - 1
-  #     }
-  #     if (cl.workers < ncpus){
-  #       cl.calc_nreps2 <- parallel::makeCluster(ncpus)
-  #       doParallel::registerDoParallel(cl.calc_nreps2)
-  #       local.cluster <- TRUE
-  #     }
-  #   }
-  # }
+  # Echo some information for the user
+  cat("\nSampling algorithms on instance:", instance$alias)
 
   # generate initial samples
   n1j <- nstart # initial number of observations

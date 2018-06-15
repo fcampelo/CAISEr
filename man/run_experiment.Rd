@@ -7,7 +7,7 @@
 run_experiment(Instance.list, Algorithm.list, power, d, sig.level = 0.05,
   alternative = "two.sided", test.type = "t.test", se.max, dif,
   method = "param", nstart = 20, nmax = 1000, seed = NULL,
-  boot.R = 999, force.balanced = FALSE)
+  boot.R = 999, force.balanced = FALSE, ncpus = 1)
 }
 \arguments{
 \item{Instance.list}{list object containing the definitions of the
@@ -60,6 +60,8 @@ See \code{\link[=calc_nreps2]{calc_nreps2()}} for details.}
 
 \item{force.balanced}{logical flag to force the use of balanced sampling for
 the algorithms on each instance}
+
+\item{ncpus}{number of cores to use}
 }
 \value{
 a list object containing the full input configuration plus the

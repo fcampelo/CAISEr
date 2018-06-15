@@ -1,3 +1,6 @@
+# CAISER 0.3
+* `run_experiment()` can now be run in parallel using multiple cores.
+
 # CAISER 0.2.4
 * `run_experiment()` now forces the use of all available instances if `power >= 1`.
 

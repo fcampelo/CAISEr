@@ -1,8 +1,8 @@
 Package: CAISEr
 Type: Package
 Title: Comparison of Algorithms with Iterative Sample Size Estimation
-Version: 0.2.4
-Date: 2018-06-14
+Version: 0.3.0
+Date: 2018-06-15
 Authors@R: c(person("Felipe", "Campelo", email = "fcampelo@ufmg.br",
                     role = c("aut", "cre")),
                 person("Fernanda", "Takahashi", email = "fernandact@ufmg.br",
@@ -11,8 +11,10 @@ Maintainer: Felipe Campelo <fcampelo@ufmg.br>
 Description: Functions for performing experimental comparisons of algorithms 
              using adequate sample sizes for power and accuracy.
 License: GPL-2
-Depends: R (>= 3.4.0)
+Depends: R (>= 3.4.0), 
 Imports: assertthat (>= 0.1),
+         parallel (>= 3.5.0),
+         pbmcapply (>= 1.2.5)
 Suggests: MOEADr,
           smoof,
           knitr,
