@@ -35,6 +35,8 @@
 #'                       seed   = 1234)
 #' summary(out)
 #'
+#' @method summary CAISEr
+#'
 #' @export
 #'
 summary.CAISEr <- function(object,
