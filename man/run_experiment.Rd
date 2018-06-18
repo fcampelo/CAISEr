@@ -210,7 +210,7 @@ my.results <- run_experiment(Instance.list = instlist,
                              dif = "perc",
                              nmax   = 200,
                              seed   = 1234,
-                             ncpus  = 2)
+                             ncpus  = 1)
 
 # Take a look at the summary table
 my.results$data.summary
