@@ -1,7 +1,4 @@
 ## CAISEr package
-[![Build Status](https://api.travis-ci.org/fcampelo/CAISEr.png)](https://travis-ci.org/fcampelo/CAISEr) [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/CAISEr)](https://CRAN.R-project.org/package=CAISEr)
-[![CRAN Downloads](https://cranlogs.r-pkg.org/badges/CAISEr)](https://CRAN.R-project.org/package=CAISEr)
-
 ***
 
 ## CAISEr: Comparing Algorithms with Iterative Sample-size Estimation in R
