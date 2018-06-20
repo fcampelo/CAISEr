@@ -241,6 +241,11 @@ calc_nreps2 <- function(instance,         # instance parameters
     set.seed(seed)
   }
 
+  # Get/set instance alias
+  if (!("alias" %in% names(instance))) {
+    instance$alias <- instance$FUN
+  }
+
   # Echo some information for the user
   cat("\nSampling algorithms on instance:", instance$alias)
 
@@ -282,14 +287,15 @@ calc_nreps2 <- function(instance,         # instance parameters
   }
 
   # Assemble output list
-  output <- list(x1j     = x1j,
-                 x2j     = x2j,
-                 phi.est = SE$x.est,
-                 se      = SE$se,
-                 n1j     = n1j,
-                 n2j     = n2j,
-                 seed    = seed,
-                 dif     = dif)
+  output <- list(instance = instance$alias,
+                 x1j      = x1j,
+                 x2j      = x2j,
+                 phi.est  = SE$x.est,
+                 se       = SE$se,
+                 n1j      = n1j,
+                 n2j      = n2j,
+                 seed     = seed,
+                 dif      = dif)
 
   # Save to file if required
   if (save.to.file){
@@ -297,13 +303,12 @@ calc_nreps2 <- function(instance,         # instance parameters
     if(!dir.exists("./nreps_files")) dir.create("./nreps_files")
 
     # Get a unique filename
-    filename <- paste0("./nreps_files/nreps_file_",
-                       gsub(":", "-", as.character(Sys.time())),
-                       "_",
+    filename <- paste0("./nreps_files/",
+                       instance$alias,
+                       "__",
                        paste(sample(c(letters, LETTERS), size = 10),
                              collapse = ""),
                        ".rds")
-    filename <- gsub(" ", "-", filename)
 
     # save output to file
     saveRDS(output, file = filename)

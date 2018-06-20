@@ -230,6 +230,7 @@ run_experiment <- function(Instance.list,    # instance parameters
 
   # set PRNG seed
   if (is.null(seed)) {
+    if (!exists(".Random.seed")) stats::runif(1)
     seed <- .Random.seed #i.e., do not change anything
   } else {
     set.seed(seed)
@@ -306,8 +307,7 @@ run_experiment <- function(Instance.list,    # instance parameters
                                       boot.R         = boot.R,
                                       force.balanced = force.balanced,
                                       save.to.file   = save.partial.results,
-                                      mc.cores       = ncpus,
-                                      mc.preschedule = FALSE)
+                                      mc.cores       = ncpus)
 
   # Consolidate raw data
   data.raw <- lapply(X   = seq(length(my.results)),

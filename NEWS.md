@@ -1,15 +1,18 @@
-# CAISER 0.3
+# CAISEr 0.3.1
+* Added function to consolidate partial results saved to file (`consolidate.partial.results()`)
+
+# CAISEr 0.3
 * `run_experiment()` can now be run in parallel using multiple cores.
 * `run_experiment()` and `calc_nreps2()` can now save results to files.
 
-# CAISER 0.2.4
+# CAISEr 0.2.4
 * `run_experiment()` now forces the use of all available instances if `power >= 1`.
 
-# CAISER 0.2.3
+# CAISEr 0.2.3
 * Improved plot and summary functions for `CAISErPowercurve` objects.
 * Added options to `calc_power_curve()` to determine the range of effect sizes to consider.
 
-# CAISER 0.2.2
+# CAISEr 0.2.2
 * Added new example and use case to `calc_nreps2()`
 
 # CAISEr 0.2.1
