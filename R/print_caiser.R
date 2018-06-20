@@ -41,6 +41,7 @@
 #'                       seed   = 1234)
 #' out
 #'
+#' @method print CAISEr
 #' @export
 #'
 print.CAISEr <- function(x, ...,

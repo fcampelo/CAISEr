@@ -9,11 +9,12 @@
 #' @param ... other parameters to be passed down to specific plotting
 #'            functions (currently unused)
 #'
+#' @export
+#' @method plot CAISErPowercurve
+#'
 #' @examples
 #' my.cpc <- calc_power_curve(ninstances = 10)
 #' plot(my.cpc)
-#'
-#' @export
 #'
 
 # TESTED

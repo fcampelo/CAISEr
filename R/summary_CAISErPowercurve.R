@@ -15,6 +15,7 @@
 #'
 #' @export
 #'
+#' @method summary CAISErPowercurve
 
 # TESTED
 summary.CAISErPowercurve <- function(object,

@@ -153,7 +153,7 @@ run, in a field named \code{value} (e.g., \code{result$value}) .
 In the \emph{general case} the initial number of observations / algorithm /
 instance (\code{nstart}) should be relatively high. For the parametric case
 we recommend ~15 if outliers are not expected, ~50 (at least) if that
-assumption cannot be made. For the bootstrap approch we recommend using at
+assumption cannot be made. For the bootstrap approach we recommend using at
 least 15 or 20. However, if some distributional assumptions can be
 made - particularly low skewness of the population of algorithm results on
 the test instances), then \code{nstart} can in principle be as small as 5 (if the
@@ -210,7 +210,7 @@ my.results <- run_experiment(Instance.list = instlist,
                              dif = "perc",
                              nmax   = 200,
                              seed   = 1234,
-                             ncpus  = 2)
+                             ncpus  = 1)
 
 # Take a look at the summary table
 my.results$data.summary
