@@ -296,7 +296,7 @@ run_experiment <- function(Instance.list,    # instance parameters
   #                            n2j      = numeric(0))
 
   # Sample instances
-  my.results <- mclapply(X = Instance.list[1:min(N.star,
+  my.results <- pbmcapply::pbmclapply(X = Instance.list[1:min(N.star,
                                                               n.available)],
                                       FUN            = calc_nreps2,
                                       algorithm1     = Algorithm.list[[1]],
