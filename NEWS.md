@@ -1,5 +1,6 @@
 # CAISEr 0.3.1
 * Added function to consolidate partial results saved to file (`consolidate.partial.results()`)
+* Minor improvements to saving partial results to file: users can now select arbitrary directory for saving
 
 # CAISEr 0.3
 * `run_experiment()` can now be run in parallel using multiple cores.

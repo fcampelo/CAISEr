@@ -6,7 +6,7 @@
 \usage{
 calc_nreps2(instance, algorithm1, algorithm2, se.max, dif, method = "param",
   nstart = 20, nmax = 200, seed = NULL, boot.R = 999,
-  force.balanced = FALSE, save.to.file = FALSE)
+  force.balanced = FALSE, save.to.file = FALSE, folder = "./nreps_files")
 }
 \arguments{
 \item{instance}{a list object containing the definitions of the problem
@@ -43,6 +43,8 @@ the algorithms on each instance}
 
 \item{save.to.file}{logical flag: should the results be saved to a file
 in the current working directory?}
+
+\item{folder}{directory to save files (if save.to.file == TRUE)}
 }
 \value{
 a list object containing the following items:

@@ -101,6 +101,7 @@
 #'        the algorithms on each instance
 #' @param save.to.file logical flag: should the results be saved to a file
 #'        in the current working directory?
+#' @param folder directory to save files (if save.to.file == TRUE)
 #'
 #'
 #' @return a list object containing the following items:
@@ -211,7 +212,8 @@ calc_nreps2 <- function(instance,         # instance parameters
                         seed   = NULL,    # seed for PRNG
                         boot.R = 999,     # number of bootstrap resamples
                         force.balanced = FALSE, # force balanced sampling
-                        save.to.file  = FALSE) # save results to tmp file
+                        save.to.file  = FALSE, # save results to tmp file
+                        folder = "./nreps_files") # directory to save files (if save.to.file == TRUE)
 {
 
   # ========== Error catching ========== #
@@ -300,14 +302,11 @@ calc_nreps2 <- function(instance,         # instance parameters
   # Save to file if required
   if (save.to.file){
     # Get folder
-    if(!dir.exists("./nreps_files")) dir.create("./nreps_files")
+    if(!dir.exists(folder)) dir.create(folder)
 
     # Get a unique filename
-    filename <- paste0("./nreps_files/",
+    filename <- paste0(folder, "/",
                        instance$alias,
-                       "__",
-                       paste(sample(c(letters, LETTERS), size = 10),
-                             collapse = ""),
                        ".rds")
 
     # save output to file

@@ -8,7 +8,7 @@ run_experiment(Instance.list, Algorithm.list, power, d, sig.level = 0.05,
   alternative = "two.sided", test.type = "t.test", se.max, dif,
   method = "param", nstart = 20, nmax = 1000, seed = NULL,
   boot.R = 999, force.balanced = FALSE, ncpus = 1,
-  save.partial.results = FALSE)
+  save.partial.results = FALSE, folder = "./nreps_files")
 }
 \arguments{
 \item{Instance.list}{list object containing the definitions of the
@@ -66,6 +66,8 @@ the algorithms on each instance}
 
 \item{save.partial.results}{logical flag: should individual instance results
 be saved to file?}
+
+\item{folder}{directory to save files (if save.to.file == TRUE)}
 }
 \value{
 a list object containing the full input configuration plus the
