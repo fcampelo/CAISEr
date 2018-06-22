@@ -309,7 +309,7 @@ run_experiment <- function(Instance.list,    # instance parameters
                                       boot.R         = boot.R,
                                       force.balanced = force.balanced,
                                       save.to.file   = save.partial.results,
-                                      #folder         = folder,
+                                      folder         = folder,
                                       mc.cores       = ncpus)
 
   # Consolidate raw data
