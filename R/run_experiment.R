@@ -260,6 +260,11 @@ run_experiment <- function(Instance.list,    # instance parameters
       Instance.list[[i]]$alias <- Instance.list[[i]]$FUN
     }
   }
+  for (i in 1:length(Algorithm.list)){
+    if (!("alias" %in% names(Algorithm.list[[i]]))) {
+      Algorithm.list[[i]]$alias <- Algorithm.list[[i]]$FUN
+    }
+  }
 
   # Calculate N*
   n.available <- length(Instance.list)
@@ -296,8 +301,7 @@ run_experiment <- function(Instance.list,    # instance parameters
   #                            n2j      = numeric(0))
 
   # Sample instances
-  my.results <- pbmcapply::pbmclapply(X = Instance.list[1:min(N.star,
-                                                              n.available)],
+  my.results <- pbmcapply::pbmclapply(X = Instance.list[1:min(N.star, n.available)],
                                       FUN            = calc_nreps2,
                                       algorithm1     = Algorithm.list[[1]],
                                       algorithm2     = Algorithm.list[[2]],

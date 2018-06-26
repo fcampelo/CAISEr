@@ -105,7 +105,7 @@ fields \code{algorithm$FUN = myalgo} and
 That is, it must be able to run if called as:
 
 \preformatted{
-         # remove '$FUN' field from list of arguments
+         # remove '$FUN' and '$alias' field from list of arguments
          # and include the problem definition as field 'instance'
          myargs          <- algorithm[names(algorithm) != "FUN"]
          myargs          <- myargs[names(myargs) != "alias"]
