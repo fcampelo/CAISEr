@@ -1,3 +1,7 @@
+# CAISEr 0.3.2
+* fixed rare bug in `calc_se()` that resulted in `NaN` if two vectors with the 
+same sample mean and same sample variance were passed as arguments.
+
 # CAISEr 0.3.1
 * Added function to consolidate partial results saved to file (`consolidate.partial.results()`)
 * Minor improvements to saving partial results to file: users can now select arbitrary directory for saving

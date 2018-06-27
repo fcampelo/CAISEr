@@ -71,6 +71,8 @@ calc_se <- function(x1,           # vector of observations
                   boot.R = boot.R)
   }
 
+  if (is.nan(se)) se <- 0
+
   x.est <- do.call(calc_phi,
                    args = list(x1 = x1, x2 = x2, dif = dif))
 

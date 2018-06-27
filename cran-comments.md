@@ -1,6 +1,8 @@
 ## Changes and notes
 * Added function to consolidate partial results saved to file (`consolidate.partial.results()`)
 * `run_nreps2()` now adds instance alias as a field to the output structure
+* fixed rare bug in `calc_se()` that resulted in `NaN` if two vectors with the 
+same sample mean and same sample variance were passed as arguments.
 
 ## Test environments
 * local OS X 10.12.6, R 3.5.0
