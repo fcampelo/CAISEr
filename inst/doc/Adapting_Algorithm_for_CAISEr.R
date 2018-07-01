@@ -78,8 +78,8 @@ Algorithm.list <- list(list(FUN   = "myalgo",
                             type  = "moead.de"))
 
 ## ---- eval=FALSE---------------------------------------------------------
-#  #library(CAISEr)
-#  my.results <- run_experiment(Instance.list = Instance.list,
+#  library(CAISEr)
+#  my.results <- run_experiment(Instance.list  = Instance.list,
 #                               Algorithm.list = Algorithm.list,
 #                               power = 0.8,      # Desired power: 80%
 #                               d = 0.5,          # to detect differences greater
@@ -98,6 +98,7 @@ load("../inst/extdata/vignette_results.RData")
 
 ## ---- fig.align="center", fig.width=7, fig.height=5----------------------
 # Take a look at the data summary:
+summary(my.results)
 print(my.results)
 
 suppressPackageStartupMessages(library(car))

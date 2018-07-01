@@ -189,8 +189,8 @@ that, all we have to do is define the desired experimental parameters and
 use `run_experiment()`:
 
 ```{r, eval=FALSE}
-#library(CAISEr)
-my.results <- run_experiment(Instance.list = Instance.list,
+library(CAISEr)
+my.results <- run_experiment(Instance.list  = Instance.list,
                              Algorithm.list = Algorithm.list,
                              power = 0.8,      # Desired power: 80%
                              d = 0.5,          # to detect differences greater
@@ -217,6 +217,7 @@ distribution of the means and use a t test with a clean conscience:
 
 ```{r, fig.align="center", fig.width=7, fig.height=5}
 # Take a look at the data summary:
+summary(my.results)
 print(my.results)
 
 suppressPackageStartupMessages(library(car))

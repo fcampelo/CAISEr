@@ -12,7 +12,7 @@
 
 <meta name="author" content="Felipe Campelo" />
 
-<meta name="date" content="2018-06-16" />
+<meta name="date" content="2018-07-01" />
 
 <title>Adapting Algorithms for CAISEr</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Adapting Algorithms for CAISEr</h1>
 <h4 class="author"><em>Felipe Campelo</em></h4>
-<h4 class="date"><em>2018-06-16</em></h4>
+<h4 class="date"><em>2018-07-01</em></h4>
 
 
 
@@ -188,8 +188,8 @@ Algorithm.list &lt;-<span class="st"> </span><span class="kw">list</span>(<span 
 <div id="running-an-experiment-using-caiser" class="section level2">
 <h2>Running an experiment using CAISEr</h2>
 <p>With the definitions above it is possible now to run an experiment using the iterative sample size determination implemented in CAISEr. For that, all we have to do is define the desired experimental parameters and use <code>run_experiment()</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#library(CAISEr)</span>
-my.results &lt;-<span class="st"> </span><span class="kw">run_experiment</span>(<span class="dt">Instance.list =</span> Instance.list,
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(CAISEr)
+my.results &lt;-<span class="st"> </span><span class="kw">run_experiment</span>(<span class="dt">Instance.list  =</span> Instance.list,
                              <span class="dt">Algorithm.list =</span> Algorithm.list,
                              <span class="dt">power =</span> <span class="fl">0.8</span>,      <span class="co"># Desired power: 80%</span>
                              <span class="dt">d =</span> <span class="fl">0.5</span>,          <span class="co"># to detect differences greater</span>
@@ -204,7 +204,16 @@ my.results &lt;-<span class="st"> </span><span class="kw">run_experiment</span>(
                              <span class="dt">seed   =</span> <span class="dv">1234</span>)    <span class="co"># PRNG seed (for reproducibility)</span></code></pre></div>
 <p>After that we can interrogate the results and perform inference, if we are so inclined. For instance, we can check if our sample of paired differences in performance is (at least approximately) Normal, so that we can assume a Normal sampling distribution of the means and use a t test with a clean conscience:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Take a look at the data summary:</span>
-<span class="kw">print</span>(my.results)</code></pre></div>
+<span class="kw">summary</span>(my.results)</code></pre></div>
+<pre><code>## #====================================
+##  CAISEr object:
+##  Number of instances sampled: 34
+##  Number of instances required: 34
+##  Adequate power: TRUE
+##  Total number of runs of Algorithm 1: 1255
+##  Total number of runs of Algorithm 2: 979
+## #====================================</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(my.results)</code></pre></div>
 <pre><code>## #====================================
 ##  Summary table of CAISEr object
 ##  Instance       phi.j    std.err n1j n2j
