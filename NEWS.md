@@ -1,3 +1,6 @@
+# CAISEr 0.3.3
+* fixed problem with printing version in the vignette.
+
 # CAISEr 0.3.2
 * fixed rare bug in `calc_se()` that resulted in `NaN` if two vectors with the 
 same sample mean and same sample variance were passed as arguments.

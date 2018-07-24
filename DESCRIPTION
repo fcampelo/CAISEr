@@ -1,8 +1,8 @@
 Package: CAISEr
 Type: Package
 Title: Comparison of Algorithms with Iterative Sample Size Estimation
-Version: 0.3.2.9002
-Date: 2018-07-01
+Version: 0.3.3
+Date: 2018-07-23
 Authors@R: c(person("Felipe", "Campelo", email = "fcampelo@ufmg.br",
                     role = c("aut", "cre")),
                 person("Fernanda", "Takahashi", email = "fernandact@ufmg.br",
