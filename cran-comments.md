@@ -7,7 +7,7 @@ same sample mean and same sample variance were passed as arguments.
 * Fixed minor problem with print function in the Vignette.
 
 ## Test environments
-* local macOS High Sierra 10.13.5, R version 3.5.0
+* local macOS High Sierra 10.13.5, R version 3.5.1
 * Ubuntu 14.04.5 LTS (on travis-ci v 3.10.1), R version 3.5.0
 * win-builder (release and devel)
 
