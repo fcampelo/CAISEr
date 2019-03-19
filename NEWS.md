@@ -1,3 +1,6 @@
+# CAISEr 0.4.0
+
+
 # CAISEr 0.3.3
 * fixed problem with printing version in the vignette.
 
