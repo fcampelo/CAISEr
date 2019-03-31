@@ -164,7 +164,6 @@
 #'
 #'
 
-# TESTED
 calc_nreps <- function(instance,         # instance parameters
                        algorithms,       # algorithm parameters
                        se.max,           # desired (max) standard error
