@@ -4,8 +4,9 @@
 \alias{calc_power_curve}
 \title{Calculate the power curve for an experiment}
 \usage{
-calc_power_curve(ninstances, sig.level = 0.05, alternative = "two.sided",
-  test.type = "t.test", d.range = c(0.1, 2), npoints = 100)
+calc_power_curve(ninstances, sig.level = 0.05,
+  alternative = "two.sided", test.type = "t.test", d.range = c(0.1,
+  2), npoints = 100)
 }
 \arguments{
 \item{ninstances}{the number of instances to be used in the experiment.}

@@ -4,8 +4,8 @@
 \alias{dummyalgo}
 \title{Dummy algorithm routine to test the sampling procedures}
 \usage{
-dummyalgo(distribution.fun = "rnorm", distribution.pars = list(mean = 0, sd
-  = 1), instance)
+dummyalgo(distribution.fun = "rnorm", distribution.pars = list(mean =
+  0, sd = 1), instance)
 }
 \arguments{
 \item{distribution.fun}{name of a function that generates random values

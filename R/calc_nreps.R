@@ -1,9 +1,8 @@
 #' Determine sample sizes for a set of algorithms on a single problem instance
 #'
 #' Iteratively calculates the required sample sizes for K algorithms
-#' on a given problem instance, so that the standard error
-#' of the estimate of the differences (either simple or percent) in mean
-#' performance is controlled at a predefined level.
+#' on a given problem instance, so that the standard errors of the estimates of
+#' the pairwise differences in performance is controlled at a predefined level.
 #'
 #' @section Instance:
 #' Parameter `instance` must be a named list containing all relevant parameters
@@ -13,7 +12,7 @@
 #' requires additional parameters, these must also be provided as named fields.
 #'
 #' @section Algorithms:
-#' Object `algorithms` is a list of lists, in which each component is a named
+#' Object `algorithms` is a list in which each component is a named
 #' list containing all relevant parameters that define an algorithm to be
 #' applied for solving the problem instance. In what follows `algorithm[[k]]`
 #' refers to any algorithm specified in the `algorithms` list.
@@ -55,12 +54,12 @@
 #' `value` (e.g., `result$value`) after a given run.
 #'
 #' @section Initial Number of Observations:
-#' In the **general case** the initial number of observations / algorithm /
-#' instance (`nstart`) should be relatively high. For the parametric case
-#' we recommend ~20 if outliers are not expected, ~50 (at least) if that
-#' assumption cannot be made. For the bootstrap approach we recommend using at
-#' least 20. However, if some distributional assumptions can be
-#' made - particularly low skewness of the population of algorithm results on
+#' In the **general case** the initial number of observations per algorithm
+#' (`nstart`) should be relatively high. For the parametric case
+#' we recommend between 10 and 20 if outliers are not expected, or between 30
+#' and 50 if that assumption cannot be made. For the bootstrap approach we
+#' recommend using at least 20. However, if some distributional assumptions can
+#' be made - particularly low skewness of the population of algorithm results on
 #' the test instances), then `nstart` can in principle be as small as 5 (if the
 #' output of the algorithm were known to be normal, it could be 1).
 #'
@@ -69,18 +68,17 @@
 #'
 #' @section Types of Differences:
 #' Parameter `dif` informs the type of difference in performance to be used
-#' for the estimation (mu1 and mu2 represent the mean performance of each
-#' algorithm on the problem instance):
+#' for the estimation (`mu_a` and `mu_b` represent the mean performance of any
+#' two algorithms on the test instance, and `mu` represents the grand mean of all
+#' algorithms given in `algorithms`):
 #'
-#' - If `dif == "perc"` it estimates (mu2 - mu1) / mu1.
+#' - If `dif == "perc"` it estimates (mu2 - mu1) / mu.
 #' - If `dif == "simple"` it estimates mu2 - mu1.
 #'
 #' @param instance a list object containing the definitions of the problem
 #'    instance.
 #'    See Section _Problems and Algorithms_ for details.
-#' @param algorithm1 a list object containing the definitions of algorithm 1.
-#'    See Section _Problems and Algorithms_ for details.
-#' @param algorithm2 a list object containing the definitions of algorithm 2.
+#' @param algorithms a list object containing the definitions of all algorithms.
 #'    See Section _Problems and Algorithms_ for details.
 #' @param se.max desired upper limit for the standard error of the estimated
 #'        difference between the two algorithms. See Section
@@ -94,6 +92,7 @@
 #' @param nmax maximum total allowed sample size.
 #' @param seed seed for the random number generator
 #' @param boot.R number of bootstrap resamples
+#' @param ncpus number of cores to use
 #' @param force.balanced logical flag to force the use of balanced sampling for
 #'        the algorithms on each instance
 #' @param save.to.file logical flag: should the results be saved to a file
@@ -103,25 +102,22 @@
 #'
 #' @return a list object containing the following items:
 #' \itemize{
-#'    \item \code{x1j} - vector of observed performance values for `algorithm1`
-#'    \item \code{x2j} - vector of observed performance values for `algorithm2`
-#'    \item \code{phi.est} - estimated value for the statistic of interest
-#'    \item \code{se} - standard error of the estimate
-#'    \item \code{n1j} - number of observations generated for algorithm 1
-#'    \item \code{n2j} - number of observations generated for algorithm 2
-#'    \item \code{r.opt = n1j / n2j}
+#'    \item \code{Xk} - list of observed performance values for all `algorithms`
+#'    \item \code{phi.est} - estimated values for the statistic of interest
+#'    \item \code{se} - standard error of the estimates
+#'    \item \code{nk} - vector with the number of observations generated for
+#'                      each algorithm
 #'    \item \code{seed} - the seed used for the PRNG
 #'    \item \code{dif} - the type of difference used
 #'    \item \code{method} - the method used ("param" / "boot")
 #' }
 #'
-#' @author Felipe Campelo (\email{fcampelo@@ufmg.br}),
-#'         Fernanda Takahashi (\email{fernandact@@ufmg.br})
+#' @author Felipe Campelo (\email{fcampelo@@ufmg.br})
 #'
 #' @references
 #' - F. Campelo, F. Takahashi:
 #'    Sample size estimation for power and accuracy in the experimental
-#'    comparison of algorithms (submitted, 2017).
+#'    comparison of algorithms. Journal of Heuristics 25(2):305-338, 2019.
 #' - P. Mathews.
 #'    Sample size calculations: Practical methods for engineers and scientists.
 #'    Mathews Malnar and Bailey, 2010.
@@ -147,60 +143,30 @@
 #' algorithm2 <- list(FUN = "dummyalgo", alias = "algo2",
 #'                    distribution.fun = "rnorm",
 #'                    distribution.pars = list(mean = 20, sd = 4))
+#' algorithm3 <- list(FUN = "dummyalgo", alias = "algo3",
+#'                    distribution.fun = "rnorm",
+#'                    distribution.pars = list(mean = 30, sd = 10))
+#' algorithms <- list(alg1 = algorithm1, alg2 = algorithm2, alg3 = algorithm3)
 #' instance <- list(FUN = "dummyinstance")
 #'
-#' # Theoretical results for an SE = 0.5 on the simple difference:
-#' # phi = 10; n1 = 20; n2 = 80
-#' # (using the parametric approach)
-#' my.reps  <- calc_nreps2(instance, algorithm1, algorithm2,
-#'                         se.max = 0.5, dif = "simple", seed = 1234)
-#' cat("n1j   =", my.reps$n1j, "\nn2j   =", my.reps$n2j,
-#'     "\nphi_j =", my.reps$phi.est, "\nse    =", my.reps$se)
-#'
-#' # Forcing equal sample sizes:
-#' my.reps  <- calc_nreps2(instance, algorithm1, algorithm2,
-#'                         se.max = 0.5, dif = "simple", seed = 1234,
-#'                         force.balanced = TRUE)
-#' cat("n1j   =", my.reps$n1j, "\nn2j   =", my.reps$n2j,
-#'     "\nphi_j =", my.reps$phi.est, "\nse    =", my.reps$se)
-#'
-#' \dontrun{
-#' # Using the bootstrap approach
-#' algorithm3 <- list(FUN = "dummyalgo", alias = "algo3",
-#'                    distribution.fun = "rchisq",
-#'                    distribution.pars = list(df = 2, ncp = 3))
-#'
-#' my.reps  <- calc_nreps2(instance, algorithm1, algorithm3,
-#'                         se.max = 0.05, dif = "perc",
-#'                         method = "boot", seed = 1234,
-#'                         nstart = 20)
-#' cat("n1j   =", my.reps$n1j, "\nn2j   =", my.reps$n2j,
-#'     "\nphi_j =", my.reps$phi.est, "\nse    =", my.reps$se)
-#' }
+#' se.max = 0.5
+#' dif = "simple"
+#' seed = 1234
+#' method = "param"
+#' nstart = 20
+#' ncpus  = 1
+#' nmax   = 200
+#' boot.R = 999
+#' force.balanced = FALSE
+#' save.to.file  = FALSE
+#' folder = "./nreps_files"
 #'
 #'
-#' \dontrun{
-#' # Example for a 21-city TSP instance using 2 configurations of SANN
-#' algorithm1 <- list(FUN  = "my.SANN", alias = "algo1",
-#'                    Temp = 2000, budget = 10000)
-#' algorithm2 <- list(FUN  = "my.SANN", alias = "algo2",
-#'                    Temp = 4000, budget = 10000)
-#' instance <- list(FUN    = "TSP.dist",
-#'                  mydist = datasets::eurodist)
-#' my.reps  <- calc_nreps2(instance, algorithm1, algorithm2,
-#'                         se.max = 0.01, dif = "perc",
-#'                         method = "param", seed = 1234,
-#'                         nstart = 20)
-#' cat("n1j   =", my.reps$n1j, "\nn2j   =", my.reps$n2j,
-#'     "\nphi_j =", my.reps$phi.est, "\nse    =", my.reps$se)
-#' }
 #'
-#' @export
 
 # TESTED
 calc_nreps <- function(instance,         # instance parameters
-                       algorithm1,       # algorithm parameters
-                       algorithm2,       # algorithm parameters
+                       algorithms,       # algorithm parameters
                        se.max,           # desired (max) standard error
                        dif,              # difference ("simple", "perc"),
                        method = "param", # method ("param", "boot")
@@ -208,6 +174,7 @@ calc_nreps <- function(instance,         # instance parameters
                        nmax   = 200,    # maximum allowed sample size
                        seed   = NULL,    # seed for PRNG
                        boot.R = 999,     # number of bootstrap resamples
+                       ncpus  = 1,       # number of cores to use
                        force.balanced = FALSE, # force balanced sampling
                        save.to.file  = FALSE, # save results to tmp file
                        folder = "./nreps_files") # directory to save files (if save.to.file == TRUE)
@@ -217,15 +184,16 @@ calc_nreps <- function(instance,         # instance parameters
   assertthat::assert_that(
     is.list(instance),
     assertthat::has_name(instance, "FUN"),
-    is.list(algorithm1), is.list(algorithm2),
-    assertthat::has_name(algorithm1, "FUN"),
-    assertthat::has_name(algorithm2, "FUN"),
+    is.list(algorithms),
+    all(sapply(X = algorithms, FUN = is.list)),
+    all(sapply(X = algorithms,
+               FUN = function(x){assertthat::has_name(x, "FUN")})),
     is.numeric(se.max) && length(se.max) == 1,
     dif %in% c("simple", "perc"),
     method %in% c("param", "boot"),
     assertthat::is.count(nstart),
     is.infinite(nmax) || assertthat::is.count(nmax),
-    nmax >= 2 * nstart,
+    nmax >= length(algorithms) * nstart,
     is.null(seed) || assertthat::is.count(seed),
     assertthat::is.count(boot.R), boot.R > 1,
     is.logical(force.balanced), length(force.balanced) == 1,
@@ -249,11 +217,15 @@ calc_nreps <- function(instance,         # instance parameters
   cat("\nSampling algorithms on instance:", instance$alias)
 
   # generate initial samples
-  n1j <- nstart # initial number of observations
-  n2j <- nstart # initial number of observations
-  x1j <- get_observations(algorithm1, instance, n1j)
-  x2j <- get_observations(algorithm2, instance, n2j)
+  Nk <- rep(nstart, length(algorithms))
+  Xk <- parallel::mcmapply(FUN      = get_observations,
+                           algo     = algorithms,
+                           n        = Nk,
+                           MoreArgs = list(instance = instance),
+                           mc.cores = ncpus,
+                           SIMPLIFY = FALSE)
 
+  # PAREI AQUI
   SE <- calc_se(x1 = x1j, x2 = x2j,
                 dif = dif, method = method, boot.R = boot.R)
 

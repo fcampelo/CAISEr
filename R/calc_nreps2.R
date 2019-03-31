@@ -124,7 +124,7 @@
 #' @references
 #' - F. Campelo, F. Takahashi:
 #'    Sample size estimation for power and accuracy in the experimental
-#'    comparison of algorithms (submitted, 2017).
+#'    comparison of algorithms. Journal of Heuristics 25(2):305-338, 2019.
 #' - P. Mathews.
 #'    Sample size calculations: Practical methods for engineers and scientists.
 #'    Mathews Malnar and Bailey, 2010.

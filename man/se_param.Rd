@@ -36,7 +36,7 @@ https://arxiv.org/pdf/0710.2024v1.pdf
 Applied Statistics and Probability for Engineers, 6th ed. Wiley (2013)
 \item F. Campelo, F. Takahashi:
 Sample size estimation for power and accuracy in the experimental
-comparison of algorithms (submitted, 2017).
+comparison of algorithms. Journal of Heuristics 25(2):305-338, 2019.
 }
 }
 

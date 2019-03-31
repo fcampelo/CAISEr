@@ -4,8 +4,8 @@
 \alias{summary.CAISErPowercurve}
 \title{summary.CAISErPowercurve}
 \usage{
-\method{summary}{CAISErPowercurve}(object, highlights = c(0.5, 0.8, 0.95),
-  ...)
+\method{summary}{CAISErPowercurve}(object, highlights = c(0.5, 0.8,
+  0.95), ...)
 }
 \arguments{
 \item{object}{list object of class \emph{caiser.powercurve}

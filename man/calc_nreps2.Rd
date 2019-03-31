@@ -4,9 +4,10 @@
 \alias{calc_nreps2}
 \title{Determine sample sizes for a pair of algorithms on a problem instance}
 \usage{
-calc_nreps2(instance, algorithm1, algorithm2, se.max, dif, method = "param",
-  nstart = 20, nmax = 200, seed = NULL, boot.R = 999,
-  force.balanced = FALSE, save.to.file = FALSE, folder = "./nreps_files")
+calc_nreps2(instance, algorithm1, algorithm2, se.max, dif,
+  method = "param", nstart = 20, nmax = 200, seed = NULL,
+  boot.R = 999, force.balanced = FALSE, save.to.file = FALSE,
+  folder = "./nreps_files")
 }
 \arguments{
 \item{instance}{a list object containing the definitions of the problem
@@ -209,7 +210,7 @@ cat("n1j   =", my.reps$n1j, "\\nn2j   =", my.reps$n2j,
 \itemize{
 \item F. Campelo, F. Takahashi:
 Sample size estimation for power and accuracy in the experimental
-comparison of algorithms (submitted, 2017).
+comparison of algorithms. Journal of Heuristics 25(2):305-338, 2019.
 \item P. Mathews.
 Sample size calculations: Practical methods for engineers and scientists.
 Mathews Malnar and Bailey, 2010.

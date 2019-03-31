@@ -7,7 +7,7 @@
 #'    Bootstrap methods and their application. Cambridge University Press (1997)
 #' - F. Campelo, F. Takahashi:
 #'    Sample size estimation for power and accuracy in the experimental
-#'    comparison of algorithms (submitted, 2017).
+#'    comparison of algorithms. Journal of Heuristics 25(2):305-338, 2019.
 #'
 #' @param x vector of observations
 #' @param boot.R (optional) number of bootstrap resamples
