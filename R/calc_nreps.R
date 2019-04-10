@@ -66,14 +66,17 @@
 #' In general, higher sample sizes are the price to pay for abandoning
 #' distributional assumptions. Use lower values of `nstart` with caution.
 #'
-#' @section Types of Differences:
+#' @section Pairwise Differences:
 #' Parameter `dif` informs the type of difference in performance to be used
 #' for the estimation (`mu_a` and `mu_b` represent the mean performance of any
 #' two algorithms on the test instance, and `mu` represents the grand mean of all
 #' algorithms given in `algorithms`):
 #'
-#' - If `dif == "perc"` it estimates (mu2 - mu1) / mu.
-#' - If `dif == "simple"` it estimates mu2 - mu1.
+#' - If `dif == "perc"` and `type == "all.vs.first`, the estimated quantity is
+#'    phi_{1b} = (mu_1 - mu_b) / mu_1 = 1 - (mu_b / mu_1).
+#' - If `dif == "perc"` and `type == "all.vs.all`, the estimated quantity is
+#'    phi_{ab} = (mu_a - mu_b) / mu_a = 1 - (mu_b / mu_a).
+#' - If `dif == "simple"` it estimates mu_a - mu_b.
 #'
 #' @param instance a list object containing the definitions of the problem
 #'    instance.
@@ -81,30 +84,34 @@
 #' @param algorithms a list object containing the definitions of all algorithms.
 #'    See Section _Problems and Algorithms_ for details.
 #' @param se.max desired upper limit for the standard error of the estimated
-#'        difference between the two algorithms. See Section
-#'        _Types of Differences_ for details.
+#'        difference between pairs of algorithms. See Section
+#'        _Pairwise Differences_ for details.
 #' @param dif type of difference to be used. Accepts "perc"
 #'          (for percent differences) or "simple" (for simple differences)
-#' @param method method to use for estimating the standard error. Accepts
+#' @param type type of comparisons being performed. Accepts "all.vs.first"
+#'          (in which cases the first object in `algorithms` is considered to be
+#'          the reference algorithm) or "all.vs.all" (if there is no reference
+#'          and all pairwise comparisons are desired).
+#' @param method method to use for estimating the standard errors. Accepts
 #'          "param" (for parametric) or "boot" (for bootstrap)
 #' @param nstart initial number of algorithm runs for each algorithm.
 #'      See Section _Initial Number of Observations_ for details.
-#' @param nmax maximum total allowed sample size.
+#' @param nmax maximum **total** allowed sample size.
 #' @param seed seed for the random number generator
-#' @param boot.R number of bootstrap resamples
+#' @param boot.R number of bootstrap resamples to use (if `method == "boot"`)
 #' @param ncpus number of cores to use
 #' @param force.balanced logical flag to force the use of balanced sampling for
 #'        the algorithms on each instance
 #' @param save.to.file logical flag: should the results be saved to a file
 #'        in the current working directory?
-#' @param folder directory to save files (if save.to.file == TRUE)
+#' @param folder directory to save files (if `save.to.file == TRUE`)
 #'
 #'
 #' @return a list object containing the following items:
 #' \itemize{
 #'    \item \code{Xk} - list of observed performance values for all `algorithms`
-#'    \item \code{phi.est} - estimated values for the statistic of interest
-#'    \item \code{se} - standard error of the estimates
+#'    \item \code{Phik} - estimated values for the statistics of interest
+#'    \item \code{SEk} - standard errors of the estimates
 #'    \item \code{nk} - vector with the number of observations generated for
 #'                      each algorithm
 #'    \item \code{seed} - the seed used for the PRNG
@@ -151,6 +158,7 @@
 #'
 #' se.max = 0.5
 #' dif = "simple"
+#' type = "all.vs.all",
 #' seed = 1234
 #' method = "param"
 #' nstart = 20
@@ -164,6 +172,7 @@
 #'
 #'
 
+#UNTESTED
 calc_nreps <- function(instance,         # instance parameters
                        algorithms,       # algorithm parameters
                        se.max,           # desired (max) standard error
@@ -189,6 +198,7 @@ calc_nreps <- function(instance,         # instance parameters
                FUN = function(x){assertthat::has_name(x, "FUN")})),
     is.numeric(se.max) && length(se.max) == 1,
     dif %in% c("simple", "perc"),
+    type %in% c("all.vs.all", "all.vs.first"),
     method %in% c("param", "boot"),
     assertthat::is.count(nstart),
     is.infinite(nmax) || assertthat::is.count(nmax),
@@ -224,9 +234,16 @@ calc_nreps <- function(instance,         # instance parameters
                            mc.cores = ncpus,
                            SIMPLIFY = FALSE)
 
-  # PAREI AQUI
-  SE <- calc_se(x1 = x1j, x2 = x2j,
-                dif = dif, method = method, boot.R = boot.R)
+  # PAREI AQUI (inside calc_sek)
+  SEk <- lapply(X      = Xk,
+                FUN    = calc_sek,
+                dif    = dif,
+                type   = type,
+                method = method,
+                boot.R = boot.R)
+
+#  SE <- calc_se(x1 = x1j, x2 = x2j,
+#                dif = dif, method = method, boot.R = boot.R)
 
   while(SE$se > se.max & (n1j + n2j) < nmax){
     # Echo something for the user

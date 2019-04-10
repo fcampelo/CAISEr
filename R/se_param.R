@@ -15,32 +15,27 @@
 #'    Sample size estimation for power and accuracy in the experimental
 #'    comparison of algorithms. Journal of Heuristics 25(2):305-338, 2019.
 #'
-#' @param x1 vector of observations
-#' @param x2 vector of observations
-#' @param dif name of the difference for which the SE is desired. Accepts
-#'            "simple" (simple differences) or "perc" (percent differences).
+#' @inheritParams calc_sek
 #' @param ... other parameters (used only for compatibility with calls to
 #'            [se_boot()], unused in this function)
 #'
-#' @return estimated standard error
+#' @return estimated standard errors
 #'
 #' @author Felipe Campelo (\email{fcampelo@@ufmg.br})
 #'
 #' @export
 #'
 #' @examples
-#' # two vectors of normally distributed observations
+#' # three vectors of normally distributed observations
 #' set.seed(1234)
-#' x1 <- rnorm(100, 5, 1)  # mean = 5, sd = 1
-#' x2 <- rnorm(200, 10, 2) # mean = 10, sd = 2
+#' Xk <- list(rnorm(100, 5, 1)  # mean = 5, sd = 1,
+#'            rnorm(200, 10, 2) # mean = 10, sd = 2,
+#'            rnorm(500, 15, 3) # mean = 15, sd = 3)
 #'
-#' # Theoretical SE for simple difference: 0.1732051
-#' se_param(x1, x2, dif = "simple")
-#'
-#' # Theoretical (Fieller, no covariance) SE for percent differences: 0.04
-#' se_param(x1, x2, dif = "perc")
+#' se_param(Xk, dif = "simple", type = "all.vs.all")
+#' se_param(Xk, dif = "percent", type = "all.vs.first")
 
-# TESTED
+# UNTESTED
 se_param <- function(x1,  # vector of observations
                      x2,  # vector of observations
                      dif, # type of statistic
