@@ -80,9 +80,9 @@
 #'
 #' @param instance a list object containing the definitions of the problem
 #'    instance.
-#'    See Section _Problems and Algorithms_ for details.
+#'    See Section _Instance_ for details.
 #' @param algorithms a list object containing the definitions of all algorithms.
-#'    See Section _Problems and Algorithms_ for details.
+#'    See Section _Algorithms_ for details.
 #' @param se.max desired upper limit for the standard error of the estimated
 #'        difference between pairs of algorithms. See Section
 #'        _Pairwise Differences_ for details.
@@ -109,14 +109,15 @@
 #'
 #' @return a list object containing the following items:
 #' \itemize{
+#'    \item \code{instance} - alias for the problem instance considered
 #'    \item \code{Xk} - list of observed performance values for all `algorithms`
-#'    \item \code{Phik} - estimated values for the statistics of interest
-#'    \item \code{SEk} - standard errors of the estimates
-#'    \item \code{nk} - vector with the number of observations generated for
-#'                      each algorithm
-#'    \item \code{seed} - the seed used for the PRNG
-#'    \item \code{dif} - the type of difference used
-#'    \item \code{method} - the method used ("param" / "boot")
+#'    \item \code{Nk} - vector of sample sizes generated for each algorithm
+#'    \item \code{Diffk} - data frame with point estimates, standard errors and
+#'    other information for all algorithm pairs of interest
+#'    \item \code{seed} - seed used for the PRNG
+#'    \item \code{dif} - type of difference used
+#'    \item \code{method} - method used ("param" / "boot")
+#'    \item \code{type} - type of pairings ("all.vs.all" / "all.vs.first")
 #' }
 #'
 #' @author Felipe Campelo (\email{fcampelo@@ufmg.br})
@@ -143,49 +144,53 @@
 #'
 #' @examples
 #' # Uses dummy algorithms and a dummy instance to illustrate the
-#' # use of calc_nreps2
+#' # use of calc_nreps
 #' algorithm1 <- list(FUN = "dummyalgo", alias = "algo1",
 #'                    distribution.fun = "rnorm",
-#'                    distribution.pars = list(mean = 10, sd = 1))
+#'                    distribution.pars = list(mean = 10, sd = 4))
 #' algorithm2 <- list(FUN = "dummyalgo", alias = "algo2",
 #'                    distribution.fun = "rnorm",
-#'                    distribution.pars = list(mean = 20, sd = 4))
+#'                    distribution.pars = list(mean = 20, sd = 8))
 #' algorithm3 <- list(FUN = "dummyalgo", alias = "algo3",
 #'                    distribution.fun = "rnorm",
-#'                    distribution.pars = list(mean = 30, sd = 10))
-#' algorithms <- list(alg1 = algorithm1, alg2 = algorithm2, alg3 = algorithm3)
+#'                    distribution.pars = list(mean = 30, sd = 16))
+#' algorithm4 <- list(FUN = "dummyalgo", alias = "algo4",
+#'                    distribution.fun = "rnorm",
+#'                    distribution.pars = list(mean = 50, sd = 32))
+#' algorithms <- list(alg1 = algorithm1, alg2 = algorithm2,
+#'                    alg3 = algorithm3, alg4 = algorithm4)
 #' instance <- list(FUN = "dummyinstance")
 #'
-#' se.max = 0.5
-#' dif = "simple"
-#' type = "all.vs.all",
+#' se.max = 0.01
+#' dif = "perc"
+#' type = "all.vs.all"
 #' seed = 1234
 #' method = "param"
 #' nstart = 20
+#' nmax   = 600
 #' ncpus  = 1
-#' nmax   = 200
-#' boot.R = 999
-#' force.balanced = FALSE
-#' save.to.file  = FALSE
-#' folder = "./nreps_files"
 #'
-#'
-#'
+#' myreps <- calc_nreps(instance = instance, algorithms = algorithms,
+#'                      se.max   = se.max,   dif        = dif,
+#'                      type     = type,     nstart     = nstart,
+#'                      nmax     = nmax,     seed       = seed)
 
-#UNTESTED
-calc_nreps <- function(instance,         # instance parameters
-                       algorithms,       # algorithm parameters
-                       se.max,           # desired (max) standard error
-                       dif,              # difference ("simple", "perc"),
-                       method = "param", # method ("param", "boot")
-                       nstart = 20,      # initial number of samples
-                       nmax   = 200,    # maximum allowed sample size
-                       seed   = NULL,    # seed for PRNG
-                       boot.R = 999,     # number of bootstrap resamples
-                       ncpus  = 1,       # number of cores to use
-                       force.balanced = FALSE, # force balanced sampling
-                       save.to.file  = FALSE, # save results to tmp file
-                       folder = "./nreps_files") # directory to save files (if save.to.file == TRUE)
+#TESTED
+calc_nreps <- function(instance,            # instance parameters
+                       algorithms,          # algorithm parameters
+                       se.max,              # desired (max) standard error
+                       dif = "simple",      # type of difference
+                       type = "all.vs.all", # differences to consider
+                       method = "param",    # method ("param", "boot")
+                       nstart = 20,         # initial number of samples
+                       nmax   = 200,        # maximum allowed sample size
+                       seed   = NULL,       # seed for PRNG
+                       boot.R = 999,        # number of bootstrap resamples
+                       ncpus  = 1,          # number of cores to use
+                       force.balanced = FALSE,   # force balanced sampling
+                       save.to.file  = FALSE,    # save results to tmp file
+                       folder = "./nreps_files") # directory to save files (if
+# save.to.file == TRUE)
 {
 
   # ========== Error catching ========== #
@@ -223,7 +228,7 @@ calc_nreps <- function(instance,         # instance parameters
   }
 
   # Echo some information for the user
-  cat("\nSampling algorithms on instance:", instance$alias)
+  cat("\nSampling algorithms on instance ", instance$alias, ": ")
 
   # generate initial samples
   Nk <- rep(nstart, length(algorithms))
@@ -234,55 +239,64 @@ calc_nreps <- function(instance,         # instance parameters
                            mc.cores = ncpus,
                            SIMPLIFY = FALSE)
 
-  # PAREI AQUI (inside calc_sek)
-  SEk <- lapply(X      = Xk,
-                FUN    = calc_sek,
-                dif    = dif,
-                type   = type,
-                method = method,
-                boot.R = boot.R)
+  # Calculate point estimates, SEs, and sample size ratios (current x optimal)
+  Diffk <- calc_se(X = Xk,
+                   dif    = dif,
+                   type   = type,
+                   method = method,
+                   boot.R = boot.R)
 
-#  SE <- calc_se(x1 = x1j, x2 = x2j,
-#                dif = dif, method = method, boot.R = boot.R)
-
-  while(SE$se > se.max & (n1j + n2j) < nmax){
+  while(any(Diffk$SE > se.max) & (sum(Nk) < nmax)){
     # Echo something for the user
-    if (!(n1j + n2j) %% nstart) cat(".")
+    if (!(sum(Nk) %% nstart)) cat(".")
 
     if (force.balanced) {
-      x1j <- c(x1j, get_observations(algorithm1, instance, 1))
-      x2j <- c(x2j, get_observations(algorithm2, instance, 1))
-      n1j <- n1j + 1
-      n2j <- n2j + 1
+      # Generate a singlenew observation for each algorithm
+      newX <- parallel::mcmapply(FUN      = get_observations,
+                                 algo     = algorithms,
+                                 n        = 1,
+                                 MoreArgs = list(instance = instance),
+                                 mc.cores = ncpus,
+                                 SIMPLIFY = FALSE)
+      # Append new observation to each algo list and update sample size counters
+      Xk <- mapply(FUN = c, Xk, newX,
+                   SIMPLIFY = FALSE)
+      Nk <- Nk + 1
     } else {
-      # Calculate optimal ratio
-      r.opt <- calc_ropt(x1 = x1j, x2 = x2j, dif = dif)
+      # Get pair that has the worst SE
+      worst.se <- Diffk[which.max(Diffk$SE), ]
 
-      # Sample according to r.opt
-      if (n1j / n2j < r.opt) {    # sample algorithm 1
-        x1j <- c(x1j, get_observations(algorithm1, instance, 1))
-        n1j <- n1j + 1
-      } else {                    # sample algorithm 2
-        x2j <- c(x2j, get_observations(algorithm2, instance, 1))
-        n2j <- n2j + 1
+      # Determine algorithm that should receive a new observation
+      if (worst.se$r <= worst.se$ropt){
+        ind <- worst.se[1, 1]
+      } else {
+        ind <- worst.se[1, 2]
       }
-    }
+      # Generate new observation and update Nk counter
+      Xk[[ind]] <- c(Xk[[ind]],
+                     get_observations(algo = algorithms[[ind]],
+                                      instance = instance,
+                                      n = 1))
+      Nk[ind] <- Nk[ind] + 1
 
-    # Recalculate SE
-    SE <- calc_se(x1 = x1j, x2 = x2j,
-                  dif = dif, method = method, boot.R = boot.R)
+      # Recalculate point estimates, SEs, and sample size ratios
+      Diffk <- calc_se(X = Xk,
+                       dif    = dif,
+                       type   = type,
+                       method = method,
+                       boot.R = boot.R)
+    }
   }
 
   # Assemble output list
   output <- list(instance = instance$alias,
-                 x1j      = x1j,
-                 x2j      = x2j,
-                 phi.est  = SE$x.est,
-                 se       = SE$se,
-                 n1j      = n1j,
-                 n2j      = n2j,
-                 seed     = seed,
-                 dif      = dif)
+                 Xk       = Xk,
+                 Nk       = Nk,
+                 Diffk    = Diffk,
+                 dif      = dif,
+                 method   = method,
+                 type     = type,
+                 seed     = seed)
 
   # Save to file if required
   if (save.to.file){

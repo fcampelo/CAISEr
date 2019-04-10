@@ -1,6 +1,8 @@
 ## Changes and notes
-* added function `calc_nreps()` to calculate the number of repetitions in the case of multiple (>2) algorithms
-* added function `calc_sek()` to calculate standard errors in the case of multiple algorithms
+* Major change in the package. Not backward compatible.
+* Added function `calc_nreps()` to calculate the number of repetitions in the case of multiple (>2) algorithms. This replaces `calc_nreps2()`
+* function `calc_se()` now performs point estimate and standard error 
+calculations for all pairs of interest in the case of multiple algorithms
 
 ## Test environments
 * local macOS High Sierra 10.13.5, R version 3.5.1

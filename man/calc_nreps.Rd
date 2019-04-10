@@ -4,37 +4,42 @@
 \alias{calc_nreps}
 \title{Determine sample sizes for a set of algorithms on a single problem instance}
 \usage{
-calc_nreps(instance, algorithms, se.max, dif, method = "param",
-  nstart = 20, nmax = 200, seed = NULL, boot.R = 999, ncpus = 1,
-  force.balanced = FALSE, save.to.file = FALSE,
-  folder = "./nreps_files")
+calc_nreps(instance, algorithms, se.max, dif = "simple",
+  type = "all.vs.all", method = "param", nstart = 20, nmax = 200,
+  seed = NULL, boot.R = 999, ncpus = 1, force.balanced = FALSE,
+  save.to.file = FALSE, folder = "./nreps_files")
 }
 \arguments{
 \item{instance}{a list object containing the definitions of the problem
 instance.
-See Section \emph{Problems and Algorithms} for details.}
+See Section \emph{Instance} for details.}
 
 \item{algorithms}{a list object containing the definitions of all algorithms.
-See Section \emph{Problems and Algorithms} for details.}
+See Section \emph{Algorithms} for details.}
 
 \item{se.max}{desired upper limit for the standard error of the estimated
-difference between the two algorithms. See Section
-\emph{Types of Differences} for details.}
+difference between pairs of algorithms. See Section
+\emph{Pairwise Differences} for details.}
 
 \item{dif}{type of difference to be used. Accepts "perc"
 (for percent differences) or "simple" (for simple differences)}
 
-\item{method}{method to use for estimating the standard error. Accepts
+\item{type}{type of comparisons being performed. Accepts "all.vs.first"
+(in which cases the first object in \code{algorithms} is considered to be
+the reference algorithm) or "all.vs.all" (if there is no reference
+and all pairwise comparisons are desired).}
+
+\item{method}{method to use for estimating the standard errors. Accepts
 "param" (for parametric) or "boot" (for bootstrap)}
 
 \item{nstart}{initial number of algorithm runs for each algorithm.
 See Section \emph{Initial Number of Observations} for details.}
 
-\item{nmax}{maximum total allowed sample size.}
+\item{nmax}{maximum \strong{total} allowed sample size.}
 
 \item{seed}{seed for the random number generator}
 
-\item{boot.R}{number of bootstrap resamples}
+\item{boot.R}{number of bootstrap resamples to use (if \code{method == "boot"})}
 
 \item{ncpus}{number of cores to use}
 
@@ -44,19 +49,19 @@ the algorithms on each instance}
 \item{save.to.file}{logical flag: should the results be saved to a file
 in the current working directory?}
 
-\item{folder}{directory to save files (if save.to.file == TRUE)}
+\item{folder}{directory to save files (if \code{save.to.file == TRUE})}
 }
 \value{
 a list object containing the following items:
 \itemize{
+\item \code{instance} - alias for the problem instance considered
 \item \code{Xk} - list of observed performance values for all \code{algorithms}
-\item \code{phi.est} - estimated values for the statistic of interest
-\item \code{se} - standard error of the estimates
-\item \code{nk} - vector with the number of observations generated for
-each algorithm
-\item \code{seed} - the seed used for the PRNG
-\item \code{dif} - the type of difference used
-\item \code{method} - the method used ("param" / "boot")
+\item \code{Diffk} - data frame with point estimates, standard errors and
+other information for all algorithm pairs of interest
+\item \code{seed} - seed used for the PRNG
+\item \code{dif} - type of difference used
+\item \code{method} - method used ("param" / "boot")
+\item \code{type} - type of pairings ("all.vs.all" / "all.vs.first")
 }
 }
 \description{
@@ -132,21 +137,24 @@ In general, higher sample sizes are the price to pay for abandoning
 distributional assumptions. Use lower values of \code{nstart} with caution.
 }
 
-\section{Types of Differences}{
+\section{Pairwise Differences}{
 
 Parameter \code{dif} informs the type of difference in performance to be used
 for the estimation (\code{mu_a} and \code{mu_b} represent the mean performance of any
 two algorithms on the test instance, and \code{mu} represents the grand mean of all
 algorithms given in \code{algorithms}):
 \itemize{
-\item If \code{dif == "perc"} it estimates (mu2 - mu1) / mu.
-\item If \code{dif == "simple"} it estimates mu2 - mu1.
+\item If \code{dif == "perc"} and \code{type == "all.vs.first}, the estimated quantity is
+phi_{1b} = (mu_1 - mu_b) / mu_1 = 1 - (mu_b / mu_1).
+\item If \code{dif == "perc"} and \code{type == "all.vs.all}, the estimated quantity is
+phi_{ab} = (mu_a - mu_b) / mu_a = 1 - (mu_b / mu_a).
+\item If \code{dif == "simple"} it estimates mu_a - mu_b.
 }
 }
 
 \examples{
 # Uses dummy algorithms and a dummy instance to illustrate the
-# use of calc_nreps2
+# use of calc_nreps
 algorithm1 <- list(FUN = "dummyalgo", alias = "algo1",
                    distribution.fun = "rnorm",
                    distribution.pars = list(mean = 10, sd = 1))
@@ -161,17 +169,16 @@ instance <- list(FUN = "dummyinstance")
 
 se.max = 0.5
 dif = "simple"
+type = "all.vs.all"
 seed = 1234
 method = "param"
 nstart = 20
 ncpus  = 1
-nmax   = 200
+nmax   = 300
 boot.R = 999
 force.balanced = FALSE
 save.to.file  = FALSE
 folder = "./nreps_files"
-
-
 
 }
 \references{

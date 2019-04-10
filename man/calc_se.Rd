@@ -4,38 +4,48 @@
 \alias{calc_se}
 \title{Calculates the standard error for simple and percent differences}
 \usage{
-calc_se(x1, x2, dif, method = "param", boot.R = 999)
+calc_se(Xk, dif = "simple", type = "all.vs.all", method = "param",
+  boot.R = 999)
 }
 \arguments{
-\item{x1}{vector of observations}
+\item{Xk}{list object where each position contains a vector of observations
+of algorithm k on a given problem instance.}
 
-\item{x2}{vector of observations}
+\item{dif}{name of the difference for which the SEs are desired.
+Accepts "perc" (for percent differences) or "simple" (for simple
+differences)}
 
-\item{dif}{name of the difference for which the SE is desired. Accepts "perc"
-(for percent differences) or "simple" (for simple differences)}
+\item{type}{standard errors to be calculated. Accepts "all.vs.first"
+(in which cases the first object in \code{algorithms} is considered to be
+the reference algorithm) or "all.vs.all" (if there is no reference
+and all pairwise SEs are desired).}
 
 \item{method}{method used to calculate the interval. Accepts "param"
 (using parametric formulas based on normality of the sampling
 distribution of the means) or "boot" (for bootstrap).}
 
-\item{boot.R}{(optional) number of bootstrap resamples.}
+\item{boot.R}{(optional) number of bootstrap resamples
+(if \code{method == "boot"})}
 }
 \value{
 a list object containing the following items:
 \itemize{
-\item \code{x.est} - estimated value
-\item \code{se} - standard error
+\item \code{Phi.est} - estimated values of the statistic of interest for
+each pair of algorithms of interest (all pairs if \code{type == "all.vs.all"},
+or all pairs containing the first algorithm if \code{type == "all.vs.first"}).
+\item \code{se} - standard error estimates
 }
 }
 \description{
 Calculates the sample standard error for the estimator differences between
-two algorithms on a given instance.
+multiple algorithms on a given instance.
 }
 \details{
 \itemize{
-\item If \code{dif == "perc"} it returns the SE for sample estimator of
-\eqn{(mu2 - mu1) / mu1}, where \eqn{mu1, mu2} are the means of the
-populations that generated the sample vectors \eqn{x1, x2}.
+\item If \code{dif == "perc"} it returns the standard errors for the sample
+estimates of pairs
+\eqn{(mu2 - mu1) / mu}, where \eqn{mu1, mu2} are the means of the
+populations that generated sample vectors \eqn{x1, x2}, and
 \item If \code{dif == "simple"} it returns the SE for sample estimator of
 \eqn{(mu2 - mu1)}
 }
@@ -50,18 +60,16 @@ comparison of algorithms. Journal of Heuristics 25(2):305-338, 2019.
 }
 
 \examples{
-# two vectors of normally distributed observations
+# three vectors of normally distributed observations
 set.seed(1234)
-x1 <- rnorm(100, 5, 1)  # mean = 5, sd = 1
-x2 <- rnorm(200, 10, 2) # mean = 10, sd = 2
+Xk <- list(rnorm(100, 5, 1),  # mean = 5, sd = 1,
+           rnorm(200, 10, 2), # mean = 10, sd = 2,
+           rnorm(500, 15, 3)) # mean = 15, sd = 3
 
-# Theoretical SE for simple difference: 0.1732051
-calc_se(x1, x2, dif = "simple", method = "param")
+calc_se(Xk, dif = "simple", type = "all.vs.all", method = "param")
 
-# Theoretical (Fieller, no covariance) SE for percent differences: 0.04
-calc_se(x1, x2, dif = "perc", method = "boot")
+calc_se(Xk, dif = "perc", type = "all.vs.first", method = "param")
 }
 \author{
-Felipe Campelo (\email{fcampelo@ufmg.br}),
-Fernanda Takahashi (\email{fernandact@ufmg.br})
+Felipe Campelo (\email{fcampelo@ufmg.br})
 }

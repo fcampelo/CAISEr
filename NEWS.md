@@ -1,7 +1,9 @@
-# CAISEr 0.4.0
+# CAISEr 1.0
 * Major update: package can now deal with comparisons of multiple (>2) algorithms.
-* added function `calc_nreps()` to calculate the number of repetitions in the case of multiple (>2) algorithms.
-* added function `calc_sek()` to perform the standard error calculations for the case with multiple algorithms
+* This version is **not** backward compatible with versions 0.xx
+* added function `calc_nreps()` to calculate the number of repetitions in the case of multiple (>2) algorithms. This function replaces the old `calc_nreps2()`
+* function `calc_se()` now performs point estimate and standard error 
+calculations for all pairs of interest in the case of multiple algorithms
 
 # CAISEr 0.3.3
 * fixed problem with printing version in the vignette.

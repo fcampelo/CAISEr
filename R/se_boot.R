@@ -1,6 +1,6 @@
 #' Bootstrap standard errors
 #'
-#' Calculates the standard error of a given statistic using bootstrap
+#' Calculates the standard errors of a given statistic using bootstrap
 #'
 #' @section References:
 #' -  A.C. Davison, D.V. Hinkley:
@@ -9,11 +9,7 @@
 #'    Sample size estimation for power and accuracy in the experimental
 #'    comparison of algorithms. Journal of Heuristics 25(2):305-338, 2019.
 #'
-#' @param x1 vector of observations
-#' @param x2 vector of observations
-#' @param dif name of the difference for which the SE is desired. Accepts
-#'            "simple" (simple differences) or "perc" (percent differences).
-#' @param boot.R (optional) number of bootstrap resamples
+#' @inheritParams calc_se
 #'
 #' @return estimated standard error
 #'
@@ -22,51 +18,47 @@
 #' @export
 #'
 #' @examples
-#' # two vectors of normally distributed observations
+#' # three vectors of normally distributed observations
 #' set.seed(1234)
-#' x1 <- rnorm(100, 5, 1)  # mean = 5, sd = 1
-#' x2 <- rnorm(200, 10, 2) # mean = 10, sd = 2
+#' Xk <- list(rnorm(100, 5, 1),  # mean = 5, sd = 1,
+#'            rnorm(200, 10, 2), # mean = 10, sd = 2,
+#'            rnorm(500, 15, 3)) # mean = 15, sd = 3
 #'
-#' # Theoretical SE for simple difference: 0.1732051
-#' se_boot(x1, x2, dif = "simple")
-#'
-#' # Theoretical (Fieller, no covariance) SE for percent differences: 0.04
-#' se_boot(x1, x2, dif = "perc")
+#' se_boot(Xk, dif = "simple", type = "all.vs.all")
+#' se_boot(Xk, dif = "perc", type = "all.vs.first")
 
-# @param ncpus number of cores to use. #//DoParallel
-
-# TESTED
-se_boot <- function(x1,           # vector of observations
-                    x2,           # vector of observations
-                    dif,          # type of statistic
-                    boot.R = 999) # number of bootstrap resamples
+# TO DO
+se_boot <- function(Xk,                  # vector of observations
+                    dif = "simple",      # type of difference
+                    type = "all.vs.all", # standard errors to calculate
+                    boot.R = 999)        # number of bootstrap resamples
 {
 
   # ========== Error catching ========== #
   assertthat::assert_that(
-    is.numeric(x1), is.vector(x1), length(x1) > 1,
-    is.numeric(x2), is.vector(x2), length(x2) > 1,
-    assertthat::is.count(boot.R), boot.R > 1,
-    dif %in% c('simple', 'perc'))
+    is.list(Xk),
+    all(sapply(Xk, is.numeric)),
+    all(sapply(Xk, function(x){length(x) >= 2})),
+    dif %in% c('simple', 'perc'),
+    type %in% c("all.vs.all", "all.vs.first"),
+    assertthat::is.count(boot.R), boot.R > 1)
   # ==================================== #
 
-  # Perform bootstrap
-  phi.hat <- numeric(boot.R)
-  for(i in 1:boot.R)
-  {
-    x1.b <- sample(x1, size = length(x1), replace = TRUE)
-    x2.b <- sample(x2, size = length(x2), replace = TRUE)
-    phi.hat[i] <- calc_phi(x1 = x1.b, x2 = x2.b, dif = dif)
-  }
+  # Get pairs for comparison
+  algo.pairs <- t(combn(1:length(Xk), 2))
+  if (type == "all.vs.first") algo.pairs <- algo.pairs[1:(nalgs - 1), ]
 
-  #//DoParallel
-  # phi.hat <- foreach(i = 1:boot.R, .combine = c) %dopar%
+  stop("se_boot still under construction")
+  # Phi.hat <- vector("list", length = nrow(algo.pairs))
+  # # Perform bootstrap
+  #
+  # for(i in 1:boot.R)
   # {
   #   x1.b <- sample(x1, size = length(x1), replace = TRUE)
   #   x2.b <- sample(x2, size = length(x2), replace = TRUE)
-  #   phi(x1 = x1.b, x2 = x2.b)
+  #   phi.hat[i] <- calc_phi(x1 = x1.b, x2 = x2.b, dif = dif)
   # }
-
-  # Return standard error
-  return(stats::sd(phi.hat))
+  #
+  # # Return standard error
+  # return(stats::sd(phi.hat))
 }
