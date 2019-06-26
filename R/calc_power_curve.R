@@ -13,7 +13,8 @@
 #' `d`, the (standardized) effect size; and `power`, the (expected) power
 #' to detect each effect size in `d`.
 #'
-#' @author Felipe Campelo (\email{fcampelo@@ufmg.br})
+#' @author Felipe Campelo (\email{fcampelo@@ufmg.br},
+#' \email{f.campelo@@aston.ac.uk})
 #'
 #' @examples
 #' my.cpc <- calc_power_curve(ninstances = 10)

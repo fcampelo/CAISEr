@@ -73,10 +73,10 @@
 #' algorithms given in `algorithms`):
 #'
 #' - If `dif == "perc"` and `type == "all.vs.first`, the estimated quantity is
-#'    phi_{1b} = (mu_1 - mu_b) / mu_1 = 1 - (mu_b / mu_1).
+#'    \eqn{phi_{1b} = (mu_1 - mu_b) / mu_1 = 1 - (mu_b / mu_1)}.
 #' - If `dif == "perc"` and `type == "all.vs.all`, the estimated quantity is
-#'    phi_{ab} = (mu_a - mu_b) / mu_a = 1 - (mu_b / mu_a).
-#' - If `dif == "simple"` it estimates mu_a - mu_b.
+#'    \eqn{phi_{ab} = (mu_a - mu_b) / mu}.
+#' - If `dif == "simple"` it estimates \eqn{mu_a - mu_b}.
 #'
 #' @param instance a list object containing the definitions of the problem
 #'    instance.
@@ -120,7 +120,7 @@
 #'    \item \code{type} - type of pairings ("all.vs.all" / "all.vs.first")
 #' }
 #'
-#' @author Felipe Campelo (\email{fcampelo@@ufmg.br})
+#' @author Felipe Campelo (\email{fcampelo@@gmail.com})
 #'
 #' @references
 #' - F. Campelo, F. Takahashi:
@@ -147,23 +147,23 @@
 #' # use of calc_nreps
 #' algorithm1 <- list(FUN = "dummyalgo", alias = "algo1",
 #'                    distribution.fun = "rnorm",
-#'                    distribution.pars = list(mean = 10, sd = 4))
+#'                    distribution.pars = list(mean = 5, sd = 2))
 #' algorithm2 <- list(FUN = "dummyalgo", alias = "algo2",
 #'                    distribution.fun = "rnorm",
-#'                    distribution.pars = list(mean = 20, sd = 8))
+#'                    distribution.pars = list(mean = 10, sd = 4))
 #' algorithm3 <- list(FUN = "dummyalgo", alias = "algo3",
 #'                    distribution.fun = "rnorm",
-#'                    distribution.pars = list(mean = 30, sd = 16))
+#'                    distribution.pars = list(mean = 15, sd = 6))
 #' algorithm4 <- list(FUN = "dummyalgo", alias = "algo4",
 #'                    distribution.fun = "rnorm",
-#'                    distribution.pars = list(mean = 50, sd = 32))
+#'                    distribution.pars = list(mean = 20, sd = 8))
 #' algorithms <- list(alg1 = algorithm1, alg2 = algorithm2,
 #'                    alg3 = algorithm3, alg4 = algorithm4)
 #' instance <- list(FUN = "dummyinstance")
 #'
-#' se.max = 0.01
-#' dif = "perc"
-#' type = "all.vs.all"
+#' se.max = 0.05
+#' dif = "simple"
+#' type = "all.vs.first"
 #' seed = 1234
 #' method = "param"
 #' nstart = 20
@@ -175,7 +175,7 @@
 #'                      type     = type,     nstart     = nstart,
 #'                      nmax     = nmax,     seed       = seed)
 
-#TESTED
+# TO TEST - VALIDATE ALL VS FIRST PERC FORMULA
 calc_nreps <- function(instance,            # instance parameters
                        algorithms,          # algorithm parameters
                        se.max,              # desired (max) standard error
@@ -228,7 +228,7 @@ calc_nreps <- function(instance,            # instance parameters
   }
 
   # Echo some information for the user
-  cat("\nSampling algorithms on instance ", instance$alias, ": ")
+  cat("\nSampling algorithms on instance", instance$alias, ": ")
 
   # generate initial samples
   Nk <- rep(nstart, length(algorithms))
@@ -240,7 +240,7 @@ calc_nreps <- function(instance,            # instance parameters
                            SIMPLIFY = FALSE)
 
   # Calculate point estimates, SEs, and sample size ratios (current x optimal)
-  Diffk <- calc_se(X = Xk,
+  Diffk <- calc_se(X      = Xk,
                    dif    = dif,
                    type   = type,
                    method = method,

@@ -244,5 +244,6 @@ Applied Statistics and Probability for Engineers, 6th ed. Wiley (2013)
 }
 }
 \author{
-Felipe Campelo (\email{fcampelo@ufmg.br})
+Felipe Campelo (\email{fcampelo@ufmg.br},
+\email{f.campelo@aston.ac.uk})
 }

@@ -38,22 +38,28 @@
 #'    \item \code{se} - standard error estimates
 #' }
 #'
-#' @author Felipe Campelo (\email{fcampelo@@ufmg.br})
+#' @author Felipe Campelo (\email{fcampelo@@ufmg.br},
+#' \email{f.campelo@@aston.ac.uk})
 #'
 #' @export
 #'
 #' @examples
 #' # three vectors of normally distributed observations
 #' set.seed(1234)
-#' Xk <- list(rnorm(100, 5, 1),  # mean = 5, sd = 1,
-#'            rnorm(200, 10, 2), # mean = 10, sd = 2,
-#'            rnorm(500, 15, 3)) # mean = 15, sd = 3
+#' Xk <- list(rnorm(10, 5, 1),  # mean = 5, sd = 1,
+#'            rnorm(20, 10, 2), # mean = 10, sd = 2,
+#'            rnorm(50, 15, 5)) # mean = 15, sd = 3
 #'
 #' calc_se(Xk, dif = "simple", type = "all.vs.all", method = "param")
+#' calc_se(Xk, dif = "simple", type = "all.vs.all", method = "boot")
 #'
 #' calc_se(Xk, dif = "perc", type = "all.vs.first", method = "param")
+#' calc_se(Xk, dif = "perc", type = "all.vs.first", method = "boot")
+#'
+#' calc_se(Xk, dif = "perc", type = "all.vs.all", method = "param")
+#' calc_se(Xk, dif = "perc", type = "all.vs.all", method = "boot")
 
-
+# TESTED: OK
 calc_se <- function(Xk,                  # vector of observations
                     dif = "simple",      # type of difference
                     type = "all.vs.all", # standard errors to calculate

@@ -12,7 +12,8 @@
 #'
 #' @seealso \link{calc_nreps2}
 #'
-#' @author Felipe Campelo (\email{fcampelo@@ufmg.br})
+#' @author Felipe Campelo (\email{fcampelo@@ufmg.br},
+#' \email{f.campelo@@aston.ac.uk})
 #'
 #' @export
 #'

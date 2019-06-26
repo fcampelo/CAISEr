@@ -39,5 +39,6 @@ calc_ropt(x1, x2, "simple")
 calc_ropt(x1, x2, "perc")
 }
 \author{
-Felipe Campelo (\email{fcampelo@ufmg.br})
+Felipe Campelo (\email{fcampelo@ufmg.br},
+\email{f.campelo@aston.ac.uk})
 }

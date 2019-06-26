@@ -16,7 +16,8 @@
 #'
 #' @return numeric value: optimal ratio n1 / n2
 #'
-#' @author Felipe Campelo (\email{fcampelo@@ufmg.br})
+#' @author Felipe Campelo (\email{fcampelo@@ufmg.br},
+#' \email{f.campelo@@aston.ac.uk})
 #'
 #' @export
 #'

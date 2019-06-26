@@ -56,6 +56,6 @@ in relation to the paired t.test, using the formulas:
 }
 
 \author{
-Felipe Campelo (\email{fcampelo@ufmg.br}),
-Fernanda Takahashi (\email{fernandact@ufmg.br})
+Felipe Campelo (\email{fcampelo@ufmg.br},
+\email{f.campelo@aston.ac.uk})
 }

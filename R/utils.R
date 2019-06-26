@@ -16,7 +16,8 @@
 #' @return a list object with a single field \code{$value}, containing a value
 #' distributed according to \code{distribution.fun} and \code{distribution.pars}.
 #'
-#' @author Felipe Campelo (\email{fcampelo@@ufmg.br})
+#' @author Felipe Campelo (\email{fcampelo@@ufmg.br},
+#' \email{f.campelo@@aston.ac.uk})
 #'
 #' @export
 

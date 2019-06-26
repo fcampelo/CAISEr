@@ -144,7 +144,8 @@
 #'    \item \code{Underpowered} - flag: TRUE if N < N.star
 #' }
 #'
-#' @author Felipe Campelo (\email{fcampelo@@ufmg.br})
+#' @author Felipe Campelo (\email{fcampelo@@ufmg.br},
+#' \email{f.campelo@@aston.ac.uk})
 #'
 #' @references
 #' - F. Campelo, F. Takahashi:

@@ -35,8 +35,8 @@
 #'    \item \code{test.type} - type of test
 #' }
 #'
-#' @author Felipe Campelo (\email{fcampelo@@ufmg.br}),
-#'         Fernanda Takahashi (\email{fernandact@@ufmg.br})
+#' @author Felipe Campelo (\email{fcampelo@@ufmg.br},
+#' \email{f.campelo@@aston.ac.uk})
 #'
 #' @export
 

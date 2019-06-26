@@ -56,6 +56,7 @@ a list object containing the following items:
 \itemize{
 \item \code{instance} - alias for the problem instance considered
 \item \code{Xk} - list of observed performance values for all \code{algorithms}
+\item \code{Nk} - vector of sample sizes generated for each algorithm
 \item \code{Diffk} - data frame with point estimates, standard errors and
 other information for all algorithm pairs of interest
 \item \code{seed} - seed used for the PRNG
@@ -131,7 +132,7 @@ and 50 if that assumption cannot be made. For the bootstrap approach we
 recommend using at least 20. However, if some distributional assumptions can
 be made - particularly low skewness of the population of algorithm results on
 the test instances), then \code{nstart} can in principle be as small as 5 (if the
-output of the algorithm were known to be normal, it could be 1).
+output of the algorithms were known to be normal, it could be 1).
 
 In general, higher sample sizes are the price to pay for abandoning
 distributional assumptions. Use lower values of \code{nstart} with caution.
@@ -145,10 +146,10 @@ two algorithms on the test instance, and \code{mu} represents the grand mean of 
 algorithms given in \code{algorithms}):
 \itemize{
 \item If \code{dif == "perc"} and \code{type == "all.vs.first}, the estimated quantity is
-phi_{1b} = (mu_1 - mu_b) / mu_1 = 1 - (mu_b / mu_1).
+\eqn{phi_{1b} = (mu_1 - mu_b) / mu_1 = 1 - (mu_b / mu_1)}.
 \item If \code{dif == "perc"} and \code{type == "all.vs.all}, the estimated quantity is
-phi_{ab} = (mu_a - mu_b) / mu_a = 1 - (mu_b / mu_a).
-\item If \code{dif == "simple"} it estimates mu_a - mu_b.
+\eqn{phi_{ab} = (mu_a - mu_b) / mu}.
+\item If \code{dif == "simple"} it estimates \eqn{mu_a - mu_b}.
 }
 }
 
@@ -157,29 +158,33 @@ phi_{ab} = (mu_a - mu_b) / mu_a = 1 - (mu_b / mu_a).
 # use of calc_nreps
 algorithm1 <- list(FUN = "dummyalgo", alias = "algo1",
                    distribution.fun = "rnorm",
-                   distribution.pars = list(mean = 10, sd = 1))
+                   distribution.pars = list(mean = 5, sd = 2))
 algorithm2 <- list(FUN = "dummyalgo", alias = "algo2",
                    distribution.fun = "rnorm",
-                   distribution.pars = list(mean = 20, sd = 4))
+                   distribution.pars = list(mean = 10, sd = 4))
 algorithm3 <- list(FUN = "dummyalgo", alias = "algo3",
                    distribution.fun = "rnorm",
-                   distribution.pars = list(mean = 30, sd = 10))
-algorithms <- list(alg1 = algorithm1, alg2 = algorithm2, alg3 = algorithm3)
+                   distribution.pars = list(mean = 15, sd = 6))
+algorithm4 <- list(FUN = "dummyalgo", alias = "algo4",
+                   distribution.fun = "rnorm",
+                   distribution.pars = list(mean = 20, sd = 8))
+algorithms <- list(alg1 = algorithm1, alg2 = algorithm2,
+                   alg3 = algorithm3, alg4 = algorithm4)
 instance <- list(FUN = "dummyinstance")
 
-se.max = 0.5
+se.max = 0.05
 dif = "simple"
-type = "all.vs.all"
+type = "all.vs.first"
 seed = 1234
 method = "param"
 nstart = 20
+nmax   = 600
 ncpus  = 1
-nmax   = 300
-boot.R = 999
-force.balanced = FALSE
-save.to.file  = FALSE
-folder = "./nreps_files"
 
+myreps <- calc_nreps(instance = instance, algorithms = algorithms,
+                     se.max   = se.max,   dif        = dif,
+                     type     = type,     nstart     = nstart,
+                     nmax     = nmax,     seed       = seed)
 }
 \references{
 \itemize{
@@ -202,5 +207,5 @@ Applied Statistics and Probability for Engineers, 6th ed. Wiley (2013)
 }
 }
 \author{
-Felipe Campelo (\email{fcampelo@ufmg.br})
+Felipe Campelo (\email{fcampelo@gmail.com})
 }

@@ -54,5 +54,6 @@ hist(boot_sdm(x3), breaks = 25, main = "SDM, n = 40")
 par(mfrow = c(1, 1))
 }
 \author{
-Felipe Campelo (\email{fcampelo@ufmg.br})
+Felipe Campelo (\email{fcampelo@ufmg.br},
+\email{f.campelo@aston.ac.uk})
 }

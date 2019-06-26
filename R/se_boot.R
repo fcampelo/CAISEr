@@ -16,21 +16,23 @@
 #' @return Data frame containing, for each pair of interest, the estimated
 #'      difference (column "Phi") and the sample standard error (column "SE")
 #'
-#' @author Felipe Campelo (\email{fcampelo@@ufmg.br})
+#' @author Felipe Campelo (\email{fcampelo@@ufmg.br},
+#' \email{f.campelo@@aston.ac.uk})
 #'
 #' @export
 #'
 #' @examples
 #' # three vectors of normally distributed observations
 #' set.seed(1234)
-#' Xk <- list(rnorm(100, 5, 1),  # mean = 5, sd = 1,
-#'            rnorm(200, 10, 2), # mean = 10, sd = 2,
-#'            rnorm(500, 15, 3)) # mean = 15, sd = 3
+#' Xk <- list(rnorm(10, 5, 1),  # mean = 5, sd = 1,
+#'            rnorm(20, 10, 2), # mean = 10, sd = 2,
+#'            rnorm(20, 15, 5)) # mean = 15, sd = 3
 #'
 #' se_boot(Xk, dif = "simple", type = "all.vs.all")
 #' se_boot(Xk, dif = "perc", type = "all.vs.first")
+#' se_boot(Xk, dif = "perc", type = "all.vs.all")
 
-# TO DO
+# TESTED: OK
 se_boot <- function(Xk,                  # vector of observations
                     dif = "simple",      # type of difference
                     type = "all.vs.all", # standard errors to calculate
@@ -70,6 +72,7 @@ se_boot <- function(Xk,                  # vector of observations
       Xk.b <- mapply(FUN = sample,
                      Xk, lapply(Xk, length),
                      MoreArgs = list(replace = TRUE))
+
       # Calculate relevant statistics for this bootstrap replicate
       Vark     <- sapply(Xk.b, stats::var)
       Xbark    <- sapply(Xk.b, mean)
@@ -77,27 +80,28 @@ se_boot <- function(Xk,                  # vector of observations
 
       if (dif == "simple") {
         # mu1 - mu2
-        phi.hat[i]  <- Xbark[ind[1]] - Xbark[ind[2]]
+        phi.hat[i] <- Xbark[ind[1]] - Xbark[ind[2]]
         # s1 / s2
         ropt.hat[i] <- sqrt(Vark[ind[1]] / Vark[ind[2]])
         #
       } else if (dif == "perc"){
         if (type == "all.vs.all"){
           # (mu1 - mu2) / mu
-          phi.hat[i]  <- (Xbark[ind[1]] - Xbark[ind[2]]) / Xbar.all
-          # s1 / s2
+          phi.hat[i] <- (Xbark[ind[1]] - Xbark[ind[2]]) / Xbar.all
+          # r = s1 / s2
           ropt.hat[i] <- sqrt(Vark[ind[1]] / Vark[ind[2]])
           #
         } else if (type == "all.vs.first"){
           # (mu1 - mu2) / mu1
-          phi.hat[i]  <- (Xbark[ind[1]] - Xbark[ind[2]]) / Xbark[ind[1]]
-          # (s1 / s2) * (mu2 / mu1)
+          phi.hat[i] <- (Xbark[ind[1]] - Xbark[ind[2]]) / Xbark[ind[1]]
+          # r = (s1 / s2) * (mu2 / mu1)
           ropt.hat[i] <- sqrt(Vark[ind[1]] / Vark[ind[2]]) * (Xbark[ind[2]] / Xbark[ind[1]])
           #
         } else stop("type option *", type, "* not recognized.")
         #
       } else stop ("dif option *", dif, "* not recognized.")
     }
+    # Estimate quantities of interest
     Phik[k]  <- mean(phi.hat)
     SEk[k]   <- stats::sd(phi.hat)
     Roptk[k] <- mean(ropt.hat)

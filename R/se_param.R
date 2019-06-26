@@ -22,21 +22,23 @@
 #' @return Data frame containing, for each pair of interest, the estimated
 #'      difference (column "Phi") and the sample standard error (column "SE")
 #'
-#' @author Felipe Campelo (\email{fcampelo@@ufmg.br})
+#' @author Felipe Campelo (\email{fcampelo@@ufmg.br},
+#' \email{f.campelo@@aston.ac.uk})
 #'
 #' @export
 #'
 #' @examples
 #' # three vectors of normally distributed observations
 #' set.seed(1234)
-#' Xk <- list(rnorm(100, 5, 1),  # mean = 5, sd = 1,
-#'            rnorm(200, 10, 2), # mean = 10, sd = 2,
-#'            rnorm(500, 15, 3)) # mean = 15, sd = 3
+#' Xk <- list(rnorm(10, 5, 1),  # mean = 5, sd = 1,
+#'            rnorm(20, 10, 2), # mean = 10, sd = 2,
+#'            rnorm(20, 15, 5)) # mean = 15, sd = 3
 #'
 #' se_param(Xk, dif = "simple", type = "all.vs.all")
 #' se_param(Xk, dif = "perc", type = "all.vs.first")
+#' se_param(Xk, dif = "perc", type = "all.vs.all")
 
-# TESTED
+# TESTED: OK
 se_param <- function(Xk,                  # vector of observations
                      dif = "simple",      # type of difference
                      type = "all.vs.all", # standard errors to calculate
@@ -70,27 +72,38 @@ se_param <- function(Xk,                  # vector of observations
     for (i in 1:nrow(algo.pairs)){
       ind <- as.numeric(algo.pairs[i, ])
       if (dif == "simple") {
+        # mu1 - mu2
         Phik[i]  <- Xbark[ind[1]] - Xbark[ind[2]]
+        # se = s1/sqrt(n1) + s2/sqrt(n2)
         SEk[i]   <- sqrt(sum(Vark[ind] / Nk[ind]))
+        # r = s1 / s2
         Roptk[i] <- sqrt(Vark[ind[1]] / Vark[ind[2]])
+        #
       } else if (dif == "perc"){
         if (type == "all.vs.all"){
+          # (mu1 - mu2) / mu
           Phik[i] <- (Xbark[ind[1]] - Xbark[ind[2]]) / Xbar.all
+          # c1 = 1/mu^2 + (mu1 - mu2)^2 / (A * mu^2)^2
           C1 <- (1 + (Phik[i] / nalgs) ^ 2) / (Xbar.all ^ 2)
+          # c2 = sum_{k!=ind}(s_k^2/n_k^2) * (mu1 - mu2)^2 / (A * mu^2)^2
           C2 <- sum(Vark[-ind] / Nk[-ind]) * ((Phik[i] / nalgs) ^ 2) / (Xbar.all ^ 2)
-          SEk[i]  <- C1 * (sum(Vark[ind] / Nk[ind])) + C2
+          # se = sqrt(c1 (s1^2/n1 + s2^2/n2) + c2)
+          SEk[i] <- sqrt(C1 * (sum(Vark[ind] / Nk[ind])) + C2)
+          # r = s1 / s2
           Roptk[i] <- sqrt(Vark[ind[1]] / Vark[ind[2]])
+          #
         } else if (type == "all.vs.first"){
+          # 1 - mu2/mu1
           Phik[i] <- 1 - Xbark[ind[2]] / Xbark[ind[1]]
-          C1      <- Vark[ind[1]] * (Xbark[ind[2]] / (Xbark[ind[1]] ^ 2)) ^2
-
-          # PAREI
-
-          C2      <- (1 + Phik[i] ^ 2) * Vark[ind[2]] / (Xbark[ind[2]] ^ 2)
-          SEk[i]  <- C1 / Nk[ind[1]] + C2 / Nk[ind[2]]
-          Roptk[i] <- sqrt((Vark[ind[1]] * Xbark[ind[2]] ^ 2) /
-                           (Vark[ind[2]] * (Xbark[ind[2]] ^ 2 +
-                                            (Xbark[ind[1]] - Xbark[ind[2]]) ^ 2)))
+          # c1 = s1^2 * mu_2^2 / mu_1^4
+          C1 <- Vark[ind[1]] * (Xbark[ind[2]] / (Xbark[ind[1]] ^ 2)) ^2
+          # c2 = s2^2 / mu_1^2
+          C2 <- Vark[ind[2]] / (Xbark[ind[1]] ^ 2)
+          # se = sqrt(c1 / n1 + c2 / n2)
+          SEk[i] <- sqrt(C1 / Nk[ind[1]] + C2 / Nk[ind[2]])
+          # r* = s1/s2 * mu2/mu1
+          Roptk[i] <- sqrt(Vark[ind[1]] / Vark[ind[2]]) * (Xbark[ind[2]] / Xbark[ind[1]])
+          #
         } else stop("type option *", type, "* not recognized.")
       } else stop ("dif option *", dif, "* not recognized.")
     }
