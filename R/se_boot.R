@@ -10,8 +10,11 @@
 #'    comparison of algorithms. Journal of Heuristics 25(2):305-338, 2019.
 #'
 #' @inheritParams calc_se
+#' @param ... other parameters (used only for compatibility with calls to
+#'            [se_boot()], unused in this function)
 #'
-#' @return estimated standard error
+#' @return Data frame containing, for each pair of interest, the estimated
+#'      difference (column "Phi") and the sample standard error (column "SE")
 #'
 #' @author Felipe Campelo (\email{fcampelo@@ufmg.br})
 #'
@@ -44,21 +47,72 @@ se_boot <- function(Xk,                  # vector of observations
     assertthat::is.count(boot.R), boot.R > 1)
   # ==================================== #
 
-  # Get pairs for comparison
+  nalgs <- length(Xk)
+  Nk    <- sapply(Xk, length)
+
+  # Get pairs for calculation
   algo.pairs <- t(combn(1:length(Xk), 2))
   if (type == "all.vs.first") algo.pairs <- algo.pairs[1:(nalgs - 1), ]
 
-  stop("se_boot still under construction")
-  # Phi.hat <- vector("list", length = nrow(algo.pairs))
-  # # Perform bootstrap
-  #
-  # for(i in 1:boot.R)
-  # {
-  #   x1.b <- sample(x1, size = length(x1), replace = TRUE)
-  #   x2.b <- sample(x2, size = length(x2), replace = TRUE)
-  #   phi.hat[i] <- calc_phi(x1 = x1.b, x2 = x2.b, dif = dif)
-  # }
-  #
-  # # Return standard error
-  # return(stats::sd(phi.hat))
+  # Calculate point estimates and standard errors for all required pairs
+  Phik  <- numeric(nrow(algo.pairs))
+  SEk   <- numeric(nrow(algo.pairs))
+  Roptk <- numeric(nrow(algo.pairs))
+
+
+  for (k in 1:nrow(algo.pairs)){
+    ind <- as.numeric(algo.pairs[k, ])
+    phi.hat  <- numeric(boot.R)
+    ropt.hat <- numeric(boot.R)
+
+    for(i in 1:boot.R){
+      # Resample everyone with replacement
+      Xk.b <- mapply(FUN = sample,
+                     Xk, lapply(Xk, length),
+                     MoreArgs = list(replace = TRUE))
+      # Calculate relevant statistics for this bootstrap replicate
+      Vark     <- sapply(Xk.b, stats::var)
+      Xbark    <- sapply(Xk.b, mean)
+      Xbar.all <- mean(Xbark)
+
+      if (dif == "simple") {
+        # mu1 - mu2
+        phi.hat[i]  <- Xbark[ind[1]] - Xbark[ind[2]]
+        # s1 / s2
+        ropt.hat[i] <- sqrt(Vark[ind[1]] / Vark[ind[2]])
+        #
+      } else if (dif == "perc"){
+        if (type == "all.vs.all"){
+          # (mu1 - mu2) / mu
+          phi.hat[i]  <- (Xbark[ind[1]] - Xbark[ind[2]]) / Xbar.all
+          # s1 / s2
+          ropt.hat[i] <- sqrt(Vark[ind[1]] / Vark[ind[2]])
+          #
+        } else if (type == "all.vs.first"){
+          # (mu1 - mu2) / mu1
+          phi.hat[i]  <- (Xbark[ind[1]] - Xbark[ind[2]]) / Xbark[ind[1]]
+          # (s1 / s2) * (mu2 / mu1)
+          ropt.hat[i] <- sqrt(Vark[ind[1]] / Vark[ind[2]]) * (Xbark[ind[2]] / Xbark[ind[1]])
+          #
+        } else stop("type option *", type, "* not recognized.")
+        #
+      } else stop ("dif option *", dif, "* not recognized.")
+    }
+    Phik[k]  <- mean(phi.hat)
+    SEk[k]   <- stats::sd(phi.hat)
+    Roptk[k] <- mean(ropt.hat)
+  }
+
+  # Assemble data frame with results
+  output <- data.frame(Alg1 = algo.pairs[, 1],
+                       Alg2 = algo.pairs[, 2],
+                       N1   = Nk[algo.pairs[, 1]],
+                       N2   = Nk[algo.pairs[, 2]],
+                       Phi  = Phik,
+                       SE   = SEk,
+                       r    = Nk[algo.pairs[, 1]] / Nk[algo.pairs[, 2]],
+                       ropt = Roptk)
+  return(output)
+  return(output)
+
 }

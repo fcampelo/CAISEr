@@ -53,7 +53,7 @@
 #'
 #' calc_se(Xk, dif = "perc", type = "all.vs.first", method = "param")
 
-# TESTED
+
 calc_se <- function(Xk,                  # vector of observations
                     dif = "simple",      # type of difference
                     type = "all.vs.all", # standard errors to calculate

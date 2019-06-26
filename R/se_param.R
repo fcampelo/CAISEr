@@ -81,9 +81,12 @@ se_param <- function(Xk,                  # vector of observations
           SEk[i]  <- C1 * (sum(Vark[ind] / Nk[ind])) + C2
           Roptk[i] <- sqrt(Vark[ind[1]] / Vark[ind[2]])
         } else if (type == "all.vs.first"){
-          Phik[i] <- (Xbark[ind[1]] - Xbark[ind[2]]) / Xbark[ind[2]]
-          C1 <- Vark[ind[1]] / (Xbark[ind[2]] ^ 2)
-          C2 <- (1 + Phik[i] ^ 2) * Vark[ind[2]] / (Xbark[ind[2]] ^ 2)
+          Phik[i] <- 1 - Xbark[ind[2]] / Xbark[ind[1]]
+          C1      <- Vark[ind[1]] * (Xbark[ind[2]] / (Xbark[ind[1]] ^ 2)) ^2
+
+          # PAREI
+
+          C2      <- (1 + Phik[i] ^ 2) * Vark[ind[2]] / (Xbark[ind[2]] ^ 2)
           SEk[i]  <- C1 / Nk[ind[1]] + C2 / Nk[ind[2]]
           Roptk[i] <- sqrt((Vark[ind[1]] * Xbark[ind[2]] ^ 2) /
                            (Vark[ind[2]] * (Xbark[ind[2]] ^ 2 +

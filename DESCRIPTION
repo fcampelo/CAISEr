@@ -11,7 +11,7 @@ Maintainer: Felipe Campelo <fcampelo@ufmg.br>
 Description: Functions for performing experimental comparisons of algorithms 
              using adequate sample sizes for power and accuracy.
 License: GPL-2
-Depends: R (>= 3.5.1), 
+Depends: R (>= 3.5.1)
 Imports: assertthat (>= 0.2.0),
          parallel (>= 3.5.1),
          pbmcapply (>= 1.2.5)

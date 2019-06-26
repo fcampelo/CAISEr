@@ -61,7 +61,7 @@
 #' recommend using at least 20. However, if some distributional assumptions can
 #' be made - particularly low skewness of the population of algorithm results on
 #' the test instances), then `nstart` can in principle be as small as 5 (if the
-#' output of the algorithm were known to be normal, it could be 1).
+#' output of the algorithms were known to be normal, it could be 1).
 #'
 #' In general, higher sample sizes are the price to pay for abandoning
 #' distributional assumptions. Use lower values of `nstart` with caution.
@@ -251,13 +251,14 @@ calc_nreps <- function(instance,            # instance parameters
     if (!(sum(Nk) %% nstart)) cat(".")
 
     if (force.balanced) {
-      # Generate a singlenew observation for each algorithm
+      # Generate a single new observation for each algorithm
       newX <- parallel::mcmapply(FUN      = get_observations,
                                  algo     = algorithms,
                                  n        = 1,
                                  MoreArgs = list(instance = instance),
                                  mc.cores = ncpus,
                                  SIMPLIFY = FALSE)
+
       # Append new observation to each algo list and update sample size counters
       Xk <- mapply(FUN = c, Xk, newX,
                    SIMPLIFY = FALSE)
@@ -280,7 +281,7 @@ calc_nreps <- function(instance,            # instance parameters
       Nk[ind] <- Nk[ind] + 1
 
       # Recalculate point estimates, SEs, and sample size ratios
-      Diffk <- calc_se(X = Xk,
+      Diffk <- calc_se(X      = Xk,
                        dif    = dif,
                        type   = type,
                        method = method,
