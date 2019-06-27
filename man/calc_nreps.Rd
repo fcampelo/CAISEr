@@ -6,23 +6,23 @@
 \usage{
 calc_nreps(instance, algorithms, se.max, dif = "simple",
   type = "all.vs.all", method = "param", nstart = 20, nmax = 200,
-  seed = NULL, boot.R = 999, ncpus = 1, force.balanced = FALSE,
+  seed = NULL, boot.R = 499, ncpus = 1, force.balanced = FALSE,
   save.to.file = FALSE, folder = "./nreps_files")
 }
 \arguments{
 \item{instance}{a list object containing the definitions of the problem
 instance.
-See Section \emph{Instance} for details.}
+See Section \code{Instance} for details.}
 
 \item{algorithms}{a list object containing the definitions of all algorithms.
-See Section \emph{Algorithms} for details.}
+See Section \code{Algorithms} for details.}
 
 \item{se.max}{desired upper limit for the standard error of the estimated
 difference between pairs of algorithms. See Section
-\emph{Pairwise Differences} for details.}
+\code{Pairwise Differences} for details.}
 
-\item{dif}{type of difference to be used. Accepts "perc"
-(for percent differences) or "simple" (for simple differences)}
+\item{dif}{type of difference to be used. Accepts "perc" (for percent
+differences) or "simple" (for simple differences)}
 
 \item{type}{type of comparisons being performed. Accepts "all.vs.first"
 (in which cases the first object in \code{algorithms} is considered to be
@@ -33,7 +33,7 @@ and all pairwise comparisons are desired).}
 "param" (for parametric) or "boot" (for bootstrap)}
 
 \item{nstart}{initial number of algorithm runs for each algorithm.
-See Section \emph{Initial Number of Observations} for details.}
+See Section \code{Initial Number of Observations} for details.}
 
 \item{nmax}{maximum \strong{total} allowed sample size.}
 
@@ -141,15 +141,15 @@ distributional assumptions. Use lower values of \code{nstart} with caution.
 \section{Pairwise Differences}{
 
 Parameter \code{dif} informs the type of difference in performance to be used
-for the estimation (\code{mu_a} and \code{mu_b} represent the mean performance of any
-two algorithms on the test instance, and \code{mu} represents the grand mean of all
-algorithms given in \code{algorithms}):
+for the estimation (\eqn{\mu_a} and \eqn{\mu_b} represent the mean
+performance of any two algorithms on the test instance, and \eqn{mu}
+represents the grand mean of all algorithms given in \code{algorithms}):
 \itemize{
-\item If \code{dif == "perc"} and \code{type == "all.vs.first}, the estimated quantity is
-\eqn{phi_{1b} = (mu_1 - mu_b) / mu_1 = 1 - (mu_b / mu_1)}.
-\item If \code{dif == "perc"} and \code{type == "all.vs.all}, the estimated quantity is
-\eqn{phi_{ab} = (mu_a - mu_b) / mu}.
-\item If \code{dif == "simple"} it estimates \eqn{mu_a - mu_b}.
+\item If \code{dif == "perc"} and \code{type == "all.vs.first"}, the estimated quantity is
+\eqn{\phi_{1b} = (\mu_1 - \mu_b) / \mu_1 = 1 - (\mu_b / \mu_1)}.
+\item If \code{dif == "perc"} and \code{type == "all.vs.all"}, the estimated quantity is
+\eqn{\phi_{ab} = (\mu_a - \mu_b) / \mu}.
+\item If \code{dif == "simple"} it estimates \eqn{\mu_a - \mu_b}.
 }
 }
 
@@ -158,33 +158,35 @@ algorithms given in \code{algorithms}):
 # use of calc_nreps
 algorithm1 <- list(FUN = "dummyalgo", alias = "algo1",
                    distribution.fun = "rnorm",
-                   distribution.pars = list(mean = 5, sd = 2))
+                   distribution.pars = list(mean = 15, sd = 2))
 algorithm2 <- list(FUN = "dummyalgo", alias = "algo2",
                    distribution.fun = "rnorm",
                    distribution.pars = list(mean = 10, sd = 4))
 algorithm3 <- list(FUN = "dummyalgo", alias = "algo3",
                    distribution.fun = "rnorm",
-                   distribution.pars = list(mean = 15, sd = 6))
+                   distribution.pars = list(mean = 30, sd = 6))
 algorithm4 <- list(FUN = "dummyalgo", alias = "algo4",
                    distribution.fun = "rnorm",
-                   distribution.pars = list(mean = 20, sd = 8))
+                   distribution.pars = list(mean = 15, sd = 8))
 algorithms <- list(alg1 = algorithm1, alg2 = algorithm2,
                    alg3 = algorithm3, alg4 = algorithm4)
 instance <- list(FUN = "dummyinstance")
 
-se.max = 0.05
-dif = "simple"
+se.max = 0.1
+dif = "perc"
 type = "all.vs.first"
+method = "boot"
 seed = 1234
-method = "param"
 nstart = 20
-nmax   = 600
+nmax   = 1000
 ncpus  = 1
 
 myreps <- calc_nreps(instance = instance, algorithms = algorithms,
                      se.max   = se.max,   dif        = dif,
-                     type     = type,     nstart     = nstart,
-                     nmax     = nmax,     seed       = seed)
+                     type     = type,     method     = method,
+                     nstart   = nstart,   nmax       = nmax,
+                     seed     = seed)
+myreps$Diffk
 }
 \references{
 \itemize{

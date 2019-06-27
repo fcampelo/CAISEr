@@ -4,21 +4,20 @@
 \alias{run_experiment}
 \title{Run a full experiment}
 \usage{
-run_experiment(Instance.list, Algorithm.list, power, d, sig.level = 0.05,
+run_experiment(instances, algorithms, power, d, sig.level = 0.05,
   alternative = "two.sided", test.type = "t.test", se.max, dif,
   method = "param", nstart = 20, nmax = 1000, seed = NULL,
   boot.R = 999, force.balanced = FALSE, ncpus = 1,
   save.partial.results = FALSE, folder = "./nreps_files")
 }
 \arguments{
-\item{Instance.list}{list object containing the definitions of the
-\emph{available} instances. this list may (or may not) be exhausted in the
+\item{instances}{list object containing the definitions of the
+\emph{available} instances. This list may (or may not) be exhausted in the
 experiment. To estimate the number of required instances,
-see \code{\link[=calc_instances]{calc_instances()}}. For more detail on the definition of each
-instance, see \code{\link[=calc_nreps2]{calc_nreps2()}}.}
+see \code{\link[=calc_instances]{calc_instances()}}. For more details, see Section \code{Instance List}.}
 
-\item{Algorithm.list}{list object containing the definitions of the
-algorithms to be compared. See \code{\link[=calc_nreps2]{calc_nreps2()}} for details.}
+\item{algorithms}{a list object containing the definitions of all algorithms.
+See Section \code{Algorithms} for details.}
 
 \item{power}{(desired) test power. See \code{\link[=calc_instances]{calc_instances()}} for details.
 Any value equal to or greater than one will force the method to use all
@@ -28,7 +27,7 @@ available instances in \code{Instance.list}.}
 effect size, i.e., "deviation from H0" / "standard deviation".
 See \code{\link[=calc_instances]{calc_instances()}} for details.}
 
-\item{sig.level}{significance level (alpha) for the experiment.
+\item{sig.level}{family-wise significance level (alpha) for the experiment.
 See \code{\link[=calc_instances]{calc_instances()}} for details.}
 
 \item{alternative}{type of alternative hypothesis ("two.sided" or
@@ -38,36 +37,30 @@ See \code{\link[=calc_instances]{calc_instances()}} for details.}
 See \code{\link[=calc_instances]{calc_instances()}} for details.}
 
 \item{se.max}{desired upper limit for the standard error of the estimated
-difference between the two algorithms on each instance.
-See \code{\link[=calc_nreps2]{calc_nreps2()}} for details.}
+difference between pairs of algorithms. See Section
+\code{Pairwise Differences} for details.}
 
-\item{dif}{type of difference to be used on each instance. Accepts "perc"
-(for percent differences) or "simple" (for simple differences).
-See \code{\link[=calc_nreps2]{calc_nreps2()}} for details.}
+\item{dif}{type of difference to be used. Accepts "perc" (for percent
+differences) or "simple" (for simple differences)}
 
 \item{method}{method to use for estimating the standard errors. Accepts
-"param" (for parametric) or "boot" (for bootstrap).
-See \code{\link[=calc_nreps2]{calc_nreps2()}} for details.}
+"param" (for parametric) or "boot" (for bootstrap)}
 
-\item{nstart}{initial number of algorithm runs for each algorithm in each
-instance. See \code{\link[=calc_nreps2]{calc_nreps2()}} for details.}
+\item{nstart}{initial number of algorithm runs for each algorithm.
+See Section \code{Initial Number of Observations} for details.}
 
-\item{nmax}{maximum total allowed sample size in each instance
-See \code{\link[=calc_nreps2]{calc_nreps2()}} for details.}
+\item{nmax}{maximum \strong{total} allowed sample size.}
 
 \item{seed}{seed for the random number generator}
 
-\item{boot.R}{number of bootstrap resamples. See \code{\link[=calc_nreps2]{calc_nreps2()}} for details.}
+\item{boot.R}{number of bootstrap resamples to use (if \code{method == "boot"})}
 
 \item{force.balanced}{logical flag to force the use of balanced sampling for
 the algorithms on each instance}
 
 \item{ncpus}{number of cores to use}
 
-\item{save.partial.results}{logical flag: should individual instance results
-be saved to file?}
-
-\item{folder}{directory to save files (if save.to.file == TRUE)}
+\item{folder}{directory to save files (if \code{save.to.file == TRUE})}
 }
 \value{
 a list object containing the full input configuration plus the
@@ -85,15 +78,15 @@ following fields:
 Design and run a full experiment - calculate the required number of
 instances, run the algorithms on each problem instance using the iterative
 approach based on optimal sample size ratios, and return the results of the
-experiment. This routine builds upon \code{\link[=calc_instances]{calc_instances()}} and \code{\link[=calc_nreps2]{calc_nreps2()}},
+experiment. This routine builds upon \code{\link[=calc_instances]{calc_instances()}} and \code{\link[=calc_nreps]{calc_nreps()}},
 so refer to the documentation of these two functions for details.
 }
 \section{Instance List}{
 
-Parameter \code{Instance.list} must contain a list of instance objects, where
-each field is itself a list, as defined in Section _Instances and Algorithms
-of the documentation of _\code{\link[=calc_nreps2]{calc_nreps2()}}. In summary, each element of
-\code{Instance.list} is an \code{instance}, i.e., a named list containing all relevant
+Parameter \code{instances} must contain a list of instance objects, where
+each field is itself a list, as defined in Section \emph{Instances and Algorithms}
+of the documentation of \code{\link[=calc_nreps]{calc_nreps()}}. In summary, each element of
+\code{instances} is an \code{instance}, i.e., a named list containing all relevant
 parameters that define the problem instance. This list must contain at least
 the field \code{instance$FUN}, with the name of the problem instance function,
 that is, a routine that calculates y = f(x). If the instance requires
@@ -103,25 +96,22 @@ provide the instance with a unique identifier (e.g., when using an
 instance generator).
 }
 
-\section{Algorithms}{
+\section{Algorithm List}{
 
-Parameter \code{Algorithm.list} must contain a list of instance objects, where
-each field is itself a list, as defined in Section \emph{Instances and Algorithms}
-of the documentation of \code{\link[=calc_nreps2]{calc_nreps2()}}. In summary, each element of
-\code{Algorithm.list} is an \code{algorithm}, i.e., a named list containing all
-relevant parameters that define the algorithm.
+Object \code{algorithms} is a list in which each component is a named
+list containing all relevant parameters that define an algorithm to be
+applied for solving the problem instance. In what follows \code{algorithm[[k]]}
+refers to any algorithm specified in the \code{algorithms} list.
 
-An \code{algorithm} must contain a \code{algorithm$FUN} field (the name
-of the function that calls the algorithm) and any other elements/parameters
-that \code{algorithm$FUN} requires (e.g., stop criteria, operator names and
-parameters, etc.). An additional field, \code{algorithm$alias}, can be used to
-provide the algorithm with a unique identifier (e.g., when comparing two
-different configurations of the same algorithm).
+\code{algorithm[[k]]} must contain an \code{algorithm[[k]]$FUN} field, which is a
+character object with the name of the function that calls the algorithm; as
+well as any other elements/parameters that \code{algorithm[[k]]$FUN} requires
+(e.g., stop criteria, operator names and parameters, etc.).
 
-The function defined by the routine \code{algorithm$FUN} must have the
-following structure: supposing that the list in \code{algorithm} has
-fields \code{algorithm$FUN = myalgo} and
-\code{algorithm$par1 = "a", algorithm$par2 = 5}, then:
+The function defined by the routine \code{algorithm[[k]]$FUN} must have the
+following structure: supposing that the list in \code{algorithm[[k]]} has
+fields \code{algorithm[[k]]$FUN = "myalgo"}, \code{algorithm[[k]]$par1 = "a"} and
+\code{algorithm$par2 = 5}, then:
 
 \preformatted{
          myalgo <- function(par1, par2, instance, ...){
@@ -134,7 +124,7 @@ fields \code{algorithm$FUN = myalgo} and
 That is, it must be able to run if called as:
 
 \preformatted{
-         # remove '$FUN' and '$alias' from list of arguments
+         # remove '$FUN' and '$alias' field from list of arguments
          # and include the problem definition as field 'instance'
          myargs          <- algorithm[names(algorithm) != "FUN"]
          myargs          <- myargs[names(myargs) != "alias"]
@@ -145,16 +135,16 @@ That is, it must be able to run if called as:
                  args = myargs)
    }
 
-The \code{algorithm$FUN} routine must return a list object containing (at
-least) the performance value of the final solution obtained after a given
-run, in a field named \code{value} (e.g., \code{result$value}) .
+The \code{algorithm$FUN} routine must return a list containing (at
+least) the performance value of the final solution obtained, in a field named
+\code{value} (e.g., \code{result$value}) after a given run.
 }
 
 \section{Initial Number of Observations}{
 
 In the \emph{general case} the initial number of observations / algorithm /
 instance (\code{nstart}) should be relatively high. For the parametric case
-we recommend ~15 if outliers are not expected, ~50 (at least) if that
+we recommend 10~15 if outliers are not expected, and 40~50 (at least) if that
 assumption cannot be made. For the bootstrap approach we recommend using at
 least 15 or 20. However, if some distributional assumptions can be
 made - particularly low skewness of the population of algorithm results on
@@ -165,14 +155,18 @@ In general, higher sample sizes are the price to pay for abandoning
 distributional assumptions. Use lower values of \code{nstart} with caution.
 }
 
-\section{Types of Differences}{
+\section{Pairwise Differences}{
 
 Parameter \code{dif} informs the type of difference in performance to be used
-for the estimation (mu1 and mu2 represent the mean performance of each
-algorithm on the problem instance):
+for the estimation (\eqn{\mu_a} and \eqn{\mu_b} represent the mean
+performance of any two algorithms on the test instance, and \eqn{mu}
+represents the grand mean of all algorithms given in \code{algorithms}):
 \itemize{
-\item If \code{dif == "perc"} it estimates (mu2 - mu1) / mu1.
-\item If \code{dif == "simple"} it estimates mu2 - mu1.
+\item If \code{dif == "perc"} and \code{type == "all.vs.first"}, the estimated quantity is
+\eqn{\phi_{1b} = (\mu_1 - \mu_b) / \mu_1 = 1 - (\mu_b / \mu_1)}.
+\item If \code{dif == "perc"} and \code{type == "all.vs.all"}, the estimated quantity is
+\eqn{\phi_{ab} = (\mu_a - \mu_b) / \mu}.
+\item If \code{dif == "simple"} it estimates \eqn{\mu_a - \mu_b}.
 }
 }
 
@@ -180,7 +174,7 @@ algorithm on the problem instance):
 
 If the parameter \code{test.type} is set to either \code{Wilcoxon} or \code{Binomial}, this
 routine approximates the number of instances using the ARE of these tests
-in relation to the paired t.test, using the formulas:
+in relation to the paired t.test:
 \itemize{
 \item \code{n.wilcox = n.ttest / 0.86 = 1.163 * n.ttest}
 \item \code{n.binom = n.ttest / 0.637 = 1.570 * n.ttest}

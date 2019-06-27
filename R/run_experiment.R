@@ -3,14 +3,14 @@
 #' Design and run a full experiment - calculate the required number of
 #' instances, run the algorithms on each problem instance using the iterative
 #' approach based on optimal sample size ratios, and return the results of the
-#' experiment. This routine builds upon [calc_instances()] and [calc_nreps2()],
+#' experiment. This routine builds upon [calc_instances()] and [calc_nreps()],
 #' so refer to the documentation of these two functions for details.
 #'
 #' @section Instance List:
-#' Parameter `Instance.list` must contain a list of instance objects, where
-#' each field is itself a list, as defined in Section _Instances and Algorithms
-#' of the documentation of _[calc_nreps2()]. In summary, each element of
-#' `Instance.list` is an `instance`, i.e., a named list containing all relevant
+#' Parameter `instances` must contain a list of instance objects, where
+#' each field is itself a list, as defined in Section _Instances and Algorithms_
+#' of the documentation of [calc_nreps()]. In summary, each element of
+#' `instances` is an `instance`, i.e., a named list containing all relevant
 #' parameters that define the problem instance. This list must contain at least
 #' the field `instance$FUN`, with the name of the problem instance function,
 #' that is, a routine that calculates y = f(x). If the instance requires
@@ -19,24 +19,21 @@
 #' provide the instance with a unique identifier (e.g., when using an
 #' instance generator).
 #'
-#' @section Algorithms:
-#' Parameter `Algorithm.list` must contain a list of instance objects, where
-#' each field is itself a list, as defined in Section _Instances and Algorithms_
-#' of the documentation of [calc_nreps2()]. In summary, each element of
-#' `Algorithm.list` is an `algorithm`, i.e., a named list containing all
-#' relevant parameters that define the algorithm.
+#' @section Algorithm List:
+#' Object `algorithms` is a list in which each component is a named
+#' list containing all relevant parameters that define an algorithm to be
+#' applied for solving the problem instance. In what follows `algorithm[[k]]`
+#' refers to any algorithm specified in the `algorithms` list.
 #'
-#' An `algorithm` must contain a `algorithm$FUN` field (the name
-#' of the function that calls the algorithm) and any other elements/parameters
-#' that `algorithm$FUN` requires (e.g., stop criteria, operator names and
-#' parameters, etc.). An additional field, `algorithm$alias`, can be used to
-#' provide the algorithm with a unique identifier (e.g., when comparing two
-#' different configurations of the same algorithm).
+#' `algorithm[[k]]` must contain an `algorithm[[k]]$FUN` field, which is a
+#' character object with the name of the function that calls the algorithm; as
+#' well as any other elements/parameters that `algorithm[[k]]$FUN` requires
+#' (e.g., stop criteria, operator names and parameters, etc.).
 #'
-#' The function defined by the routine `algorithm$FUN` must have the
-#' following structure: supposing that the list in `algorithm` has
-#' fields `algorithm$FUN = myalgo` and
-#' `algorithm$par1 = "a", algorithm$par2 = 5`, then:
+#' The function defined by the routine `algorithm[[k]]$FUN` must have the
+#' following structure: supposing that the list in `algorithm[[k]]` has
+#' fields `algorithm[[k]]$FUN = "myalgo"`, `algorithm[[k]]$par1 = "a"` and
+#' `algorithm$par2 = 5`, then:
 #'
 #'    \preformatted{
 #'          myalgo <- function(par1, par2, instance, ...){
@@ -49,7 +46,7 @@
 #' That is, it must be able to run if called as:
 #'
 #'    \preformatted{
-#'          # remove '$FUN' and '$alias' from list of arguments
+#'          # remove '$FUN' and '$alias' field from list of arguments
 #'          # and include the problem definition as field 'instance'
 #'          myargs          <- algorithm[names(algorithm) != "FUN"]
 #'          myargs          <- myargs[names(myargs) != "alias"]
@@ -60,14 +57,14 @@
 #'                  args = myargs)
 #'    }
 #'
-#' The `algorithm$FUN` routine must return a list object containing (at
-#' least) the performance value of the final solution obtained after a given
-#' run, in a field named `value` (e.g., `result$value`) .
+#' The `algorithm$FUN` routine must return a list containing (at
+#' least) the performance value of the final solution obtained, in a field named
+#' `value` (e.g., `result$value`) after a given run.
 #'
 #' @section Initial Number of Observations:
 #' In the _general case_ the initial number of observations / algorithm /
 #' instance (`nstart`) should be relatively high. For the parametric case
-#' we recommend ~15 if outliers are not expected, ~50 (at least) if that
+#' we recommend 10~15 if outliers are not expected, and 40~50 (at least) if that
 #' assumption cannot be made. For the bootstrap approach we recommend using at
 #' least 15 or 20. However, if some distributional assumptions can be
 #' made - particularly low skewness of the population of algorithm results on
@@ -77,61 +74,44 @@
 #' In general, higher sample sizes are the price to pay for abandoning
 #' distributional assumptions. Use lower values of `nstart` with caution.
 #'
-#' @section Types of Differences:
+#' @section Pairwise Differences:
 #' Parameter `dif` informs the type of difference in performance to be used
-#' for the estimation (mu1 and mu2 represent the mean performance of each
-#' algorithm on the problem instance):
+#' for the estimation (\eqn{\mu_a} and \eqn{\mu_b} represent the mean
+#' performance of any two algorithms on the test instance, and \eqn{mu}
+#' represents the grand mean of all algorithms given in `algorithms`):
 #'
-#' - If `dif == "perc"` it estimates (mu2 - mu1) / mu1.
-#' - If `dif == "simple"` it estimates mu2 - mu1.
+#' - If `dif == "perc"` and `type == "all.vs.first"`, the estimated quantity is
+#'    \eqn{\phi_{1b} = (\mu_1 - \mu_b) / \mu_1 = 1 - (\mu_b / \mu_1)}.
+#'
+#' - If `dif == "perc"` and `type == "all.vs.all"`, the estimated quantity is
+#'    \eqn{\phi_{ab} = (\mu_a - \mu_b) / \mu}.
+#'
+#' - If `dif == "simple"` it estimates \eqn{\mu_a - \mu_b}.
 #'
 #' @section Sample Sizes for Nonparametric Methods:
 #' If the parameter `test.type` is set to either `Wilcoxon` or `Binomial`, this
 #' routine approximates the number of instances using the ARE of these tests
-#' in relation to the paired t.test, using the formulas:
+#' in relation to the paired t.test:
 #'   - `n.wilcox = n.ttest / 0.86 = 1.163 * n.ttest`
 #'   - `n.binom = n.ttest / 0.637 = 1.570 * n.ttest`
 #'
-#' @param Instance.list list object containing the definitions of the
-#'    _available_ instances. this list may (or may not) be exhausted in the
+#' @inheritParams calc_nreps
+#' @param instances list object containing the definitions of the
+#'    _available_ instances. This list may (or may not) be exhausted in the
 #'    experiment. To estimate the number of required instances,
-#'    see [calc_instances()]. For more detail on the definition of each
-#'    instance, see [calc_nreps2()].
-#' @param Algorithm.list list object containing the definitions of the
-#'    algorithms to be compared. See [calc_nreps2()] for details.
+#'    see [calc_instances()]. For more details, see Section `Instance List`.
 #' @param power (desired) test power. See [calc_instances()] for details.
 #'    Any value equal to or greater than one will force the method to use all
 #'    available instances in `Instance.list`.
 #' @param d minimally relevant effect size (MRES), expressed as a standardized
 #'        effect size, i.e., "deviation from H0" / "standard deviation".
 #'        See [calc_instances()] for details.
-#' @param sig.level significance level (alpha) for the experiment.
+#' @param sig.level family-wise significance level (alpha) for the experiment.
 #'        See [calc_instances()] for details.
 #' @param alternative type of alternative hypothesis ("two.sided" or
 #'        "one.sided"). See [calc_instances()] for details.
 #' @param test.type type of test ("t.test", "wilcoxon", "binomial").
 #'        See [calc_instances()] for details.
-#' @param se.max desired upper limit for the standard error of the estimated
-#'        difference between the two algorithms on each instance.
-#'        See [calc_nreps2()] for details.
-#' @param dif type of difference to be used on each instance. Accepts "perc"
-#'        (for percent differences) or "simple" (for simple differences).
-#'        See [calc_nreps2()] for details.
-#' @param method method to use for estimating the standard errors. Accepts
-#'        "param" (for parametric) or "boot" (for bootstrap).
-#'        See [calc_nreps2()] for details.
-#' @param nstart initial number of algorithm runs for each algorithm in each
-#'        instance. See [calc_nreps2()] for details.
-#' @param nmax maximum total allowed sample size in each instance
-#'        See [calc_nreps2()] for details.
-#' @param seed seed for the random number generator
-#' @param boot.R number of bootstrap resamples. See [calc_nreps2()] for details.
-#' @param force.balanced logical flag to force the use of balanced sampling for
-#'        the algorithms on each instance
-#' @param ncpus number of cores to use
-#' @param save.partial.results logical flag: should individual instance results
-#'        be saved to file?
-#' @param folder directory to save files (if save.to.file == TRUE)
 #'
 #' @return a list object containing the full input configuration plus the
 #' following fields:
@@ -169,19 +149,22 @@
 #'
 #' @examples
 #' # Example using dummy algorithms and instances. See ?dummyalgo for details.
-#' # In this case all instances are the same, so we expect all cases to return
-#' # a percent difference of approx. phi.j = 1.0 and sample sizes of
-#' # approx. n1 = 31, n2 = 87
-#' algorithm1 <- list(FUN = "dummyalgo", alias = "algo1",
-#'                    distribution.fun = "rnorm",
-#'                    distribution.pars = list(mean = 10, sd = 1))
-#' algorithm2 <- list(FUN = "dummyalgo", alias = "algo2",
-#'                    distribution.fun = "rnorm",
-#'                    distribution.pars = list(mean = 20, sd = 4))
-#' algolist <- list(algorithm1, algorithm2)
-#' instlist <- vector(100, mode = "list")
-#' for (i in 1:100) instlist[[i]] <- list(FUN = "dummyinstance",
-#'                                        alias = paste0("Inst. ", i))
+#' # Generating 4 dummy algorithms here, with means 15, 10, 30, 15 and standard
+#' # deviations 2, 4, 6, 8.
+#' algorithms <- mapply(FUN = function(i, m, s){
+#'                           list(FUN   = "dummyalgo",
+#'                                alias = paste0("algo", i),
+#'                                distribution.fun  = "rnorm",
+#'                                distribution.pars = list(mean = m, sd = s))},
+#'                      i = c(alg1 = 1, alg2 = 2, alg3 = 3, alg4 = 4),
+#'                      m = c(15, 10, 30, 15),
+#'                      s = c(2, 4, 6, 8),
+#'                      SIMPLIFY = FALSE)
+#'
+#' # Just generate the same instance, 100 times
+#' instances <- lapply(1:100,
+#'              function(i) {list(FUN   = "dummyinstance",
+#'                                alias = paste0("Inst. ", i))})
 #'
 #' my.results <- run_experiment(Instance.list = instlist,
 #'                              Algorithm.list = algolist,
@@ -203,14 +186,11 @@
 #' # Test assumption of normality (of the data)
 #' shapiro.test(my.results$data.summary$phi.j)
 
-# @param ncpus number of cores to use. See [calc_nreps2()] for details. #//DoParallel
-
-# TESTED
-run_experiment <- function(Instance.list,    # instance parameters
-                           Algorithm.list,   # algorithm parameters
+run_experiment <- function(instances,        # instance parameters
+                           algorithms,       # algorithm parameters
                            power ,           # power
                            d,                # MRES
-                           sig.level = 0.05,          # significance level
+                           sig.level = 0.05, # significance level
                            alternative = "two.sided", # type of H1
                            test.type = "t.test",      # type of test
                            se.max,           # desired (max) standard error
@@ -219,11 +199,12 @@ run_experiment <- function(Instance.list,    # instance parameters
                            nstart = 20,      # initial number of samples
                            nmax   = 1000,    # maximum allowed sample size
                            seed   = NULL,    # seed for PRNG
-                           boot.R = 999,     # number of bootstrap resamples
+                           boot.R = 499,     # number of bootstrap resamples
                            force.balanced = FALSE, # force balanced sampling
-                           ncpus  = 1,       # number of cores to use
+                           ncpus  = 1,             # number of cores to use
                            save.partial.results = FALSE, # save tmp files?
-                           folder = "./nreps_files") # folder to save files (if save.partial.results == TRUE)
+                           folder = "./nreps_files")     # folder to save files
+                                              #(if save.partial.results == TRUE)
 {
 
   # ========== Error catching to be performed by specific routines ========== #
@@ -256,20 +237,22 @@ run_experiment <- function(Instance.list,    # instance parameters
   }
 
   # Fill up algorithm and instance aliases if needed
-  for (i in 1:length(Instance.list)){
-    if (!("alias" %in% names(Instance.list[[i]]))) {
-      Instance.list[[i]]$alias <- Instance.list[[i]]$FUN
+  for (i in 1:length(instances)){
+    if (!("alias" %in% names(instances[[i]]))) {
+      instances[[i]]$alias <- instances[[i]]$FUN
     }
   }
-  for (i in 1:length(Algorithm.list)){
-    if (!("alias" %in% names(Algorithm.list[[i]]))) {
-      Algorithm.list[[i]]$alias <- Algorithm.list[[i]]$FUN
+  for (i in 1:length(algorithms)){
+    if (!("alias" %in% names(algorithms[[i]]))) {
+      algorithms[[i]]$alias <- algorithms[[i]]$FUN
     }
   }
 
   # Calculate N*
-  n.available <- length(Instance.list)
+  n.available <- length(instances)
 
+
+  ##### PAREI #####
   if (power >= 1) {
     N.star <- n.available
   } else {

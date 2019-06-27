@@ -63,7 +63,7 @@ se_boot <- function(Xk,                  # vector of observations
 
 
   for (k in 1:nrow(algo.pairs)){
-    ind <- as.numeric(algo.pairs[k, ])
+    ind      <- as.numeric(algo.pairs[k, ])
     phi.hat  <- numeric(boot.R)
     ropt.hat <- numeric(boot.R)
 
@@ -71,7 +71,8 @@ se_boot <- function(Xk,                  # vector of observations
       # Resample everyone with replacement
       Xk.b <- mapply(FUN = sample,
                      Xk, lapply(Xk, length),
-                     MoreArgs = list(replace = TRUE))
+                     MoreArgs = list(replace = TRUE),
+                     SIMPLIFY = FALSE)
 
       # Calculate relevant statistics for this bootstrap replicate
       Vark     <- sapply(Xk.b, stats::var)
@@ -93,7 +94,7 @@ se_boot <- function(Xk,                  # vector of observations
           #
         } else if (type == "all.vs.first"){
           # (mu1 - mu2) / mu1
-          phi.hat[i] <- (Xbark[ind[1]] - Xbark[ind[2]]) / Xbark[ind[1]]
+          phi.hat[i] <- 1 - Xbark[ind[2]] / Xbark[ind[1]]
           # r = (s1 / s2) * (mu2 / mu1)
           ropt.hat[i] <- sqrt(Vark[ind[1]] / Vark[ind[2]]) * (Xbark[ind[2]] / Xbark[ind[1]])
           #

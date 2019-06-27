@@ -84,9 +84,10 @@ se_param <- function(Xk,                  # vector of observations
           # (mu1 - mu2) / mu
           Phik[i] <- (Xbark[ind[1]] - Xbark[ind[2]]) / Xbar.all
           # c1 = 1/mu^2 + (mu1 - mu2)^2 / (A * mu^2)^2
-          C1 <- (1 + (Phik[i] / nalgs) ^ 2) / (Xbar.all ^ 2)
-          # c2 = sum_{k!=ind}(s_k^2/n_k^2) * (mu1 - mu2)^2 / (A * mu^2)^2
-          C2 <- sum(Vark[-ind] / Nk[-ind]) * ((Phik[i] / nalgs) ^ 2) / (Xbar.all ^ 2)
+          #    = (1 + phi^2 / A^2) / mu^2
+          C1 <- (1 + Phik[i] ^ 2 / nalgs ^ 2) / Xbar.all ^ 2
+          # c2 = sum_{k!=ind}(s_k^2/n_k^2) * phi^2 / (A^2 * mu^2)
+          C2 <- sum(Vark[-ind] / Nk[-ind]) * Phik[i] ^ 2 / (nalgs ^ 2 * Xbar.all ^ 2)
           # se = sqrt(c1 (s1^2/n1 + s2^2/n2) + c2)
           SEk[i] <- sqrt(C1 * (sum(Vark[ind] / Nk[ind])) + C2)
           # r = s1 / s2
@@ -95,7 +96,7 @@ se_param <- function(Xk,                  # vector of observations
         } else if (type == "all.vs.first"){
           # 1 - mu2/mu1
           Phik[i] <- 1 - Xbark[ind[2]] / Xbark[ind[1]]
-          # c1 = s1^2 * mu_2^2 / mu_1^4
+          # c1 = s1^2 * (mu_2 / mu_1^2)^2
           C1 <- Vark[ind[1]] * (Xbark[ind[2]] / (Xbark[ind[1]] ^ 2)) ^2
           # c2 = s2^2 / mu_1^2
           C2 <- Vark[ind[2]] / (Xbark[ind[1]] ^ 2)

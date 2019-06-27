@@ -68,26 +68,28 @@
 #'
 #' @section Pairwise Differences:
 #' Parameter `dif` informs the type of difference in performance to be used
-#' for the estimation (`mu_a` and `mu_b` represent the mean performance of any
-#' two algorithms on the test instance, and `mu` represents the grand mean of all
-#' algorithms given in `algorithms`):
+#' for the estimation (\eqn{\mu_a} and \eqn{\mu_b} represent the mean
+#' performance of any two algorithms on the test instance, and \eqn{mu}
+#' represents the grand mean of all algorithms given in `algorithms`):
 #'
-#' - If `dif == "perc"` and `type == "all.vs.first`, the estimated quantity is
-#'    \eqn{phi_{1b} = (mu_1 - mu_b) / mu_1 = 1 - (mu_b / mu_1)}.
-#' - If `dif == "perc"` and `type == "all.vs.all`, the estimated quantity is
-#'    \eqn{phi_{ab} = (mu_a - mu_b) / mu}.
-#' - If `dif == "simple"` it estimates \eqn{mu_a - mu_b}.
+#' - If `dif == "perc"` and `type == "all.vs.first"`, the estimated quantity is
+#'    \eqn{\phi_{1b} = (\mu_1 - \mu_b) / \mu_1 = 1 - (\mu_b / \mu_1)}.
+#'
+#' - If `dif == "perc"` and `type == "all.vs.all"`, the estimated quantity is
+#'    \eqn{\phi_{ab} = (\mu_a - \mu_b) / \mu}.
+#'
+#' - If `dif == "simple"` it estimates \eqn{\mu_a - \mu_b}.
 #'
 #' @param instance a list object containing the definitions of the problem
 #'    instance.
-#'    See Section _Instance_ for details.
+#'    See Section `Instance` for details.
 #' @param algorithms a list object containing the definitions of all algorithms.
-#'    See Section _Algorithms_ for details.
+#'    See Section `Algorithms` for details.
 #' @param se.max desired upper limit for the standard error of the estimated
 #'        difference between pairs of algorithms. See Section
-#'        _Pairwise Differences_ for details.
-#' @param dif type of difference to be used. Accepts "perc"
-#'          (for percent differences) or "simple" (for simple differences)
+#'        `Pairwise Differences` for details.
+#' @param dif type of difference to be used. Accepts "perc" (for percent
+#'          differences) or "simple" (for simple differences)
 #' @param type type of comparisons being performed. Accepts "all.vs.first"
 #'          (in which cases the first object in `algorithms` is considered to be
 #'          the reference algorithm) or "all.vs.all" (if there is no reference
@@ -95,7 +97,7 @@
 #' @param method method to use for estimating the standard errors. Accepts
 #'          "param" (for parametric) or "boot" (for bootstrap)
 #' @param nstart initial number of algorithm runs for each algorithm.
-#'      See Section _Initial Number of Observations_ for details.
+#'      See Section `Initial Number of Observations` for details.
 #' @param nmax maximum **total** allowed sample size.
 #' @param seed seed for the random number generator
 #' @param boot.R number of bootstrap resamples to use (if `method == "boot"`)
@@ -147,35 +149,37 @@
 #' # use of calc_nreps
 #' algorithm1 <- list(FUN = "dummyalgo", alias = "algo1",
 #'                    distribution.fun = "rnorm",
-#'                    distribution.pars = list(mean = 5, sd = 2))
+#'                    distribution.pars = list(mean = 15, sd = 2))
 #' algorithm2 <- list(FUN = "dummyalgo", alias = "algo2",
 #'                    distribution.fun = "rnorm",
 #'                    distribution.pars = list(mean = 10, sd = 4))
 #' algorithm3 <- list(FUN = "dummyalgo", alias = "algo3",
 #'                    distribution.fun = "rnorm",
-#'                    distribution.pars = list(mean = 15, sd = 6))
+#'                    distribution.pars = list(mean = 30, sd = 6))
 #' algorithm4 <- list(FUN = "dummyalgo", alias = "algo4",
 #'                    distribution.fun = "rnorm",
-#'                    distribution.pars = list(mean = 20, sd = 8))
+#'                    distribution.pars = list(mean = 15, sd = 8))
 #' algorithms <- list(alg1 = algorithm1, alg2 = algorithm2,
 #'                    alg3 = algorithm3, alg4 = algorithm4)
 #' instance <- list(FUN = "dummyinstance")
 #'
-#' se.max = 0.05
-#' dif = "simple"
+#' se.max = 0.1
+#' dif = "perc"
 #' type = "all.vs.first"
+#' method = "boot"
 #' seed = 1234
-#' method = "param"
 #' nstart = 20
-#' nmax   = 600
+#' nmax   = 1000
 #' ncpus  = 1
 #'
 #' myreps <- calc_nreps(instance = instance, algorithms = algorithms,
 #'                      se.max   = se.max,   dif        = dif,
-#'                      type     = type,     nstart     = nstart,
-#'                      nmax     = nmax,     seed       = seed)
+#'                      type     = type,     method     = method,
+#'                      nstart   = nstart,   nmax       = nmax,
+#'                      seed     = seed)
+#' myreps$Diffk
 
-# TO TEST - VALIDATE ALL VS FIRST PERC FORMULA
+# TESTED: OK
 calc_nreps <- function(instance,            # instance parameters
                        algorithms,          # algorithm parameters
                        se.max,              # desired (max) standard error
@@ -185,7 +189,7 @@ calc_nreps <- function(instance,            # instance parameters
                        nstart = 20,         # initial number of samples
                        nmax   = 200,        # maximum allowed sample size
                        seed   = NULL,       # seed for PRNG
-                       boot.R = 999,        # number of bootstrap resamples
+                       boot.R = 499,        # number of bootstrap resamples
                        ncpus  = 1,          # number of cores to use
                        force.balanced = FALSE,   # force balanced sampling
                        save.to.file  = FALSE,    # save results to tmp file

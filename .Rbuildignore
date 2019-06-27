@@ -3,3 +3,4 @@
 ^.*\.yml$
 ^cran-comments.md$
 docs$
+testdata_ignore.R
