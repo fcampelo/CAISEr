@@ -1,20 +1,3 @@
-power = 0.8           # power
-d = 1               # MRES
-sig.level = 0.05 # significance level
-alternative = "two.sided" # type of H1
-test.type = "t.test"      # type of test
-se.max = 1           # desired (max) standard error
-dif = "simple"             # difference ("simple" "perc")
-method = "param" # method ("param" "boot")
-nstart = 20      # initial number of samples
-nmax   = 1000    # maximum allowed sample size
-seed   = 1234    # seed for PRNG
-boot.R = 499     # number of bootstrap resamples
-force.balanced = FALSE # force balanced sampling
-ncpus  = 1             # number of cores to use
-save.partial.results = FALSE # save tmp files?
-folder = "./nreps_files"
-
 algorithms <- mapply(FUN = function(i, m, s){
                           list(FUN   = "dummyalgo",
                                alias = paste0("algo", i),
@@ -24,8 +7,35 @@ algorithms <- mapply(FUN = function(i, m, s){
                      m = c(15, 10, 30, 15),
                      s = c(2, 4, 6, 8),
                      SIMPLIFY = FALSE)
-#'
+
 # Just generate the same instance, 100 times
 instances <- lapply(1:100,
              function(i) {list(FUN   = "dummyinstance",
-                               alias = paste0("Inst. ", i))})
+                               alias = paste0("Inst.", i))})
+
+
+d = .5
+se.max = .5
+power = 0.8
+sig.level = 0.05
+power.target = "mean"
+dif = "simple"
+comparisons = "all.vs.all"
+alternative = "two.sided"
+test = "t.test"
+method = "param"
+nstart = 20
+nmax = 600
+force.balanced = FALSE
+ncpus = parallel::detectCores() - 1
+boot.R = 499
+seed = NULL
+save.partial.results = FALSE
+folder = "./nreps_files"
+
+
+my.results <- run_experiment(instances, algorithms, d, se.max,
+                             power, sig.level, power.target, dif, comparisons,
+                             alternative, test, method, nstart, nmax,
+                             force.balanced, ncpus, boot.R, seed,
+                             save.partial.results, folder)

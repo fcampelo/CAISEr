@@ -5,9 +5,10 @@
 \title{Determine sample sizes for a set of algorithms on a single problem instance}
 \usage{
 calc_nreps(instance, algorithms, se.max, dif = "simple",
-  type = "all.vs.all", method = "param", nstart = 20, nmax = 200,
-  seed = NULL, boot.R = 499, ncpus = 1, force.balanced = FALSE,
-  save.to.file = FALSE, folder = "./nreps_files")
+  comparisons = "all.vs.all", method = "param", nstart = 20,
+  nmax = 200, seed = NULL, boot.R = 499, ncpus = 1,
+  force.balanced = FALSE, save.to.file = FALSE,
+  folder = "./nreps_files")
 }
 \arguments{
 \item{instance}{a list object containing the definitions of the problem
@@ -24,7 +25,7 @@ difference between pairs of algorithms. See Section
 \item{dif}{type of difference to be used. Accepts "perc" (for percent
 differences) or "simple" (for simple differences)}
 
-\item{type}{type of comparisons being performed. Accepts "all.vs.first"
+\item{comparisons}{type of comparisons being performed. Accepts "all.vs.first"
 (in which cases the first object in \code{algorithms} is considered to be
 the reference algorithm) or "all.vs.all" (if there is no reference
 and all pairwise comparisons are desired).}
@@ -62,7 +63,7 @@ other information for all algorithm pairs of interest
 \item \code{seed} - seed used for the PRNG
 \item \code{dif} - type of difference used
 \item \code{method} - method used ("param" / "boot")
-\item \code{type} - type of pairings ("all.vs.all" / "all.vs.first")
+\item \code{comparisons} - type of pairings ("all.vs.all" / "all.vs.first")
 }
 }
 \description{
@@ -145,37 +146,35 @@ for the estimation (\eqn{\mu_a} and \eqn{\mu_b} represent the mean
 performance of any two algorithms on the test instance, and \eqn{mu}
 represents the grand mean of all algorithms given in \code{algorithms}):
 \itemize{
-\item If \code{dif == "perc"} and \code{type == "all.vs.first"}, the estimated quantity is
+\item If \code{dif == "perc"} and \code{comparisons == "all.vs.first"}, the estimated quantity is
 \eqn{\phi_{1b} = (\mu_1 - \mu_b) / \mu_1 = 1 - (\mu_b / \mu_1)}.
-\item If \code{dif == "perc"} and \code{type == "all.vs.all"}, the estimated quantity is
+\item If \code{dif == "perc"} and \code{comparisons == "all.vs.all"}, the estimated quantity is
 \eqn{\phi_{ab} = (\mu_a - \mu_b) / \mu}.
 \item If \code{dif == "simple"} it estimates \eqn{\mu_a - \mu_b}.
 }
 }
 
 \examples{
-# Uses dummy algorithms and a dummy instance to illustrate the
-# use of calc_nreps
-algorithm1 <- list(FUN = "dummyalgo", alias = "algo1",
-                   distribution.fun = "rnorm",
-                   distribution.pars = list(mean = 15, sd = 2))
-algorithm2 <- list(FUN = "dummyalgo", alias = "algo2",
-                   distribution.fun = "rnorm",
-                   distribution.pars = list(mean = 10, sd = 4))
-algorithm3 <- list(FUN = "dummyalgo", alias = "algo3",
-                   distribution.fun = "rnorm",
-                   distribution.pars = list(mean = 30, sd = 6))
-algorithm4 <- list(FUN = "dummyalgo", alias = "algo4",
-                   distribution.fun = "rnorm",
-                   distribution.pars = list(mean = 15, sd = 8))
-algorithms <- list(alg1 = algorithm1, alg2 = algorithm2,
-                   alg3 = algorithm3, alg4 = algorithm4)
+# Example using dummy algorithms and instances. See ?dummyalgo for details.
+# We generate 4 dummy algorithms, with true means 15, 10, 30, 15; and true
+standard deviations 2, 4, 6, 8.
+algorithms <- mapply(FUN = function(i, m, s){
+                          list(FUN   = "dummyalgo",
+                               alias = paste0("algo", i),
+                               distribution.fun  = "rnorm",
+                               distribution.pars = list(mean = m, sd = s))},
+                     i = c(alg1 = 1, alg2 = 2, alg3 = 3, alg4 = 4),
+                     m = c(15, 10, 30, 15),
+                     s = c(2, 4, 6, 8),
+                     SIMPLIFY = FALSE)
+
+A dummy instance. Just a placeholder.
 instance <- list(FUN = "dummyinstance")
 
-se.max = 0.1
+se.max = 0.05
 dif = "perc"
-type = "all.vs.first"
-method = "boot"
+comparisons = "all.vs.all"
+method = "param"
 seed = 1234
 nstart = 20
 nmax   = 1000
@@ -183,7 +182,7 @@ ncpus  = 1
 
 myreps <- calc_nreps(instance = instance, algorithms = algorithms,
                      se.max   = se.max,   dif        = dif,
-                     type     = type,     method     = method,
+                     comparisons     = comparisons,     method     = method,
                      nstart   = nstart,   nmax       = nmax,
                      seed     = seed)
 myreps$Diffk

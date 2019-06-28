@@ -4,7 +4,7 @@
 \alias{se_boot}
 \title{Bootstrap standard errors}
 \usage{
-se_boot(Xk, dif = "simple", type = "all.vs.all", boot.R = 999)
+se_boot(Xk, dif = "simple", comparisons = "all.vs.all", boot.R = 999)
 }
 \arguments{
 \item{Xk}{list object where each position contains a vector of observations
@@ -14,7 +14,7 @@ of algorithm k on a given problem instance.}
 Accepts "perc" (for percent differences) or "simple" (for simple
 differences)}
 
-\item{type}{standard errors to be calculated. Accepts "all.vs.first"
+\item{comparisons}{standard errors to be calculated. Accepts "all.vs.first"
 (in which cases the first object in \code{algorithms} is considered to be
 the reference algorithm) or "all.vs.all" (if there is no reference
 and all pairwise SEs are desired).}
@@ -50,9 +50,9 @@ Xk <- list(rnorm(10, 5, 1),  # mean = 5, sd = 1,
            rnorm(20, 10, 2), # mean = 10, sd = 2,
            rnorm(20, 15, 5)) # mean = 15, sd = 3
 
-se_boot(Xk, dif = "simple", type = "all.vs.all")
-se_boot(Xk, dif = "perc", type = "all.vs.first")
-se_boot(Xk, dif = "perc", type = "all.vs.all")
+se_boot(Xk, dif = "simple", comparisons = "all.vs.all")
+se_boot(Xk, dif = "perc", comparisons = "all.vs.first")
+se_boot(Xk, dif = "perc", comparisons = "all.vs.all")
 }
 \author{
 Felipe Campelo (\email{fcampelo@ufmg.br},

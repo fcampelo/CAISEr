@@ -4,8 +4,8 @@
 \alias{calc_se}
 \title{Calculates the standard error for simple and percent differences}
 \usage{
-calc_se(Xk, dif = "simple", type = "all.vs.all", method = "param",
-  boot.R = 999)
+calc_se(Xk, dif = "simple", comparisons = "all.vs.all",
+  method = "param", boot.R = 999)
 }
 \arguments{
 \item{Xk}{list object where each position contains a vector of observations
@@ -15,7 +15,7 @@ of algorithm k on a given problem instance.}
 Accepts "perc" (for percent differences) or "simple" (for simple
 differences)}
 
-\item{type}{standard errors to be calculated. Accepts "all.vs.first"
+\item{comparisons}{standard errors to be calculated. Accepts "all.vs.first"
 (in which cases the first object in \code{algorithms} is considered to be
 the reference algorithm) or "all.vs.all" (if there is no reference
 and all pairwise SEs are desired).}
@@ -31,8 +31,8 @@ distribution of the means) or "boot" (for bootstrap).}
 a list object containing the following items:
 \itemize{
 \item \code{Phi.est} - estimated values of the statistic of interest for
-each pair of algorithms of interest (all pairs if \code{type == "all.vs.all"},
-or all pairs containing the first algorithm if \code{type == "all.vs.first"}).
+each pair of algorithms of interest (all pairs if \code{comparisons == "all.vs.all"},
+or all pairs containing the first algorithm if \code{comparisons == "all.vs.first"}).
 \item \code{se} - standard error estimates
 }
 }
@@ -66,14 +66,14 @@ Xk <- list(rnorm(10, 5, 1),  # mean = 5, sd = 1,
            rnorm(20, 10, 2), # mean = 10, sd = 2,
            rnorm(50, 15, 5)) # mean = 15, sd = 3
 
-calc_se(Xk, dif = "simple", type = "all.vs.all", method = "param")
-calc_se(Xk, dif = "simple", type = "all.vs.all", method = "boot")
+calc_se(Xk, dif = "simple", comparisons = "all.vs.all", method = "param")
+calc_se(Xk, dif = "simple", comparisons = "all.vs.all", method = "boot")
 
-calc_se(Xk, dif = "perc", type = "all.vs.first", method = "param")
-calc_se(Xk, dif = "perc", type = "all.vs.first", method = "boot")
+calc_se(Xk, dif = "perc", comparisons = "all.vs.first", method = "param")
+calc_se(Xk, dif = "perc", comparisons = "all.vs.first", method = "boot")
 
-calc_se(Xk, dif = "perc", type = "all.vs.all", method = "param")
-calc_se(Xk, dif = "perc", type = "all.vs.all", method = "boot")
+calc_se(Xk, dif = "perc", comparisons = "all.vs.all", method = "param")
+calc_se(Xk, dif = "perc", comparisons = "all.vs.all", method = "boot")
 }
 \author{
 Felipe Campelo (\email{fcampelo@ufmg.br},

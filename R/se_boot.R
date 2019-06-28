@@ -28,14 +28,14 @@
 #'            rnorm(20, 10, 2), # mean = 10, sd = 2,
 #'            rnorm(20, 15, 5)) # mean = 15, sd = 3
 #'
-#' se_boot(Xk, dif = "simple", type = "all.vs.all")
-#' se_boot(Xk, dif = "perc", type = "all.vs.first")
-#' se_boot(Xk, dif = "perc", type = "all.vs.all")
+#' se_boot(Xk, dif = "simple", comparisons = "all.vs.all")
+#' se_boot(Xk, dif = "perc", comparisons = "all.vs.first")
+#' se_boot(Xk, dif = "perc", comparisons = "all.vs.all")
 
 # TESTED: OK
 se_boot <- function(Xk,                  # vector of observations
                     dif = "simple",      # type of difference
-                    type = "all.vs.all", # standard errors to calculate
+                    comparisons = "all.vs.all", # standard errors to calculate
                     boot.R = 999)        # number of bootstrap resamples
 {
 
@@ -45,7 +45,7 @@ se_boot <- function(Xk,                  # vector of observations
     all(sapply(Xk, is.numeric)),
     all(sapply(Xk, function(x){length(x) >= 2})),
     dif %in% c('simple', 'perc'),
-    type %in% c("all.vs.all", "all.vs.first"),
+    comparisons %in% c("all.vs.all", "all.vs.first"),
     assertthat::is.count(boot.R), boot.R > 1)
   # ==================================== #
 
@@ -54,7 +54,7 @@ se_boot <- function(Xk,                  # vector of observations
 
   # Get pairs for calculation
   algo.pairs <- t(combn(1:length(Xk), 2))
-  if (type == "all.vs.first") algo.pairs <- algo.pairs[1:(nalgs - 1), ]
+  if (comparisons == "all.vs.first") algo.pairs <- algo.pairs[1:(nalgs - 1), ]
 
   # Calculate point estimates and standard errors for all required pairs
   Phik  <- numeric(nrow(algo.pairs))
@@ -86,19 +86,19 @@ se_boot <- function(Xk,                  # vector of observations
         ropt.hat[i] <- sqrt(Vark[ind[1]] / Vark[ind[2]])
         #
       } else if (dif == "perc"){
-        if (type == "all.vs.all"){
+        if (comparisons == "all.vs.all"){
           # (mu1 - mu2) / mu
           phi.hat[i] <- (Xbark[ind[1]] - Xbark[ind[2]]) / Xbar.all
           # r = s1 / s2
           ropt.hat[i] <- sqrt(Vark[ind[1]] / Vark[ind[2]])
           #
-        } else if (type == "all.vs.first"){
+        } else if (comparisons == "all.vs.first"){
           # (mu1 - mu2) / mu1
           phi.hat[i] <- 1 - Xbark[ind[2]] / Xbark[ind[1]]
           # r = (s1 / s2) * (mu2 / mu1)
           ropt.hat[i] <- sqrt(Vark[ind[1]] / Vark[ind[2]]) * (Xbark[ind[2]] / Xbark[ind[1]])
           #
-        } else stop("type option *", type, "* not recognized.")
+        } else stop("comparisons option *", comparisons, "* not recognized.")
         #
       } else stop ("dif option *", dif, "* not recognized.")
     }

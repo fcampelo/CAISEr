@@ -11,12 +11,11 @@ calc_power_curve(ninstances, sig.level = 0.05,
 \arguments{
 \item{ninstances}{the number of instances to be used in the experiment.}
 
-\item{sig.level}{significance level (alpha) for the experiment}
+\item{sig.level}{desired family-wise significance level (alpha) for the
+experiment}
 
-\item{alternative}{type of alternative hypothesis ("two.sided" or
-"one.sided")}
-
-\item{test.type}{type of test ("t.test", "wilcoxon", "binomial")}
+\item{alternative}{type of alternative hypothesis to be performed
+("two.sided" or "one.sided")}
 
 \item{d.range}{vector \code{c(dmin, dmax)} with range of effect sizes to consider
 for the power calculations.}

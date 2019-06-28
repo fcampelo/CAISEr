@@ -20,7 +20,7 @@
 #' @param dif name of the difference for which the SEs are desired.
 #'            Accepts "perc" (for percent differences) or "simple" (for simple
 #'            differences)
-#' @param type standard errors to be calculated. Accepts "all.vs.first"
+#' @param comparisons standard errors to be calculated. Accepts "all.vs.first"
 #'          (in which cases the first object in `algorithms` is considered to be
 #'          the reference algorithm) or "all.vs.all" (if there is no reference
 #'          and all pairwise SEs are desired).
@@ -33,8 +33,8 @@
 #' @return a list object containing the following items:
 #' \itemize{
 #'    \item \code{Phi.est} - estimated values of the statistic of interest for
-#'    each pair of algorithms of interest (all pairs if `type == "all.vs.all"`,
-#'    or all pairs containing the first algorithm if `type == "all.vs.first"`).
+#'    each pair of algorithms of interest (all pairs if `comparisons == "all.vs.all"`,
+#'    or all pairs containing the first algorithm if `comparisons == "all.vs.first"`).
 #'    \item \code{se} - standard error estimates
 #' }
 #'
@@ -50,19 +50,19 @@
 #'            rnorm(20, 10, 2), # mean = 10, sd = 2,
 #'            rnorm(50, 15, 5)) # mean = 15, sd = 3
 #'
-#' calc_se(Xk, dif = "simple", type = "all.vs.all", method = "param")
-#' calc_se(Xk, dif = "simple", type = "all.vs.all", method = "boot")
+#' calc_se(Xk, dif = "simple", comparisons = "all.vs.all", method = "param")
+#' calc_se(Xk, dif = "simple", comparisons = "all.vs.all", method = "boot")
 #'
-#' calc_se(Xk, dif = "perc", type = "all.vs.first", method = "param")
-#' calc_se(Xk, dif = "perc", type = "all.vs.first", method = "boot")
+#' calc_se(Xk, dif = "perc", comparisons = "all.vs.first", method = "param")
+#' calc_se(Xk, dif = "perc", comparisons = "all.vs.first", method = "boot")
 #'
-#' calc_se(Xk, dif = "perc", type = "all.vs.all", method = "param")
-#' calc_se(Xk, dif = "perc", type = "all.vs.all", method = "boot")
+#' calc_se(Xk, dif = "perc", comparisons = "all.vs.all", method = "param")
+#' calc_se(Xk, dif = "perc", comparisons = "all.vs.all", method = "boot")
 
 # TESTED: OK
 calc_se <- function(Xk,                  # vector of observations
                     dif = "simple",      # type of difference
-                    type = "all.vs.all", # standard errors to calculate
+                    comparisons = "all.vs.all", # standard errors to calculate
                     method = "param",    # method for calculating CI
                     boot.R = 999)        # number of bootstrap resamples
 
@@ -74,16 +74,16 @@ calc_se <- function(Xk,                  # vector of observations
     all(sapply(Xk, is.numeric)),
     all(sapply(Xk, function(x){length(x) >= 2})),
     dif %in% c('simple', 'perc'),
-    type %in% c("all.vs.all", "all.vs.first"),
+    comparisons %in% c("all.vs.all", "all.vs.first"),
     method %in% c('param', 'boot'),
     assertthat::is.count(boot.R))
   # ==================================== #
 
   # Calculate point estimates and standard errors
   if (method == "param"){
-    Diffk <- se_param(Xk = Xk, dif = dif, type = type)
+    Diffk <- se_param(Xk = Xk, dif = dif, comparisons = comparisons)
   } else if (method == "boot"){
-    Diffk <- se_boot(Xk = Xk, dif = dif, type = type,
+    Diffk <- se_boot(Xk = Xk, dif = dif, comparisons = comparisons,
                   boot.R = boot.R)
   }
 

@@ -2,13 +2,16 @@
 % Please edit documentation in R/run_experiment.R
 \name{run_experiment}
 \alias{run_experiment}
-\title{Run a full experiment}
+\title{Run a full experiment for comparing multiple algorithms using multiple
+instances}
 \usage{
-run_experiment(instances, algorithms, power, d, sig.level = 0.05,
-  alternative = "two.sided", test.type = "t.test", se.max, dif,
-  method = "param", nstart = 20, nmax = 1000, seed = NULL,
-  boot.R = 999, force.balanced = FALSE, ncpus = 1,
-  save.partial.results = FALSE, folder = "./nreps_files")
+run_experiment(instances, algorithms, d, se.max, power = 0.8,
+  sig.level = 0.05, power.target = "mean", dif = "simple",
+  comparisons = "all.vs.all", alternative = "two.sided",
+  test = "t.test", method = "param", nstart = 20, nmax = 100 *
+  length(algorithms), force.balanced = FALSE, ncpus = 1,
+  boot.R = 499, seed = NULL, save.partial.results = FALSE,
+  folder = "./nreps_files")
 }
 \arguments{
 \item{instances}{list object containing the definitions of the
@@ -19,29 +22,38 @@ see \code{\link[=calc_instances]{calc_instances()}}. For more details, see Secti
 \item{algorithms}{a list object containing the definitions of all algorithms.
 See Section \code{Algorithms} for details.}
 
-\item{power}{(desired) test power. See \code{\link[=calc_instances]{calc_instances()}} for details.
-Any value equal to or greater than one will force the method to use all
-available instances in \code{Instance.list}.}
-
 \item{d}{minimally relevant effect size (MRES), expressed as a standardized
 effect size, i.e., "deviation from H0" / "standard deviation".
-See \code{\link[=calc_instances]{calc_instances()}} for details.}
-
-\item{sig.level}{family-wise significance level (alpha) for the experiment.
-See \code{\link[=calc_instances]{calc_instances()}} for details.}
-
-\item{alternative}{type of alternative hypothesis ("two.sided" or
-"one.sided"). See \code{\link[=calc_instances]{calc_instances()}} for details.}
-
-\item{test.type}{type of test ("t.test", "wilcoxon", "binomial").
 See \code{\link[=calc_instances]{calc_instances()}} for details.}
 
 \item{se.max}{desired upper limit for the standard error of the estimated
 difference between pairs of algorithms. See Section
 \code{Pairwise Differences} for details.}
 
+\item{power}{(desired) test power. See \code{\link[=calc_instances]{calc_instances()}} for details.
+Any value equal to or greater than one will force the method to use all
+available instances in \code{Instance.list}.}
+
+\item{sig.level}{family-wise significance level (alpha) for the experiment.
+See \code{\link[=calc_instances]{calc_instances()}} for details.}
+
+\item{power.target}{which comparison should have the desired \code{power}?
+Accepts "mean", "median", or "worst.case" (this last one
+is equivalent to the Bonferroni correction).}
+
 \item{dif}{type of difference to be used. Accepts "perc" (for percent
 differences) or "simple" (for simple differences)}
+
+\item{comparisons}{type of comparisons being performed. Accepts "all.vs.first"
+(in which cases the first object in \code{algorithms} is considered to be
+the reference algorithm) or "all.vs.all" (if there is no reference
+and all pairwise comparisons are desired).}
+
+\item{alternative}{type of alternative hypothesis ("two.sided" or
+"one.sided"). See \code{\link[=calc_instances]{calc_instances()}} for details.}
+
+\item{test}{type of test to be used
+("t.test", "wilcoxon" or "binomial")}
 
 \item{method}{method to use for estimating the standard errors. Accepts
 "param" (for parametric) or "boot" (for bootstrap)}
@@ -51,25 +63,29 @@ See Section \code{Initial Number of Observations} for details.}
 
 \item{nmax}{maximum \strong{total} allowed sample size.}
 
-\item{seed}{seed for the random number generator}
-
-\item{boot.R}{number of bootstrap resamples to use (if \code{method == "boot"})}
-
 \item{force.balanced}{logical flag to force the use of balanced sampling for
 the algorithms on each instance}
 
 \item{ncpus}{number of cores to use}
 
+\item{boot.R}{number of bootstrap resamples to use (if \code{method == "boot"})}
+
+\item{seed}{seed for the random number generator}
+
 \item{folder}{directory to save files (if \code{save.to.file == TRUE})}
+
+\item{type}{of test ("t.test", "wilcoxon", "binomial").
+See \code{\link[=calc_instances]{calc_instances()}} for details.}
 }
 \value{
-a list object containing the full input configuration plus the
-following fields:
+a list object containing the following fields:
 \itemize{
+\item \code{Configuration} - the full input configuration (for reproducibility)
 \item \code{data.raw} - data frame containing all observations generated
 \item \code{data.summary} - data frame summarizing the experiment.
 \item \code{N} - number of instances sampled
 \item \code{N.star} - number of instances required
+\item \code{total.runs} - total number of algorithm runs performed
 \item \code{instances.sampled} - names of the instances sampled
 \item \code{Underpowered} - flag: TRUE if N < N.star
 }
@@ -162,9 +178,11 @@ for the estimation (\eqn{\mu_a} and \eqn{\mu_b} represent the mean
 performance of any two algorithms on the test instance, and \eqn{mu}
 represents the grand mean of all algorithms given in \code{algorithms}):
 \itemize{
-\item If \code{dif == "perc"} and \code{type == "all.vs.first"}, the estimated quantity is
+\item If \code{dif == "perc"} and \code{comparisons == "all.vs.first"}, the estimated
+quantity is:
 \eqn{\phi_{1b} = (\mu_1 - \mu_b) / \mu_1 = 1 - (\mu_b / \mu_1)}.
-\item If \code{dif == "perc"} and \code{type == "all.vs.all"}, the estimated quantity is
+\item If \code{dif == "perc"} and \code{comparisons == "all.vs.all"}, the estimated
+quantity is:
 \eqn{\phi_{ab} = (\mu_a - \mu_b) / \mu}.
 \item If \code{dif == "simple"} it estimates \eqn{\mu_a - \mu_b}.
 }
@@ -172,7 +190,7 @@ represents the grand mean of all algorithms given in \code{algorithms}):
 
 \section{Sample Sizes for Nonparametric Methods}{
 
-If the parameter \code{test.type} is set to either \code{Wilcoxon} or \code{Binomial}, this
+If the parameter `` is set to either \code{Wilcoxon} or `Binomial`, this
 routine approximates the number of instances using the ARE of these tests
 in relation to the paired t.test:
 \itemize{
@@ -183,30 +201,23 @@ in relation to the paired t.test:
 
 \examples{
 # Example using dummy algorithms and instances. See ?dummyalgo for details.
-# In this case all instances are the same, so we expect all cases to return
-# a percent difference of approx. phi.j = 1.0 and sample sizes of
-# approx. n1 = 31, n2 = 87
-algorithm1 <- list(FUN = "dummyalgo", alias = "algo1",
-                   distribution.fun = "rnorm",
-                   distribution.pars = list(mean = 10, sd = 1))
-algorithm2 <- list(FUN = "dummyalgo", alias = "algo2",
-                   distribution.fun = "rnorm",
-                   distribution.pars = list(mean = 20, sd = 4))
-algolist <- list(algorithm1, algorithm2)
-instlist <- vector(100, mode = "list")
-for (i in 1:100) instlist[[i]] <- list(FUN = "dummyinstance",
-                                       alias = paste0("Inst. ", i))
+# Generating 4 dummy algorithms here, with means 15, 10, 30, 15 and standard
+# deviations 2, 4, 6, 8.
+algorithms <- mapply(FUN = function(i, m, s){
+                          list(FUN   = "dummyalgo",
+                               alias = paste0("algo", i),
+                               distribution.fun  = "rnorm",
+                               distribution.pars = list(mean = m, sd = s))},
+                     i = c(alg1 = 1, alg2 = 2, alg3 = 3, alg4 = 4),
+                     m = c(15, 10, 30, 15),
+                     s = c(2, 4, 6, 8),
+                     SIMPLIFY = FALSE)
 
-my.results <- run_experiment(Instance.list = instlist,
-                             Algorithm.list = algolist,
-                             power = 0.8,
-                             d = 1,
-                             sig.level = 0.01,
-                             se.max = 0.05,
-                             dif = "perc",
-                             nmax   = 200,
-                             seed   = 1234,
-                             ncpus  = 1)
+# Just generate the same instance, 100 times
+instances <- lapply(1:100,
+             function(i) {list(FUN   = "dummyinstance",
+                               alias = paste0("Inst.", i))})
+
 
 # Take a look at the summary table
 my.results$data.summary
@@ -235,6 +246,9 @@ Ratios: A short guide to confidence limits and proper use (2007).
 https://arxiv.org/pdf/0710.2024v1.pdf
 \item D.C. Montgomery, C.G. Runger:
 Applied Statistics and Probability for Engineers, 6th ed. Wiley (2013)
+\item D.J. Sheskin:
+Handbook of Parametric and Nonparametric Statistical Procedures,
+4th ed., Chapman & Hall/CRC, 1996.
 }
 }
 \author{

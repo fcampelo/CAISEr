@@ -34,14 +34,14 @@
 #'            rnorm(20, 10, 2), # mean = 10, sd = 2,
 #'            rnorm(20, 15, 5)) # mean = 15, sd = 3
 #'
-#' se_param(Xk, dif = "simple", type = "all.vs.all")
-#' se_param(Xk, dif = "perc", type = "all.vs.first")
-#' se_param(Xk, dif = "perc", type = "all.vs.all")
+#' se_param(Xk, dif = "simple", comparisons = "all.vs.all")
+#' se_param(Xk, dif = "perc", comparisons = "all.vs.first")
+#' se_param(Xk, dif = "perc", comparisons = "all.vs.all")
 
 # TESTED: OK
 se_param <- function(Xk,                  # vector of observations
                      dif = "simple",      # type of difference
-                     type = "all.vs.all", # standard errors to calculate
+                     comparisons = "all.vs.all", # standard errors to calculate
                      ...)
 {
 
@@ -51,7 +51,7 @@ se_param <- function(Xk,                  # vector of observations
       all(sapply(Xk, is.numeric)),
       all(sapply(Xk, function(x){length(x) >= 2})),
       dif %in% c('simple', 'perc'),
-      type %in% c("all.vs.all", "all.vs.first"))
+      comparisons %in% c("all.vs.all", "all.vs.first"))
     # ==================================== #
 
     # Estimates
@@ -63,7 +63,7 @@ se_param <- function(Xk,                  # vector of observations
 
     # Get pairs for comparison
     algo.pairs <- t(combn(1:length(Xk), 2))
-    if (type == "all.vs.first") algo.pairs <- algo.pairs[1:(nalgs - 1), ]
+    if (comparisons == "all.vs.first") algo.pairs <- algo.pairs[1:(nalgs - 1), ]
 
     # Calculate point estimates and standard errors for all required pairs
     Phik  <- numeric(nrow(algo.pairs))
@@ -80,7 +80,7 @@ se_param <- function(Xk,                  # vector of observations
         Roptk[i] <- sqrt(Vark[ind[1]] / Vark[ind[2]])
         #
       } else if (dif == "perc"){
-        if (type == "all.vs.all"){
+        if (comparisons == "all.vs.all"){
           # (mu1 - mu2) / mu
           Phik[i] <- (Xbark[ind[1]] - Xbark[ind[2]]) / Xbar.all
           # c1 = 1/mu^2 + (mu1 - mu2)^2 / (A * mu^2)^2
@@ -93,7 +93,7 @@ se_param <- function(Xk,                  # vector of observations
           # r = s1 / s2
           Roptk[i] <- sqrt(Vark[ind[1]] / Vark[ind[2]])
           #
-        } else if (type == "all.vs.first"){
+        } else if (comparisons == "all.vs.first"){
           # 1 - mu2/mu1
           Phik[i] <- 1 - Xbark[ind[2]] / Xbark[ind[1]]
           # c1 = s1^2 * (mu_2 / mu_1^2)^2
@@ -105,7 +105,7 @@ se_param <- function(Xk,                  # vector of observations
           # r* = s1/s2 * mu2/mu1
           Roptk[i] <- sqrt(Vark[ind[1]] / Vark[ind[2]]) * (Xbark[ind[2]] / Xbark[ind[1]])
           #
-        } else stop("type option *", type, "* not recognized.")
+        } else stop("comparisons option *", comparisons, "* not recognized.")
       } else stop ("dif option *", dif, "* not recognized.")
     }
 

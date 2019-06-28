@@ -72,10 +72,10 @@
 #' performance of any two algorithms on the test instance, and \eqn{mu}
 #' represents the grand mean of all algorithms given in `algorithms`):
 #'
-#' - If `dif == "perc"` and `type == "all.vs.first"`, the estimated quantity is
+#' - If `dif == "perc"` and `comparisons == "all.vs.first"`, the estimated quantity is
 #'    \eqn{\phi_{1b} = (\mu_1 - \mu_b) / \mu_1 = 1 - (\mu_b / \mu_1)}.
 #'
-#' - If `dif == "perc"` and `type == "all.vs.all"`, the estimated quantity is
+#' - If `dif == "perc"` and `comparisons == "all.vs.all"`, the estimated quantity is
 #'    \eqn{\phi_{ab} = (\mu_a - \mu_b) / \mu}.
 #'
 #' - If `dif == "simple"` it estimates \eqn{\mu_a - \mu_b}.
@@ -90,7 +90,7 @@
 #'        `Pairwise Differences` for details.
 #' @param dif type of difference to be used. Accepts "perc" (for percent
 #'          differences) or "simple" (for simple differences)
-#' @param type type of comparisons being performed. Accepts "all.vs.first"
+#' @param comparisons type of comparisons being performed. Accepts "all.vs.first"
 #'          (in which cases the first object in `algorithms` is considered to be
 #'          the reference algorithm) or "all.vs.all" (if there is no reference
 #'          and all pairwise comparisons are desired).
@@ -119,7 +119,7 @@
 #'    \item \code{seed} - seed used for the PRNG
 #'    \item \code{dif} - type of difference used
 #'    \item \code{method} - method used ("param" / "boot")
-#'    \item \code{type} - type of pairings ("all.vs.all" / "all.vs.first")
+#'    \item \code{comparisons} - type of pairings ("all.vs.all" / "all.vs.first")
 #' }
 #'
 #' @author Felipe Campelo (\email{fcampelo@@gmail.com})
@@ -145,28 +145,26 @@
 #' @export
 #'
 #' @examples
-#' # Uses dummy algorithms and a dummy instance to illustrate the
-#' # use of calc_nreps
-#' algorithm1 <- list(FUN = "dummyalgo", alias = "algo1",
-#'                    distribution.fun = "rnorm",
-#'                    distribution.pars = list(mean = 15, sd = 2))
-#' algorithm2 <- list(FUN = "dummyalgo", alias = "algo2",
-#'                    distribution.fun = "rnorm",
-#'                    distribution.pars = list(mean = 10, sd = 4))
-#' algorithm3 <- list(FUN = "dummyalgo", alias = "algo3",
-#'                    distribution.fun = "rnorm",
-#'                    distribution.pars = list(mean = 30, sd = 6))
-#' algorithm4 <- list(FUN = "dummyalgo", alias = "algo4",
-#'                    distribution.fun = "rnorm",
-#'                    distribution.pars = list(mean = 15, sd = 8))
-#' algorithms <- list(alg1 = algorithm1, alg2 = algorithm2,
-#'                    alg3 = algorithm3, alg4 = algorithm4)
+#' # Example using dummy algorithms and instances. See ?dummyalgo for details.
+#' # We generate 4 dummy algorithms, with true means 15, 10, 30, 15; and true
+#' standard deviations 2, 4, 6, 8.
+#' algorithms <- mapply(FUN = function(i, m, s){
+#'                           list(FUN   = "dummyalgo",
+#'                                alias = paste0("algo", i),
+#'                                distribution.fun  = "rnorm",
+#'                                distribution.pars = list(mean = m, sd = s))},
+#'                      i = c(alg1 = 1, alg2 = 2, alg3 = 3, alg4 = 4),
+#'                      m = c(15, 10, 30, 15),
+#'                      s = c(2, 4, 6, 8),
+#'                      SIMPLIFY = FALSE)
+#'
+#' A dummy instance. Just a placeholder.
 #' instance <- list(FUN = "dummyinstance")
 #'
-#' se.max = 0.1
+#' se.max = 0.05
 #' dif = "perc"
-#' type = "all.vs.first"
-#' method = "boot"
+#' comparisons = "all.vs.all"
+#' method = "param"
 #' seed = 1234
 #' nstart = 20
 #' nmax   = 1000
@@ -174,7 +172,7 @@
 #'
 #' myreps <- calc_nreps(instance = instance, algorithms = algorithms,
 #'                      se.max   = se.max,   dif        = dif,
-#'                      type     = type,     method     = method,
+#'                      comparisons     = comparisons,     method     = method,
 #'                      nstart   = nstart,   nmax       = nmax,
 #'                      seed     = seed)
 #' myreps$Diffk
@@ -184,17 +182,16 @@ calc_nreps <- function(instance,            # instance parameters
                        algorithms,          # algorithm parameters
                        se.max,              # desired (max) standard error
                        dif = "simple",      # type of difference
-                       type = "all.vs.all", # differences to consider
+                       comparisons = "all.vs.all", # differences to consider
                        method = "param",    # method ("param", "boot")
                        nstart = 20,         # initial number of samples
                        nmax   = 200,        # maximum allowed sample size
                        seed   = NULL,       # seed for PRNG
                        boot.R = 499,        # number of bootstrap resamples
                        ncpus  = 1,          # number of cores to use
-                       force.balanced = FALSE,   # force balanced sampling
-                       save.to.file  = FALSE,    # save results to tmp file
-                       folder = "./nreps_files") # directory to save files (if
-# save.to.file == TRUE)
+                       force.balanced = FALSE,   # force balanced sampling?
+                       save.to.file  = FALSE,    # save results to tmp file?
+                       folder = "./nreps_files") # directory to save tmp file
 {
 
   # ========== Error catching ========== #
@@ -207,7 +204,7 @@ calc_nreps <- function(instance,            # instance parameters
                FUN = function(x){assertthat::has_name(x, "FUN")})),
     is.numeric(se.max) && length(se.max) == 1,
     dif %in% c("simple", "perc"),
-    type %in% c("all.vs.all", "all.vs.first"),
+    comparisons %in% c("all.vs.all", "all.vs.first"),
     method %in% c("param", "boot"),
     assertthat::is.count(nstart),
     is.infinite(nmax) || assertthat::is.count(nmax),
@@ -246,7 +243,7 @@ calc_nreps <- function(instance,            # instance parameters
   # Calculate point estimates, SEs, and sample size ratios (current x optimal)
   Diffk <- calc_se(X      = Xk,
                    dif    = dif,
-                   type   = type,
+                   comparisons = comparisons,
                    method = method,
                    boot.R = boot.R)
 
@@ -287,21 +284,22 @@ calc_nreps <- function(instance,            # instance parameters
       # Recalculate point estimates, SEs, and sample size ratios
       Diffk <- calc_se(X      = Xk,
                        dif    = dif,
-                       type   = type,
+                       comparisons   = comparisons,
                        method = method,
                        boot.R = boot.R)
     }
   }
 
   # Assemble output list
-  output <- list(instance = instance$alias,
-                 Xk       = Xk,
-                 Nk       = Nk,
-                 Diffk    = Diffk,
-                 dif      = dif,
-                 method   = method,
-                 type     = type,
-                 seed     = seed)
+  names(Nk) <- lapply(algorithms, function(x)x$alias)
+  output    <- list(instance = instance$alias,
+                    Xk       = Xk,
+                    Nk       = Nk,
+                    Diffk    = Diffk,
+                    dif      = dif,
+                    method   = method,
+                    comparisons     = comparisons,
+                    seed     = seed)
 
   # Save to file if required
   if (save.to.file){
