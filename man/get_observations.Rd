@@ -8,10 +8,10 @@ get_observations(algo, instance, n = 1)
 }
 \arguments{
 \item{algo}{a list object containing the definitions of the algorithm.
-See \code{\link[=calc_nreps2]{calc_nreps2()}} for details.}
+See \code{\link[=calc_nreps]{calc_nreps()}} for details.}
 
 \item{instance}{a list object containing the definitions of the problem
-instance. See \code{\link[=calc_nreps2]{calc_nreps2()}} for details.}
+instance. See \code{\link[=calc_nreps]{calc_nreps()}} for details.}
 
 \item{n}{number of observations to generate.}
 }
@@ -30,7 +30,7 @@ x <- get_observations(algorithm, instance, n = 1000)
 hist(x)
 }
 \seealso{
-\link{calc_nreps2}
+\code{\link[=calc_nreps]{calc_nreps()}}
 }
 \author{
 Felipe Campelo (\email{fcampelo@ufmg.br},

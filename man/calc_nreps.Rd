@@ -168,8 +168,8 @@ algorithms <- mapply(FUN = function(i, m, s){
                      s = c(2, 4, 6, 8),
                      SIMPLIFY = FALSE)
 
-A dummy instance. Just a placeholder.
-instance <- list(FUN = "dummyinstance")
+# Make a dummy instance with a centered (zero-mean) exponential distribution:
+instance = list(FUN = "dummyinstance", distr = "rexp", rate = 5, bias = -1/5)
 
 se.max = 0.05
 dif = "perc"
@@ -181,10 +181,9 @@ nmax   = 1000
 ncpus  = 1
 
 myreps <- calc_nreps(instance = instance, algorithms = algorithms,
-                     se.max   = se.max,   dif        = dif,
-                     comparisons     = comparisons,     method     = method,
-                     nstart   = nstart,   nmax       = nmax,
-                     seed     = seed)
+                     se.max = se.max,   dif = dif,
+                     comparisons = comparisons, method = method,
+                     nstart = nstart, nmax = nmax, seed = seed)
 myreps$Diffk
 }
 \references{

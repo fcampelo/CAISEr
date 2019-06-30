@@ -8,10 +8,12 @@ algorithms <- mapply(FUN = function(i, m, s){
                      s = c(2, 4, 6, 8),
                      SIMPLIFY = FALSE)
 
-# Just generate the same instance, 100 times
 instances <- lapply(1:100,
-             function(i) {list(FUN   = "dummyinstance",
-                               alias = paste0("Inst.", i))})
+                    function(i) {rate <- runif(1, 1, 10)
+                    list(FUN   = "dummyinstance",
+                         alias = paste0("Inst.", i),
+                         distr = "rexp", rate = rate,
+                         bias  = -1 / rate)})
 
 
 d = .5
@@ -27,7 +29,7 @@ method = "param"
 nstart = 20
 nmax = 600
 force.balanced = FALSE
-ncpus = parallel::detectCores() - 1
+ncpus = 1#parallel::detectCores() - 1
 boot.R = 499
 seed = NULL
 save.partial.results = FALSE

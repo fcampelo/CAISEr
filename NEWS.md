@@ -4,6 +4,11 @@
 * added function `calc_nreps()` to calculate the number of repetitions in the case of multiple (>2) algorithms. This function replaces the old `calc_nreps2()`
 * function `calc_se()` now performs point estimate and standard error 
 calculations for all pairs of interest in the case of multiple algorithms.
+* function `calc_instances()` now returns the number of required instances to
+maintain the desired power for the family of experiments, based on Holm's 
+step-down correction. It also returns the sequence of alpha values and the 
+corresponding power to detect the effect size `d`, for each comparison using 
+Holm's method.
 
 # CAISEr 0.3.3
 * fixed problem with printing version in the vignette.

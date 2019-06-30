@@ -9,37 +9,37 @@
 #'
 #' @section Instance List:
 #' Parameter `instances` must contain a list of instance objects, where
-#' each field is itself a list, as defined in Section _Instances and Algorithms_
-#' of the documentation of [calc_nreps()]. In summary, each element of
-#' `instances` is an `instance`, i.e., a named list containing all relevant
-#' parameters that define the problem instance. This list must contain at least
-#' the field `instance$FUN`, with the name of the problem instance function,
-#' that is, a routine that calculates y = f(x). If the instance requires
-#' additional parameters, these must also be provided as named fields.
-#' An additional field, "instance$alias", can be used to
-#' provide the instance with a unique identifier (e.g., when using an
-#' instance generator).
+#' each field is itself a list, as defined in the documentation of function
+#' [calc_nreps()]. In short, each element of `instances` is an `instance`, i.e.,
+#' a named list containing all relevant parameters that define the problem
+#' instance. This list must contain at least the field `instance$FUN`, with the
+#' name of the problem instance function, that is, a routine that calculates
+#' y = f(x). If the instance requires additional parameters, these must also be
+#' provided as named fields.
+#' An additional field, "instance$alias", can be used to provide the instance
+#' with a unique identifier (e.g., when using an instance generator).
 #'
 #' @section Algorithm List:
 #' Object `algorithms` is a list in which each component is a named
 #' list containing all relevant parameters that define an algorithm to be
-#' applied for solving the problem instance. In what follows `algorithm[[k]]`
+#' applied for solving the problem instance. In what follows `algorithms[[k]]`
 #' refers to any algorithm specified in the `algorithms` list.
 #'
-#' `algorithm[[k]]` must contain an `algorithm[[k]]$FUN` field, which is a
+#' `algorithms[[k]]` must contain an `algorithms[[k]]$FUN` field, which is a
 #' character object with the name of the function that calls the algorithm; as
-#' well as any other elements/parameters that `algorithm[[k]]$FUN` requires
+#' well as any other elements/parameters that `algorithms[[k]]$FUN` requires
 #' (e.g., stop criteria, operator names and parameters, etc.).
 #'
-#' The function defined by the routine `algorithm[[k]]$FUN` must have the
-#' following structure: supposing that the list in `algorithm[[k]]` has
-#' fields `algorithm[[k]]$FUN = "myalgo"`, `algorithm[[k]]$par1 = "a"` and
-#' `algorithm$par2 = 5`, then:
+#' The function defined by the routine `algorithms[[k]]$FUN` must have the
+#' following structure: supposing that the list in `algorithms[[k]]` has
+#' fields `algorithm[[k]]$FUN = "myalgo"`, `algorithms[[k]]$par1 = "a"` and
+#' `algorithms[[k]]$par2 = 5`, then:
 #'
 #'    \preformatted{
 #'          myalgo <- function(par1, par2, instance, ...){
-#'                # do stuff
-#'                # ...
+#'                #
+#'                # <do stuff>
+#'                #
 #'                return(results)
 #'          }
 #'    }
@@ -60,12 +60,13 @@
 #'
 #' The `algorithm$FUN` routine must return a list containing (at
 #' least) the performance value of the final solution obtained, in a field named
-#' `value` (e.g., `result$value`) after a given run.
+#' `value` (e.g., `result$value`) after a given run. In general it is easier to
+#' write a small wrapper funciton around existing implementations.
 #'
 #' @section Initial Number of Observations:
 #' In the _general case_ the initial number of observations / algorithm /
 #' instance (`nstart`) should be relatively high. For the parametric case
-#' we recommend 10~15 if outliers are not expected, and 40~50 (at least) if that
+#' we recommend 10~15 if outliers are not expected, and 30~40 (at least) if that
 #' assumption cannot be made. For the bootstrap approach we recommend using at
 #' least 15 or 20. However, if some distributional assumptions can be
 #' made - particularly low skewness of the population of algorithm results on
@@ -156,25 +157,37 @@
 #' @export
 #'
 #' @examples
-#' # Example using dummy algorithms and instances. See ?dummyalgo for details.
+#' \dontrun{
+#' # Example using four dummy algorithms and 100 dummy instances.
+#' # See [dummyalgo()] and [dummyinstance()] for details.
 #' # Generating 4 dummy algorithms here, with means 15, 10, 30, 15 and standard
 #' # deviations 2, 4, 6, 8.
 #' algorithms <- mapply(FUN = function(i, m, s){
-#'                           list(FUN   = "dummyalgo",
-#'                                alias = paste0("algo", i),
-#'                                distribution.fun  = "rnorm",
-#'                                distribution.pars = list(mean = m, sd = s))},
-#'                      i = c(alg1 = 1, alg2 = 2, alg3 = 3, alg4 = 4),
-#'                      m = c(15, 10, 30, 15),
-#'                      s = c(2, 4, 6, 8),
-#'                      SIMPLIFY = FALSE)
+#'   list(FUN   = "dummyalgo",
+#'        alias = paste0("algo", i),
+#'        distribution.fun  = "rnorm",
+#'        distribution.pars = list(mean = m, sd = s))},
+#'   i = c(alg1 = 1, alg2 = 2, alg3 = 3, alg4 = 4),
+#'   m = c(15, 10, 30, 15),
+#'   s = c(2, 4, 6, 8),
+#'   SIMPLIFY = FALSE)
 #'
-#' # Just generate the same instance, 100 times
+#' # Generate 100 dummy instances with centered exponential distributions
 #' instances <- lapply(1:100,
-#'              function(i) {list(FUN   = "dummyinstance",
-#'                                alias = paste0("Inst.", i))})
+#'                     function(i) {rate <- runif(1, 1, 10)
+#'                                  list(FUN   = "dummyinstance",
+#'                                       alias = paste0("Inst.", i),
+#'                                       distr = "rexp", rate = rate,
+#'                                       bias  = -1 / rate)})
 #'
-
+#' my.results <- run_experiment(instances, algorithms,
+#'                              d = .5, se.max = .1,
+#'                              power = .85, sig.level = .05,
+#'                              power.target = "mean",
+#'                              dif = "perc", comparisons = "all.vs.all",
+#'                              seed = 1234)
+#'
+#'
 #'
 #' # Take a look at the summary table
 #' my.results$data.summary
@@ -193,12 +206,17 @@ run_experiment <- function(instances, algorithms, d, se.max,
                            method = "param",
                            nstart = 20, nmax = 100 * length(algorithms),
                            force.balanced = FALSE,
-                           ncpus = 1, boot.R = 499, seed = NULL,
+                           ncpus = 2, boot.R = 499, seed = NULL,
                            save.partial.results = FALSE,
                            folder = "./nreps_files")
 {
 
-  # ========== Error catching to be performed by specific routines ========== #
+  # ======== Most error catching to be performed by specific routines ======== #
+  assertthat::assert_that(assertthat::is.count(ncpus),
+                          is.null(seed) || seed == seed %/% 1)
+
+  # Fix a common mistake
+  if (tolower(dif) == "percent") dif <- "perc"
 
   # Capture input parameters
   var.input.pars <- as.list(sys.call())[-1]
@@ -270,34 +288,40 @@ run_experiment <- function(instances, algorithms, d, se.max,
   cat("\nUsing", ncpus, "cores.")
   cat("\n-----------------------------")
 
-  # Initialize output structures
-  # data.raw <- data.frame(Algorithm    = character(0),
-  #                        Instance     = character(0),
-  #                        Observation  = numeric(0))
-  # data.summary <- data.frame(Instance = character(0),
-  #                            phi.j    = numeric(0),
-  #                            std.err  = numeric(0),
-  #                            n1j      = numeric(0),
-  #                            n2j      = numeric(0))
-
   # Sample instances
-  my.results <- pbmcapply::pbmclapply(X = instances[1:min(N.star, n.available)],
-                                      FUN            = calc_nreps,
-                                      # Arguments to FUN:
-                                      algorithms     = algorithms,
-                                      se.max         = se.max,
-                                      dif            = dif,
-                                      comparisons    = comparisons,
-                                      method         = method,
-                                      nstart         = nstart,
-                                      nmax           = nmax,
-                                      boot.R         = boot.R,
-                                      force.balanced = force.balanced,
-                                      save.to.file   = save.partial.results,
-                                      folder         = folder,
-                                      # other arguments for pbmclapply:
-                                      mc.cores = ncpus)
-
+  if(ncpus > 1){
+    my.results <- pbmcapply::pbmclapply(X = instances[1:min(N.star, n.available)],
+                                        FUN            = calc_nreps,
+                                        # Arguments for calc_nreps:
+                                        algorithms     = algorithms,
+                                        se.max         = se.max,
+                                        dif            = dif,
+                                        comparisons    = comparisons,
+                                        method         = method,
+                                        nstart         = nstart,
+                                        nmax           = nmax,
+                                        boot.R         = boot.R,
+                                        force.balanced = force.balanced,
+                                        save.to.file   = save.partial.results,
+                                        folder         = folder,
+                                        # other pbmclapply arguments:
+                                        mc.cores = ncpus)
+  } else {
+    my.results <- lapply(X = instances[1:min(N.star, n.available)],
+                         FUN            = calc_nreps,
+                         # Arguments for calc_nreps:
+                         algorithms     = algorithms,
+                         se.max         = se.max,
+                         dif            = dif,
+                         comparisons    = comparisons,
+                         method         = method,
+                         nstart         = nstart,
+                         nmax           = nmax,
+                         boot.R         = boot.R,
+                         force.balanced = force.balanced,
+                         save.to.file   = save.partial.results,
+                         folder         = folder)
+  }
   # Consolidate raw data
   data.raw <- lapply(X   = my.results,
                      FUN = function(x){
@@ -307,7 +331,7 @@ run_experiment <- function(instances, algorithms, d, se.max,
                                                       mapply(rep,
                                                              names(x$Nk),
                                                              x$Nk)),
-                                  Instance = rep(inst, nj),
+                                  Instance    = rep(inst, nj),
                                   Observation = do.call(c, x$Xk),
                                   stringsAsFactors = FALSE)})
 

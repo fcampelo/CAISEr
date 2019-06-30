@@ -100,39 +100,39 @@ so refer to the documentation of these two functions for details.
 \section{Instance List}{
 
 Parameter \code{instances} must contain a list of instance objects, where
-each field is itself a list, as defined in Section \emph{Instances and Algorithms}
-of the documentation of \code{\link[=calc_nreps]{calc_nreps()}}. In summary, each element of
-\code{instances} is an \code{instance}, i.e., a named list containing all relevant
-parameters that define the problem instance. This list must contain at least
-the field \code{instance$FUN}, with the name of the problem instance function,
-that is, a routine that calculates y = f(x). If the instance requires
-additional parameters, these must also be provided as named fields.
-An additional field, "instance$alias", can be used to
-provide the instance with a unique identifier (e.g., when using an
-instance generator).
+each field is itself a list, as defined in the documentation of function
+\code{\link[=calc_nreps]{calc_nreps()}}. In short, each element of \code{instances} is an \code{instance}, i.e.,
+a named list containing all relevant parameters that define the problem
+instance. This list must contain at least the field \code{instance$FUN}, with the
+name of the problem instance function, that is, a routine that calculates
+y = f(x). If the instance requires additional parameters, these must also be
+provided as named fields.
+An additional field, "instance$alias", can be used to provide the instance
+with a unique identifier (e.g., when using an instance generator).
 }
 
 \section{Algorithm List}{
 
 Object \code{algorithms} is a list in which each component is a named
 list containing all relevant parameters that define an algorithm to be
-applied for solving the problem instance. In what follows \code{algorithm[[k]]}
+applied for solving the problem instance. In what follows \code{algorithms[[k]]}
 refers to any algorithm specified in the \code{algorithms} list.
 
-\code{algorithm[[k]]} must contain an \code{algorithm[[k]]$FUN} field, which is a
+\code{algorithms[[k]]} must contain an \code{algorithms[[k]]$FUN} field, which is a
 character object with the name of the function that calls the algorithm; as
-well as any other elements/parameters that \code{algorithm[[k]]$FUN} requires
+well as any other elements/parameters that \code{algorithms[[k]]$FUN} requires
 (e.g., stop criteria, operator names and parameters, etc.).
 
-The function defined by the routine \code{algorithm[[k]]$FUN} must have the
-following structure: supposing that the list in \code{algorithm[[k]]} has
-fields \code{algorithm[[k]]$FUN = "myalgo"}, \code{algorithm[[k]]$par1 = "a"} and
-\code{algorithm$par2 = 5}, then:
+The function defined by the routine \code{algorithms[[k]]$FUN} must have the
+following structure: supposing that the list in \code{algorithms[[k]]} has
+fields \code{algorithm[[k]]$FUN = "myalgo"}, \code{algorithms[[k]]$par1 = "a"} and
+\code{algorithms[[k]]$par2 = 5}, then:
 
 \preformatted{
          myalgo <- function(par1, par2, instance, ...){
-               # do stuff
-               # ...
+               #
+               # <do stuff>
+               #
                return(results)
          }
    }
@@ -153,14 +153,15 @@ That is, it must be able to run if called as:
 
 The \code{algorithm$FUN} routine must return a list containing (at
 least) the performance value of the final solution obtained, in a field named
-\code{value} (e.g., \code{result$value}) after a given run.
+\code{value} (e.g., \code{result$value}) after a given run. In general it is easier to
+write a small wrapper funciton around existing implementations.
 }
 
 \section{Initial Number of Observations}{
 
 In the \emph{general case} the initial number of observations / algorithm /
 instance (\code{nstart}) should be relatively high. For the parametric case
-we recommend 10~15 if outliers are not expected, and 40~50 (at least) if that
+we recommend 10~15 if outliers are not expected, and 30~40 (at least) if that
 assumption cannot be made. For the bootstrap approach we recommend using at
 least 15 or 20. However, if some distributional assumptions can be
 made - particularly low skewness of the population of algorithm results on
@@ -199,35 +200,6 @@ in relation to the paired t.test:
 }
 }
 
-\examples{
-# Example using dummy algorithms and instances. See ?dummyalgo for details.
-# Generating 4 dummy algorithms here, with means 15, 10, 30, 15 and standard
-# deviations 2, 4, 6, 8.
-algorithms <- mapply(FUN = function(i, m, s){
-                          list(FUN   = "dummyalgo",
-                               alias = paste0("algo", i),
-                               distribution.fun  = "rnorm",
-                               distribution.pars = list(mean = m, sd = s))},
-                     i = c(alg1 = 1, alg2 = 2, alg3 = 3, alg4 = 4),
-                     m = c(15, 10, 30, 15),
-                     s = c(2, 4, 6, 8),
-                     SIMPLIFY = FALSE)
-
-# Just generate the same instance, 100 times
-instances <- lapply(1:100,
-             function(i) {list(FUN   = "dummyinstance",
-                               alias = paste0("Inst.", i))})
-
-
-# Take a look at the summary table
-my.results$data.summary
-
-# To perform inference on the results:
-t.test(my.results$data.summary$phi.j, conf.level = 0.95)
-
-# Test assumption of normality (of the data)
-shapiro.test(my.results$data.summary$phi.j)
-}
 \references{
 \itemize{
 \item F. Campelo, F. Takahashi:

@@ -158,8 +158,8 @@
 #'                      s = c(2, 4, 6, 8),
 #'                      SIMPLIFY = FALSE)
 #'
-#' A dummy instance. Just a placeholder.
-#' instance <- list(FUN = "dummyinstance")
+#' # Make a dummy instance with a centered (zero-mean) exponential distribution:
+#' instance = list(FUN = "dummyinstance", distr = "rexp", rate = 5, bias = -1/5)
 #'
 #' se.max = 0.05
 #' dif = "perc"
@@ -171,10 +171,9 @@
 #' ncpus  = 1
 #'
 #' myreps <- calc_nreps(instance = instance, algorithms = algorithms,
-#'                      se.max   = se.max,   dif        = dif,
-#'                      comparisons     = comparisons,     method     = method,
-#'                      nstart   = nstart,   nmax       = nmax,
-#'                      seed     = seed)
+#'                      se.max = se.max,   dif = dif,
+#'                      comparisons = comparisons, method = method,
+#'                      nstart = nstart, nmax = nmax, seed = seed)
 #' myreps$Diffk
 
 # TESTED: OK
@@ -209,7 +208,7 @@ calc_nreps <- function(instance,            # instance parameters
     assertthat::is.count(nstart),
     is.infinite(nmax) || assertthat::is.count(nmax),
     nmax >= length(algorithms) * nstart,
-    is.null(seed) || assertthat::is.count(seed),
+    is.null(seed) || seed == seed %/% 1,
     assertthat::is.count(boot.R), boot.R > 1,
     is.logical(force.balanced), length(force.balanced) == 1,
     is.logical(save.to.file), length(save.to.file) == 1)
