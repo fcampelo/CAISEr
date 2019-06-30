@@ -182,21 +182,15 @@
 #'
 #' my.results <- run_experiment(instances, algorithms,
 #'                              d = .5, se.max = .1,
-#'                              power = .85, sig.level = .05,
+#'                              power = .9, sig.level = .05,
 #'                              power.target = "mean",
 #'                              dif = "perc", comparisons = "all.vs.all",
 #'                              seed = 1234)
 #'
-#'
-#'
 #' # Take a look at the summary table
-#' my.results$data.summary
+#' head(my.results$data.summary, 25)
+#'}
 #'
-#' # To perform inference on the results:
-#' t.test(my.results$data.summary$phi.j, conf.level = 0.95)
-#'
-#' # Test assumption of normality (of the data)
-#' shapiro.test(my.results$data.summary$phi.j)
 
 run_experiment <- function(instances, algorithms, d, se.max,
                            power = 0.8, sig.level = 0.05,
@@ -330,12 +324,13 @@ run_experiment <- function(instances, algorithms, d, se.max,
                        data.frame(Algorithm = do.call(what = c,
                                                       mapply(rep,
                                                              names(x$Nk),
-                                                             x$Nk)),
+                                                             x$Nk,
+                                                             SIMPLIFY = FALSE)),
                                   Instance    = rep(inst, nj),
-                                  Observation = do.call(c, x$Xk),
-                                  stringsAsFactors = FALSE)})
+                                  Observation = do.call(c, x$Xk))})
 
   data.raw <- do.call(rbind, data.raw)
+  rownames(data.raw) <- NULL
 
   # Consolidate summary data
   data.summary <- lapply(X   = my.results,
@@ -344,7 +339,10 @@ run_experiment <- function(instances, algorithms, d, se.max,
                                  x$Diffk)})
 
   data.summary <- do.call(rbind, data.summary)
-
+  algonames <- sapply(algorithms, function(x) x$alias)
+  rownames(data.summary) <- NULL
+  data.summary$Alg1 <- as.factor(algonames[data.summary$Alg1])
+  data.summary$Alg2 <- as.factor(algonames[data.summary$Alg2])
   # Assemble output
   output <- list(Configuration     = var.input.pars,
                  data.raw          = data.raw,
