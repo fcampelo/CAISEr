@@ -17,13 +17,14 @@ running an experiment using CAISEr. In this document, we cover:
 - Adaptation of existing algorithms
 - Some stuff you can do with the results
 
-A general description of the CAISE methodology is available in our paper.^[F. 
-Campelo, F. Takahashi, Sample size estimation for power and accuracy in the 
-experimental comparison of algorithms. Journal of Heuristics 25(2):305-338, 
-2019.]
+A general description of the CAISE methodology is available in our papers:
+- F. Campelo, F. Takahashi, _Sample size estimation for power and accuracy in the  experimental comparison of algorithms_. Journal of Heuristics 25(2):305-338, 
+2019.]  
+- F. Campelo, E. Wanner, _Sample size calculations for the experimental comparison of multiple algorithms on multiple problem instances_. Submitted, Journal of 
+Heuristics, 2019.
 
 ## Assembling an instance list
-As stated in the documentation of both `run_experiment` and `calc_nreps2`, each 
+As stated in the documentation of both `run_experiment()` and `calc_nreps()`, each 
 instance must be a named list containing all relevant parameters that 
 define the problem instance. This list must contain at least the field
 `instance$FUN`, with the name of the problem instance function, that is, a
@@ -33,13 +34,15 @@ also have an `alias`, a unique name to distinguish it from other instances. If
 no alias is provided, the name of the function (`instance$FUN`) is used as the 
 instance ID.
 
-The `Instance.list` parameter for `run_experiment()` is simply a vector of these instance lists.
+The `instances` parameter for `run_experiment()` is simply a list or vector of 
+these instance lists.
 
 To illustrate how to adapt existing implementations to this structure, we 
-assume that we are interested in comparing two multiobjective optimization 
-algorithms for a (hypothetical) problem class that is well-represented by 
+assume that we are interested in comparing three multiobjective optimization 
+algorithms for a (hypothetical) problem class represented by 
 problems UF1 - UF7 (in dimensions between 10 and 40) from package 
-[smoof](https://CRAN.R-project.org/package=smoof), . For this implementation to work with the `MOEADr::moead()` routine (see next section) some 
+[smoof](https://CRAN.R-project.org/package=smoof). For this implementation to 
+work with the `MOEADr::moead()` routine (see next section) some 
 manipulation is necessary, but the instance list in this case is simply a list 
 with each element containing the name of the routine as field `$FUN` (since 
 all function names are different, no need for aliases).
@@ -54,15 +57,14 @@ dims    <- c(10:40)
 allfuns <- expand.grid(fname, dims, stringsAsFactors = FALSE)
 
 # Assemble instances list
-Instance.list <- vector(nrow(allfuns), mode = "list")
+instances <- vector(nrow(allfuns), mode = "list")
 for (i in 1:length(Instance.list)){
-  Instance.list[[i]]$FUN <- paste0(allfuns[i,1], "_", allfuns[i,2])
+  instances[[i]]$FUN <- paste0(allfuns[i,1], "_", allfuns[i,2])
 }
 
-### Build the functions listed in Instance.list
-# (so that they can be properly used)
+### Build the functions listed above (so that they can be properly used)
 for (i in 1:nrow(allfuns)){
-  assign(x = Instance.list[[i]]$FUN,
+  assign(x = instances[[i]]$FUN,
      value = MOEADr::make_vectorized_smoof(prob.name  = "UF",
                     dimensions = allfuns[i, 2],
                     id = as.numeric(strsplit(allfuns[i, 1], "_")[[1]][2])))
@@ -72,17 +74,15 @@ for (i in 1:nrow(allfuns)){
 ## Adaptation of an existing algorithm implementation
 We will use the MOEA/D implementation available in the [MOEADr](https://CRAN.R-project.org/package=MOEADr) package as our base 
 algorithm, and assume that we are interested in comparing the performance of 
-two versions of this algorithm: the original MOEA/D and the MOEA/D-DE (see the 
-documentation of [MOEADr](https://CRAN.R-project.org/package=MOEADr) and 
+three versions of this algorithm: the two versions described in the [original MOEA/D paper](https://ieeexplore.ieee.org/document/4358754), and the one described in the [MOEA/D-DE paper](https://ieeexplore.ieee.org/document/4633340) (see the documentation of [MOEADr](https://CRAN.R-project.org/package=MOEADr) and 
 references therein for details of these methods) as solvers of the hypothetical 
 problem class represented by the available test instances. The performance of 
 each algorithm on each instance will be measured according to an indicator 
-known as _Inverted Generational Distance_ (IGD - details 
-[here](http://ieeexplore.ieee.org/document/1197687/)), for which 
+known as _Inverted Generational Distance_ (IGD - details [here](http://ieeexplore.ieee.org/document/1197687/)), for which 
 _smaller = better_.
 
 As described in the documentation of both `run_experiment()` and 
-`calc_nreps2()`, an `algorithm` must contain an `algorithm$FUN` field (the name
+`calc_nreps()`, an `algorithm` must contain an `algorithm$FUN` field (the name
 of the function that calls the algorithm) and any other elements/parameters
 that `algorithm$FUN` requires (e.g., stop criteria, operator names and
 parameters, etc.). An additional field, `algorithm$alias`, can be used to
@@ -119,14 +119,14 @@ To build the algorithm functions to be used in `run_experiment()`, we
 encapsulate (almost) all algorithm parameters within a `myalgo()` function, 
 which receives only two inputs: the instance to be solved (i.e., one element 
 from `Instance.list`) and the specification of which version of the algorithm 
-is to be run (the _original MOEA/D_ or the _MOEA/D-DE_).
+is to be run.
 
 ```{r}
 # Prepare algorithm function to be used in run_experiment():
 myalgo <- function(type, instance){
   # Input parameters:
-  #     - type (variant to use: "original" or "moead.de")
-  #     - instance (instance to be solved, e.g., instance = Instance.list[[i]])
+  #     - type (variant to use: "original", "original2" or "moead.de")
+  #     - instance (instance to be solved, e.g., instance = instances[[i]])
   # All other parameters are set internally
 
   ## Extract instance information to build the MOEADr problem format
@@ -167,19 +167,22 @@ myalgo <- function(type, instance){
 }
 ```
 
-Finally, the `Algorithm.list` parameter must be assembled as a list of 
+Finally, the `algorithms` parameter must be assembled as a list of 
 algorithm objects (each containing fields `$FUN`, `$alias` and, in 
 this case, `$type`).
 
 ```{r}
 # Assemble Algorithm.list. Notice that we need to provide an alias for each 
 # method, since both algorithms have the same '$FUN' argument.
-Algorithm.list <- list(list(FUN   = "myalgo", 
-                            alias = "Algorithm 1", 
-                            type  = "original"), 
-                       list(FUN   = "myalgo", 
-                            alias = "Algorithm 2", 
-                            type  = "moead.de"))
+algorithms <- list(list(FUN   = "myalgo", 
+                        alias = "Original 1", 
+                        type  = "original"),
+                   list(FUN   = "myalgo", 
+                        alias = "Original 2", 
+                        type  = "original2"),
+                   list(FUN   = "myalgo", 
+                        alias = "MOEAD-DE", 
+                        type  = "moead.de"))
 ```
 
 ## Running an experiment using CAISEr
@@ -191,19 +194,24 @@ use `run_experiment()`:
 
 ```{r, eval=FALSE}
 library(CAISEr)
-my.results <- run_experiment(Instance.list  = Instance.list,
-                             Algorithm.list = Algorithm.list,
+my.results <- run_experiment(instances  = instances,
+                             algorithms = algorithms,
                              power = 0.8,      # Desired power: 80%
+                             power.target = "mean", # on average,
                              d = 0.5,          # to detect differences greater
                                                # than 0.5 standard deviations
                              sig.level = 0.05, # at a 95% confidence level. 
                              se.max = 0.05,    # Measurement error: 5% 
                              dif = "perc",     # on the paired percent 
                                                # differences of means,
-                             method = "boot",  # calculated using bootstrap.
-                             nstart = 15,      # Start with 20 runs/algo/inst
-                             nmax   = 200,     # and do no more than 200 runs/inst
-                             seed   = 1234)    # PRNG seed (for reproducibility)
+                             method = "param", # calculated using parametric
+                                               # formula.
+                             comparisons = "all.vs.all", # Compare all algorithms 
+                                                         # vs all others,
+                             nstart = 15,      # start with 15 runs/algo/inst
+                             nmax   = 200,     # and do no more than 200 runs/inst.
+                             seed   = 1234,    # PRNG seed (for reproducibility)
+                             ncpus  = parallel::detectCores() - 1)
 ```
 
 ```{r, echo=FALSE}
@@ -218,7 +226,7 @@ distribution of the means and use a t test with a clean conscience:
 
 ```{r, fig.align="center", fig.width=7, fig.height=5}
 # Take a look at the data summary:
-# summary(my.results)
+summary(my.results)
 # print(my.results)
 
 suppressPackageStartupMessages(library(car))

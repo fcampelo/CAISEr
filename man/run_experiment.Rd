@@ -9,7 +9,7 @@ run_experiment(instances, algorithms, d, se.max, power = 0.8,
   sig.level = 0.05, power.target = "mean", dif = "simple",
   comparisons = "all.vs.all", alternative = "two.sided",
   test = "t.test", method = "param", nstart = 20, nmax = 100 *
-  length(algorithms), force.balanced = FALSE, ncpus = 1,
+  length(algorithms), force.balanced = FALSE, ncpus = 2,
   boot.R = 499, seed = NULL, save.partial.results = FALSE,
   folder = "./nreps_files")
 }
@@ -200,6 +200,42 @@ in relation to the paired t.test:
 }
 }
 
+\examples{
+\dontrun{
+# Example using four dummy algorithms and 100 dummy instances.
+# See [dummyalgo()] and [dummyinstance()] for details.
+# Generating 4 dummy algorithms here, with means 15, 10, 30, 15 and standard
+# deviations 2, 4, 6, 8.
+algorithms <- mapply(FUN = function(i, m, s){
+  list(FUN   = "dummyalgo",
+       alias = paste0("algo", i),
+       distribution.fun  = "rnorm",
+       distribution.pars = list(mean = m, sd = s))},
+  i = c(alg1 = 1, alg2 = 2, alg3 = 3, alg4 = 4),
+  m = c(15, 10, 30, 15),
+  s = c(2, 4, 6, 8),
+  SIMPLIFY = FALSE)
+
+# Generate 100 dummy instances with centered exponential distributions
+instances <- lapply(1:100,
+                    function(i) {rate <- runif(1, 1, 10)
+                                 list(FUN   = "dummyinstance",
+                                      alias = paste0("Inst.", i),
+                                      distr = "rexp", rate = rate,
+                                      bias  = -1 / rate)})
+
+my.results <- run_experiment(instances, algorithms,
+                             d = .5, se.max = .1,
+                             power = .9, sig.level = .05,
+                             power.target = "mean",
+                             dif = "perc", comparisons = "all.vs.all",
+                             seed = 1234)
+
+# Take a look at the summary table
+head(my.results$data.summary, 25)
+}
+
+}
 \references{
 \itemize{
 \item F. Campelo, F. Takahashi:

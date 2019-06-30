@@ -4,13 +4,14 @@
 \alias{boot_sdm}
 \title{Bootstrap the sampling distribution of the mean}
 \usage{
-boot_sdm(x, boot.R = 999, seed = NULL)
+boot_sdm(x, boot.R = 999, ncpus = 2, seed = NULL)
 }
 \arguments{
 \item{x}{vector of observations}
 
-\item{boot.R}{(optional) number of bootstrap resamples
-#@param ncpus (optional) number of cores to use #//DoParallel}
+\item{boot.R}{number of bootstrap resamples}
+
+\item{ncpus}{number of cores to use}
 
 \item{seed}{seed for the PRNG}
 }
@@ -34,7 +35,7 @@ comparison of algorithms. Journal of Heuristics 25(2):305-338, 2019.
 \examples{
 x <- rnorm(15, mean = 4, sd = 1)
 my.sdm <- boot_sdm(x)
-hist(my.sdm)
+hist(my.sdm, breaks = 30)
 qqnorm(my.sdm, pch = 20)
 
 x <- runif(12)

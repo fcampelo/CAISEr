@@ -18,30 +18,34 @@ S3 method for summarizing \emph{CAISEr} objects (the output of
 \code{\link[=run_experiment]{run_experiment()}}).
 }
 \examples{
-# Example using dummy algorithms and instances. See ?dummyalgo for details.
-# In this case all instances are the same, so we expect all cases to return
-# a percent difference of approx. phi.j = 1.0 and sample sizes of
-# approx. n1 = 31, n2 = 87
-algorithm1 <- list(FUN = "dummyalgo", alias = "algo1",
-                   distribution.fun = "rnorm",
-                   distribution.pars = list(mean = 10, sd = 1))
-algorithm2 <- list(FUN = "dummyalgo", alias = "algo2",
-                   distribution.fun = "rnorm",
-                   distribution.pars = list(mean = 20, sd = 4))
-algolist <- list(algorithm1, algorithm2)
-instlist <- vector(100, mode = "list")
-for (i in 1:100) instlist[[i]] <- list(FUN = "dummyinstance",
-                                       alias = paste0("Inst. ", i))
+# Example using four dummy algorithms and 100 dummy instances.
+# See [dummyalgo()] and [dummyinstance()] for details.
+# Generating 4 dummy algorithms here, with means 15, 10, 30, 15 and standard
+# deviations 2, 4, 6, 8.
+algorithms <- mapply(FUN = function(i, m, s){
+  list(FUN   = "dummyalgo",
+       alias = paste0("algo", i),
+       distribution.fun  = "rnorm",
+       distribution.pars = list(mean = m, sd = s))},
+  i = c(alg1 = 1, alg2 = 2, alg3 = 3, alg4 = 4),
+  m = c(15, 10, 30, 15),
+  s = c(2, 4, 6, 8),
+  SIMPLIFY = FALSE)
 
-out <- run_experiment(Instance.list = instlist,
-                      Algorithm.list = algolist,
-                      power = 0.8,
-                      d = 1,
-                      sig.level = 0.01,
-                      se.max = 0.05,
-                      dif = "perc",
-                      nmax   = 200,
-                      seed   = 1234)
-summary(out)
+# Generate 100 dummy instances with centered exponential distributions
+instances <- lapply(1:100,
+                    function(i) {rate <- runif(1, 1, 10)
+                                 list(FUN   = "dummyinstance",
+                                      alias = paste0("Inst.", i),
+                                      distr = "rexp", rate = rate,
+                                      bias  = -1 / rate)})
+
+my.results <- run_experiment(instances, algorithms,
+                             d = 1, se.max = .1,
+                             power = .9, sig.level = .05,
+                             power.target = "mean",
+                             dif = "perc", comparisons = "all.vs.all",
+                             seed = 1234, ncpus = 1)
+summary(my.results)
 
 }

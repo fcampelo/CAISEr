@@ -17,6 +17,7 @@
 #'
 #' @export
 #'
+
 consolidate.partial.results <- function(folder = "./nreps_files")
 {
 
