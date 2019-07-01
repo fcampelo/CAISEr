@@ -58,7 +58,7 @@ allfuns <- expand.grid(fname, dims, stringsAsFactors = FALSE)
 
 # Assemble instances list
 instances <- vector(nrow(allfuns), mode = "list")
-for (i in 1:length(Instance.list)){
+for (i in 1:length(instances)){
   instances[[i]]$FUN <- paste0(allfuns[i,1], "_", allfuns[i,2])
 }
 
