@@ -83,7 +83,7 @@ print.CAISEr <- function(x, ...,
   if(echo){
     cat("#====================================")
     cat("\n Summary table of CAISEr object\n")
-    print.data.frame(my.table,
+    print.data.frame(my.table[, 1:(ncol(my.table) - 2)],
                      digits = digits, right = right,
                      quote = FALSE, row.names = FALSE)
     cat("\n#====================================")

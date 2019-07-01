@@ -23,7 +23,6 @@ Suggests: MOEADr,
           car,
           dplyr,
           ggplot2,
-          ggridges,
           pkgdown
 LazyData: TRUE
 Encoding: UTF-8

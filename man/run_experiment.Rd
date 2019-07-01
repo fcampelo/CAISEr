@@ -72,10 +72,9 @@ the algorithms on each instance}
 
 \item{seed}{seed for the random number generator}
 
-\item{folder}{directory to save files (if \code{save.to.file == TRUE})}
+\item{save.partial.results}{logical, should partial results be saved to file?}
 
-\item{type}{of test ("t.test", "wilcoxon", "binomial").
-See \code{\link[=calc_instances]{calc_instances()}} for details.}
+\item{folder}{directory to save files (if \code{save.to.file == TRUE})}
 }
 \value{
 a list object containing the following fields:

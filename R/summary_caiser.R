@@ -53,6 +53,68 @@ summary.CAISEr <- function(object,
   # ===========================================================================
   algonames <- as.character(unique(object$data.raw$Algorithm))
   algoruns  <- as.numeric(table(object$data.raw$Algorithm))
+  algopairs <- paste(object$data.summary$Alg1,
+                     object$data.summary$Alg2,
+                     sep = " - ")
+
+  # perform initial tests to calculate p-values
+  my.tests <- vector(mode = "list", length = length(unique(algopairs)))
+  for (i in seq_along(unique(algopairs))){
+    tmp <- object$data.summary[algopairs == unique(algopairs)[i], ]
+    my.tests[[i]]$comparison <- unique(algopairs)[i]
+    my.tests[[i]]$data <- tmp
+
+    if (object$Configuration$test == "t.test"){
+      my.tests[[i]]$test <- stats::t.test(tmp$Phi,
+                                   conf.level = 1 - object$Configuration$sig.level,
+                                   alternative = object$Configuration$alternative)
+
+    } else if (object$Configuration$test == "wilcoxon"){
+      my.tests[[i]]$test <- stats::wilcox.test(tmp$Phi,
+                                        conf.level = 1 - object$Configuration$sig.level,
+                                        alternative = object$Configuration$alternative)
+
+    } else if  (object$Configuration$test == "binomial"){
+      x <- tmp$Phi[tmp$Phi != 0]
+      n <- length(x)
+      x <- sum(x > 0)
+      my.tests[[i]]$test <- stats::binom.test(x, n,
+                                       conf.level = 1 - object$Configuration$sig.level,
+                                       alternative = object$Configuration$alternative)
+
+    } else stop("Test", object$Configuration$test, "not recognised in function summary.CAISEr")
+
+    my.tests[[i]]$pval <- my.tests[[i]]$test$p.value
+  }
+
+  # Reorder the tests in increasing order of p-values
+  my.tests <- my.tests[order(sapply(my.tests, function(x) x$pval))]
+
+  # Re-evaluate tests based on corrected significance values
+  alpha <- object$samplesize.calc$sig.level
+  for (i in seq_along(my.tests)){
+    if (object$Configuration$test == "t.test"){
+      my.tests[[i]]$test <- stats::t.test(my.tests[[i]]$data$Phi,
+                                   conf.level = 1 - alpha[i],
+                                   alternative = object$Configuration$alternative)
+
+    } else if (object$Configuration$test == "wilcoxon"){
+      my.tests[[i]]$test <- stats::wilcox.test(my.tests[[i]]$data$Phi,
+                                        conf.level = 1 - alpha[i],
+                                        alternative = object$Configuration$alternative)
+
+    } else if  (object$Configuration$test == "binomial"){
+      x <- my.tests[[i]]$data$Phi[my.tests[[i]]$data$Phi != 0]
+      n <- length(x)
+      x <- sum(x > 0)
+      my.tests[[i]]$test <- stats::binom.test(x, n,
+                                       conf.level = 1 - alpha[i],
+                                       alternative = object$Configuration$alternative)
+    }
+
+    my.tests[[i]]$pval <- my.tests[[i]]$test$p.value
+  }
+
 
   # Print summary
   cat("#====================================")
@@ -64,6 +126,24 @@ summary.CAISEr <- function(object,
     cat("\n Total runs of", algonames[i], ":", algoruns[i])
   }
   cat("\n#====================================")
+  cat("\n Pairwise comparisons of interest:")
+  cat("\n Test:", object$Configuration$test)
+  cat("\n H1:", object$Configuration$alternative)
+  cat("\n Comparisons:", object$Configuration$comparisons)
+  cat("\n Alpha (FWER):", object$Configuration$sig.level)
+  cat("\n Power target:", object$Configuration$power.target)
+  cat("\n Desired power:", object$Configuration$power)
+  cat("\n#====================================")
+  cat("\nTests using Holm's step-down procedure:")
+  stflag <- FALSE
+  for (i in seq_along(my.tests)){
+    if (!stflag && (my.tests[[i]]$pval > alpha[i])){
+      cat("\n\n ----- Stop rejecting H0 at this point -----\n")
+    } else cat("\n")
+    cat("\n Test", i, ":", my.tests[[i]]$comparison)
+    cat("\n alpha\t\t=", alpha[i], "\n p-value\t=", my.tests[[i]]$pval)
+    cat("\n CI{1-alpha}\t= [", my.tests[[i]]$test$conf.int, "]")
+  }
 
   invisible(TRUE)
 }

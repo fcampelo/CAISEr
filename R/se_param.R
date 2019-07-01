@@ -62,7 +62,7 @@ se_param <- function(Xk,                  # vector of observations
     Xbar.all <- mean(Xbark)
 
     # Get pairs for comparison
-    algo.pairs <- t(combn(1:length(Xk), 2))
+    algo.pairs <- t(utils::combn(1:length(Xk), 2))
     if (comparisons == "all.vs.first") algo.pairs <- algo.pairs[1:(nalgs - 1), ]
 
     # Calculate point estimates and standard errors for all required pairs

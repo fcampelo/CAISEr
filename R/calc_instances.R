@@ -155,8 +155,10 @@ calc_instances <- function(ncomparisons,               # number of comparisons
   if (is.null(ninstances)){ # Estimate sample size
     if (power.target == "mean"){
       # Start by calculating N without any correction:
-      N <- power.t.test(delta = d, sd = 1, sig.level = sig.level, power = power,
-                        type = "paired", alternative = alternative)$n - 1
+      N <- stats::power.t.test(delta = d, sd = 1,
+                               sig.level = sig.level, power = power,
+                               type = "paired",
+                               alternative = alternative)$n - 1
 
       p.mean <- 0 # mean power
       while (p.mean < power){
@@ -164,39 +166,39 @@ calc_instances <- function(ncomparisons,               # number of comparisons
         p <- numeric(ncomparisons)
         a <- numeric(ncomparisons)
         for (i in seq_along(p)){
-          ss <- power.t.test(delta = d, sd = 1, n = N,
-                             sig.level = sig.level / (ncomparisons - i + 1),
-                             type = "paired",
-                             alternative = alternative)
+          ss <- stats::power.t.test(delta = d, sd = 1, n = N,
+                                    sig.level = sig.level / (ncomparisons - i + 1),
+                                    type = "paired",
+                                    alternative = alternative)
           p[i] <- ss$power
           a[i] <- ss$sig.level
         }
         p.mean <- mean(p)
       }
-      p.median <- median(p)
+      p.median <- stats::median(p)
       #
     } else {
       if (power.target == "worst.case") r <- 1 # Bonferroni correction
       if (power.target == "median")     r <- floor(ncomparisons / 2)
 
-      N <- power.t.test(delta = d, sd = 1,
-                        sig.level = sig.level / (ncomparisons - r + 1),
-                        power = power,
-                        type = "paired", alternative = alternative)$n
+      N <- stats::power.t.test(delta = d, sd = 1,
+                               sig.level = sig.level / (ncomparisons - r + 1),
+                               power = power,
+                               type = "paired", alternative = alternative)$n
 
       # Calculate individual power of each comparison, + mean and median power
       p <- numeric(ncomparisons)
       a <- numeric(ncomparisons)
       for (i in seq_along(p)){
-        ss <- power.t.test(delta = d, sd = 1, n = ceiling(N),
-                           sig.level = sig.level / (ncomparisons - i + 1),
-                           type = "paired",
-                           alternative = alternative)
+        ss <- stats::power.t.test(delta = d, sd = 1, n = ceiling(N),
+                                  sig.level = sig.level / (ncomparisons - i + 1),
+                                  type = "paired",
+                                  alternative = alternative)
         p[i] <- ss$power
         a[i] <- ss$sig.level
       }
       p.mean   <- mean(p)
-      p.median <- median(p)
+      p.median <- stats::median(p)
     }
 
     # Adjust sample size depending on the type of test to be performed
@@ -207,15 +209,15 @@ calc_instances <- function(ncomparisons,               # number of comparisons
     p <- numeric(ncomparisons)
     a <- numeric(ncomparisons)
     for (i in seq_along(p)){
-      ss <- power.t.test(delta = d, sd = 1, n = ceiling(N / corr.factor),
-                         sig.level = sig.level / (ncomparisons - i + 1),
-                         type = "paired",
-                         alternative = alternative)
+      ss <- stats::power.t.test(delta = d, sd = 1, n = ceiling(N / corr.factor),
+                                sig.level = sig.level / (ncomparisons - i + 1),
+                                type = "paired",
+                                alternative = alternative)
       p[i] <- ss$power
       a[i] <- ss$sig.level
     }
     p.mean <- mean(p)
-    p.median <- median(p)
+    p.median <- stats::median(p)
   }
 
 

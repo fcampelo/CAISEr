@@ -147,7 +147,7 @@
 #' @examples
 #' # Example using dummy algorithms and instances. See ?dummyalgo for details.
 #' # We generate 4 dummy algorithms, with true means 15, 10, 30, 15; and true
-#' standard deviations 2, 4, 6, 8.
+#' # standard deviations 2, 4, 6, 8.
 #' algorithms <- mapply(FUN = function(i, m, s){
 #'                           list(FUN   = "dummyalgo",
 #'                                alias = paste0("algo", i),
@@ -240,7 +240,7 @@ calc_nreps <- function(instance,            # instance parameters
                            SIMPLIFY = FALSE)
 
   # Calculate point estimates, SEs, and sample size ratios (current x optimal)
-  Diffk <- calc_se(X      = Xk,
+  Diffk <- calc_se(Xk     = Xk,
                    dif    = dif,
                    comparisons = comparisons,
                    method = method,
@@ -281,7 +281,7 @@ calc_nreps <- function(instance,            # instance parameters
       Nk[ind] <- Nk[ind] + 1
 
       # Recalculate point estimates, SEs, and sample size ratios
-      Diffk <- calc_se(X      = Xk,
+      Diffk <- calc_se(Xk     = Xk,
                        dif    = dif,
                        comparisons   = comparisons,
                        method = method,

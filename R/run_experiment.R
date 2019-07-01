@@ -115,8 +115,7 @@
 #'        See [calc_instances()] for details.
 #' @param alternative type of alternative hypothesis ("two.sided" or
 #'        "one.sided"). See [calc_instances()] for details.
-#' @param type of test ("t.test", "wilcoxon", "binomial").
-#'        See [calc_instances()] for details.
+#' @param save.partial.results logical, should partial results be saved to file?
 #'
 #' @return a list object containing the following fields:
 #' \itemize{
@@ -208,12 +207,15 @@ run_experiment <- function(instances, algorithms, d, se.max,
   # ======== Most error catching to be performed by specific routines ======== #
   assertthat::assert_that(assertthat::is.count(ncpus),
                           is.null(seed) || seed == seed %/% 1)
+  if (alternative == "one.sided"){
+    assertthat::assert_that(comparisons == "all.vs.first")
+  }
 
   # Fix a common mistake
   if (tolower(dif) == "percent") dif <- "perc"
 
   # Capture input parameters
-  var.input.pars <- as.list(sys.call())[-1]
+  var.input.pars <- as.list(environment())
 
   # set PRNG seed
   if (is.null(seed)) {
@@ -351,7 +353,8 @@ run_experiment <- function(instances, algorithms, d, se.max,
                  N.star            = N.star,
                  total.runs        = nrow(data.raw),
                  instances.sampled = unique(data.raw$Instance),
-                 Underpowered      = (N.star > n.available))
+                 Underpowered      = (N.star > n.available),
+                 samplesize.calc   = ss.calc)
 
   class(output) <- c("CAISEr", "list")
 

@@ -22,10 +22,14 @@ vector of observed performance values
 Call algorithm routine for the solution of a problem instance
 }
 \examples{
-algorithm <- list(FUN = "dummyalgo", alias = "myalgo",
-                  distribution.fun = "rnorm",
-                  distribution.pars = list(mean = 50, sd = 10))
-instance <- list(FUN = "dummyinstance")
+# Make a dummy instance with a centered (zero-mean) exponential distribution:
+instance <- list(FUN = "dummyinstance", distr = "rexp", rate = 5, bias = -1/5)
+
+# Simulate a dummy algorithm that has a uniform distribution of expected
+# performance values, between -25 and 50.
+algorithm <- list(FUN = "dummyalgo",
+                 distribution.fun = "runif",
+                 distribution.pars = list(min = -25, max = 50))
 x <- get_observations(algorithm, instance, n = 1000)
 hist(x)
 }

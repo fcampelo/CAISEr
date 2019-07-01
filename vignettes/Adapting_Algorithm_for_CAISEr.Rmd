@@ -190,7 +190,8 @@ algorithms <- list(list(FUN   = "myalgo",
 With the definitions above it is possible now to run an experiment 
 using the iterative sample size determination implemented in CAISEr. For 
 that, all we have to do is define the desired experimental parameters and 
-use `run_experiment()`:
+use `run_experiment()`. **IMPORTANT NOTICE:** running this experiment takes a 
+while (about 3 hours in my Core i7 iMac with 16Gb RAM, using 7 cores). 
 
 ```{r, eval=FALSE}
 library(CAISEr)
@@ -220,111 +221,70 @@ load("../inst/extdata/vignette_results.RData")
 
 After that we can interrogate the results and perform inference, if we are so 
 inclined. 
-For instance, we can check if our sample of paired differences in performance 
-is (at least approximately) Normal, so that we can assume a Normal sampling 
-distribution of the means and use a t test with a clean conscience:
+For instance, we can check if all paired differences in performance 
+are (at least approximately) Normal, so that we can assume a Normal sampling 
+distribution of the means and use t-tests without much worry:
 
-```{r, fig.align="center", fig.width=7, fig.height=5}
-# Take a look at the data summary:
-summary(my.results)
-# print(my.results)
-
+```{r, fig.align="center", fig.width=5, fig.height=4}
 suppressPackageStartupMessages(library(car))
-car::qqPlot(my.results$data.summary$phi.j, 
-            pch = 20, las = 1, 
-            ylab = "observed results", xlab = "theoretical quantiles")
+
+algopairs <- paste(my.results$data.summary$Alg1, 
+                   my.results$data.summary$Alg2,
+                   sep = " - ")
+
+for (i in seq_along(unique(algopairs))){
+  tmp <- my.results$data.summary[algopairs == unique(algopairs)[i], ]
+  car::qqPlot(tmp$Phi, 
+            pch = 20, las = 1, main = unique(algopairs)[i],
+            ylab = "observed", xlab = "theoretical quantiles")
+}
+
 ```
 
-The normal QQ plot indicates that no expressive deviations of normality are 
-present, which gives us confidence in using the t test as our inferential 
-procedure of choice (as the sampling distribution of the means will be even more 
-"well-behaved" than the data distribution).
+The normal QQ plots indicate some deviation from normality, but nothing too 
+severe. This which gives us confidence in using the t test as our inferential 
+procedure of choice (as the sampling distribution of the means will be even more "well-behaved" than the data distribution).
 
-It is also interesting to observe a few things from the summary table. First, 
-we observed negative values of `phi.j` in the majority of instances tested, 
-which suggests an advantage of the MOEA/D-DE over the original MOEA/D (remember, 
-_smaller = better_ for the quality indicator used). The MOEA/D-DE seems to 
-require smaller sample sizes in most instances, suggesting a smaller variance of performance, which is also a desirable feature. Also, in three instances 
-(UF\_5\_28, UF\_3\_29 and UF_\5_\17) the maximum number of runs/instance 
-(`nmax = 200` in the `run_experiment()` call) was not enough to reduce the 
-standard error (our "measurement error" on the values of `phi.j`) below the 
-predefined threshold of $0.05$. There is no reason to worry in this particular 
-case, however, since the resulting standard errors were not particularly high, 
-and therefore their effect on the test power (resulting from the increased 
-uncertainty in the estimation of these particular `phi.j` values) will be insignificant.
+Some preliminary graphical analysis can be quite informative:
+```{r, fig.align="center", fig.width=6, fig.height=4}
+df <- cbind(my.results$data.summary, Comparison = algopairs)
 
-Since our observations `phi.j`  already express paired differences per instance, we can compare the two algorithms using a simple, one-sample t.test:
-
-```{r}
-t.test(my.results$data.summary$phi.j)
+suppressPackageStartupMessages(library(ggplot2))
+mp <- ggplot(df, aes(x = Comparison, y = Phi, fill = Comparison))
+mp + 
+  geom_violin(alpha = 0.6, show.legend = FALSE) + 
+  geom_boxplot(alpha = 0, show.legend = FALSE, 
+               outlier.shape = NA, width = .15) + 
+  geom_point(shape = 16, col = "black", fill = "black", alpha = 0.6,
+             position = position_jitter(width = .15)) + 
+  geom_abline(slope = 0, intercept = 0, col = "red", lty = 2) + 
+  ylab("Percent difference in IGD") + xlab("")
 ```
 
-which indicates a statistically significant advantage of the MOEA/D-DE over the 
-original MOEA/D ($p = 2.90\times10^{-6}, df=33$), with estimated mean 
-IGD gains of $37.94\%$ ($CI_{0.95} = [24.22\%,51.66\%]$) over the original 
-MOEA/D for instances belonging to the problem class of interest.
+Recall first that `smaller = better` for the quality indicator used in this experiment. Looking at the plot below shows that the differences between all pairs of algorithms were quite high - e.g., differences of up to 150\% in the case of the `Original 2 x MOEAD-DE` comparison. In general the `MOEA/D-DE` seems to generate better (lower) IGD values than both `Original` versions, and `Original 1` seems generally better than `Original 2`. Also, while the variability seem to be reasonably high for all comparisons, they are all generally of the same magnitude, with no large discrepancies in spread.
 
-These results could also be used to motivate further analyses. For instance, 
-we can observe in the summary table that the only two cases for which the 
-MOEA/D was substantially better than the MOEA/D-DE were for different 
-dimensions of problem UF\_5, which could suggest that some specific 
-feature of this problem jeopardizes the latter algorithm's search mechanism. 
-This could motivate research on which particular aspect of this problem results 
-in this loss of performance, and on how to improve the MOEA/D-DE.
+We can also visualise the individual estimates (with their standard errors):
+
+```{r, fig.align="center", fig.width=6, fig.height=8}
+mp <- ggplot(df, aes(x = Instance, y = Phi, colour = Comparison,
+                     ymin = Phi - SE, ymax = Phi + SE))
+mp + 
+  geom_pointrange(show.legend = FALSE) + 
+  geom_abline(slope = 0, intercept = 0, col = 1, lty = 2) + 
+  facet_grid(Comparison ~ .) + 
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) + 
+  xlab("")
+```
+
+Notice that the standard errors of the estimators are in most cases smaller than the marker used for the point estimate. Also notice that the observations fall, for each comparison, mainly on one side of the zero-line, which is an almost sure indicator that the comparisons will be statistically significant.
+
+Finally, we can examine our hypothesis tests. If you just want to perform the same tests that were used to design the experiment, the `summary` method of 
+class `CAISEr` already outputs the desired information.
+
+```{r, fig.align="center", fig.width=6, fig.height=8}
+summary(my.results)
+```
 
 Finally, the full data of the experiment is contained in other fields of 
 the output list `my.results`, and the user is encouraged to explore these. 
-As an example, we can generate box plots and confidence intervals on the mean 
-performance of each algorithm on each sampled instance, which could 
-inspire new questions for the researcher.
-
-```{r,fig.width=7,fig.height=7}
-suppressPackageStartupMessages(library(dplyr))
-suppressPackageStartupMessages(library(ggplot2))
-suppressPackageStartupMessages(library(ggridges))
-
-# Adjust instance names for plotting
-mydata <- my.results$data.raw
-mydata$Instance <- gsub(pattern = "UF\\_", replacement = "UF", mydata$Instance)
-mydata$Instance <- gsub(pattern = "\\_", replacement = " (", mydata$Instance)
-mydata$Instance <- sapply(mydata$Instance, FUN = function(x){paste0(x, ")")})
-
-ggplot2::ggplot(mydata, 
-                aes(x = Observation, y = Instance, fill = Algorithm)) + 
-  ggridges::geom_density_ridges(alpha = 0.7) + 
-  ggplot2::ggtitle("Estimated IGD distribution", 
-                   subtitle = "for each algorithm on each instance") + 
-  ggplot2::theme(legend.position = "bottom")
-```
-
-```{r, fig.width=7}
-# Calculate confidence intervals for each instance
-algos <- unique(mydata$Algorithm)
-ninstances <- length(my.results$instances.sampled)
-CIs <- data.frame(instance  = rep(unique(mydata$Instance, times = 2)),
-                  algorithm = rep(algos, each = ninstances),
-                  x.est     = 0, CI.l = 0, CI.u = 0)
-
-for (i in 1:ninstances){
-  tmpdata <- mydata %>% 
-    filter(Instance == unique(mydata$Instance)[i])
-  myt1 <- t.test(tmpdata$Observation[tmpdata$Algorithm == algos[1]])
-  myt2 <- t.test(tmpdata$Observation[tmpdata$Algorithm == algos[2]])
-  
-  CIs[i,3:5] <- c(myt1$estimate, as.numeric(myt1$conf.int))
-  CIs[i + ninstances,3:5] <- c(myt2$estimate, as.numeric(myt2$conf.int))
-}
-
-# Plot individual confidence intervals for each instance
-myplot <- ggplot2::ggplot(CIs, aes(x = instance, 
-                                   y = x.est, ymin = CI.l, ymax = CI.u,
-                                   group = algorithm, colour = algorithm,
-                                   fill = algorithm))
-myplot + 
-  ggplot2::geom_pointrange(position = position_dodge(width = 0.5), alpha = 0.7) + 
-  ggplot2::xlab("Instance") + ggplot2::ylab("IGD") + 
-  ggplot2::ggtitle("Estimated mean IGD", 
-                   subtitle = "for each algorithm on each instance") + 
-  ggplot2::theme(legend.position = "bottom",
-                 axis.text.x = element_text(angle = 55, hjust = 1, size = 6))
-```
+It is possible, for instance, to can generate box plots and confidence intervals on the mean performance of each algorithm on each sampled instance, which can inspire new questions for the researcher.
