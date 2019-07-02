@@ -38,7 +38,7 @@ The `instances` parameter for `run_experiment()` is simply a list or vector of
 these instance lists.
 
 To illustrate how to adapt existing implementations to this structure, we 
-assume that we are interested in comparing three multiobjective optimization 
+assume that we are interested in comparing four multiobjective optimization 
 algorithms for a (hypothetical) problem class represented by 
 problems UF1 - UF7 (in dimensions between 10 and 40) from package 
 [smoof](https://CRAN.R-project.org/package=smoof). For this implementation to 
@@ -74,7 +74,7 @@ for (i in 1:nrow(allfuns)){
 ## Adaptation of an existing algorithm implementation
 We will use the MOEA/D implementation available in the [MOEADr](https://CRAN.R-project.org/package=MOEADr) package as our base 
 algorithm, and assume that we are interested in comparing the performance of 
-three versions of this algorithm: the two versions described in the [original MOEA/D paper](https://ieeexplore.ieee.org/document/4358754), and the one described in the [MOEA/D-DE paper](https://ieeexplore.ieee.org/document/4633340) (see the documentation of [MOEADr](https://CRAN.R-project.org/package=MOEADr) and 
+four versions of this algorithm: the two versions described in the [original MOEA/D paper](https://ieeexplore.ieee.org/document/4358754), the one described in the [MOEA/D-DE paper](https://ieeexplore.ieee.org/document/4633340), and a variation of the MOEA/D-DE configuration that uses PBI as the aggregation function and calculates neighborhoods based on the space of parameters instead of on the scalarisation weight vectors (see the documentation of [MOEADr](https://CRAN.R-project.org/package=MOEADr) and 
 references therein for details of these methods) as solvers of the hypothetical 
 problem class represented by the available test instances. The performance of 
 each algorithm on each instance will be measured according to an indicator 
@@ -125,7 +125,7 @@ is to be run.
 # Prepare algorithm function to be used in run_experiment():
 myalgo <- function(type, instance){
   # Input parameters:
-  #     - type (variant to use: "original", "original2" or "moead.de")
+  #     - type (variant to use: "original", "original2", "moead.de" or "moead.de2")
   #     - instance (instance to be solved, e.g., instance = instances[[i]])
   # All other parameters are set internally
 
@@ -144,7 +144,11 @@ myalgo <- function(type, instance){
 
   ## Load presets for the algorithm provided in input 'type' and 
   ## modify whatever is needed for this particular experiment
-  
+  de2 <- FALSE
+  if (type == "moead.de2"){
+    de2  <- TRUE
+    type <- "moead.de"
+  }
   algo.preset <- MOEADr::preset_moead(type)
   algo.preset$decomp$H <- 99 # <-- set population size
   algo.preset$stopcrit[[1]]$name <- "maxeval" # <-- type of stop criterion
@@ -152,13 +156,18 @@ myalgo <- function(type, instance){
   poly.ind <- which(sapply(algo.preset$variation,
                            function(x){x$name == "polymut"}))
   algo.preset$variation[[poly.ind]]$pm <- 1 / prob.dim # <--- pm = 1/d
+  if (de2){
+    algo.preset$aggfun$name <- "pbi"
+    algo.preset$aggfun$theta <- 5
+    algo.preset$neighbors$name = "x"
+  }
   
   ## Run algorithm on "instance"
   out <- MOEADr::moead(preset = algo.preset, problem = problem,
                        showpars = list(show.iters = "none"))
 
   ## Read reference data to calculate the IGD
-  Yref  <- as.matrix(read.table(paste0("../inst/extdata/pf_data/",
+  Yref  <- as.matrix(read.table(paste0("./inst/extdata/pf_data/",
                                        fdef[1], fdef[2], ".dat")))
   IGD = MOEADr::calcIGD(Y = out$Y, Yref = Yref)
 
@@ -182,7 +191,10 @@ algorithms <- list(list(FUN   = "myalgo",
                         type  = "original2"),
                    list(FUN   = "myalgo", 
                         alias = "MOEAD-DE", 
-                        type  = "moead.de"))
+                        type  = "moead.de"),
+                   list(FUN   = "myalgo", 
+                        alias = "MOEAD-DE2", 
+                        type  = "moead.de2"))
 ```
 
 ## Running an experiment using CAISEr
@@ -191,7 +203,7 @@ With the definitions above it is possible now to run an experiment
 using the iterative sample size determination implemented in CAISEr. For 
 that, all we have to do is define the desired experimental parameters and 
 use `run_experiment()`. **IMPORTANT NOTICE:** running this experiment takes a 
-while (about 3 hours in my Core i7 iMac with 16Gb RAM, using 7 cores). 
+while (about 10 hours in my Core i7 iMac with 16Gb RAM, using 7 cores). 
 
 ```{r, eval=FALSE}
 library(CAISEr)
@@ -212,6 +224,8 @@ my.results <- run_experiment(instances  = instances,
                              nstart = 15,      # start with 15 runs/algo/inst
                              nmax   = 200,     # and do no more than 200 runs/inst.
                              seed   = 1234,    # PRNG seed (for reproducibility)
+                             #
+                             # NOTICE: Using all but 1 cores. Change if needed
                              ncpus  = parallel::detectCores() - 1)
 ```
 
