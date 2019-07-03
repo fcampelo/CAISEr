@@ -15,6 +15,7 @@ corresponding power to detect the effect size `d`, for each comparison using
 Holm's method.
 * Removed class `CAISER_powercurve` and all associated methods (print, summary, 
 plot) as these were (very) rarely used.
+* Updated `print` and `summary` methods.
  
 # CAISEr 0.3.3
 * fixed problem with printing version in the vignette.

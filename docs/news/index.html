@@ -115,10 +115,10 @@
 <a href="#caiser-1-0-0" class="anchor"></a>CAISEr 1.0.0<small> Unreleased </small>
 </h1>
 <ul>
-<li>Major update: package can now deal with comparisons of multiple (&gt;2) algorithms. This version is <strong>not</strong> backward compatible with versions 0.xx. To use the previous versions (e.g., to replicate the results from the paper “Sample Size Estimation for Power and Accuracy in the Experimental Comparison of Algorithms”, Journal of Heuristics 2019), install the previous version from <a href="https://cran.r-project.org/src/contrib/CAISEr_0.3.3.tar.gz" class="uri">https://cran.r-project.org/src/contrib/CAISEr_0.3.3.tar.gz</a>.</li>
-<li>Replaced function <code>calc_nreps2()</code> by <code>calc_nreps()</code> to calculate the number of repetitions in the case of multiple (&gt;2) algorithms.</li>
-<li>function <code>calc_se()</code> now performs point estimate and standard error calculations for all pairs of interest in the case of multiple algorithms.</li>
-<li>function <code>calc_instances()</code> now returns the number of required instances to maintain the desired power for the family of experiments, based on Holm’s step-down correction. It also returns the sequence of alpha values and the corresponding power to detect the effect size <code>d</code>, for each comparison using Holm’s method.</li>
+<li>Major update: package can now deal with comparisons of multiple (&gt;2) algorithms. This version is <strong>not</strong> backward compatible with versions 0.xx. To use the previous versions (e.g., to replicate the results from the paper “Sample Size Estimation for Power and Accuracy in the Experimental Comparison of Algorithms”, Journal of Heuristics 2019), install the previous version from <a href="https://cran.r-project.org/src/contrib/CAISEr_0.3.3.tar.gz">https://cran.r-project.org/src/contrib/CAISEr_0.3.3.tar.gz</a>.</li>
+<li>Replaced function <code>calc_nreps2()</code> by <code><a href="../reference/calc_nreps.html">calc_nreps()</a></code> to calculate the number of repetitions in the case of multiple (&gt;2) algorithms.</li>
+<li>function <code><a href="../reference/calc_se.html">calc_se()</a></code> now performs point estimate and standard error calculations for all pairs of interest in the case of multiple algorithms.</li>
+<li>function <code><a href="../reference/calc_instances.html">calc_instances()</a></code> now returns the number of required instances to maintain the desired power for the family of experiments, based on Holm’s step-down correction. It also returns the sequence of alpha values and the corresponding power to detect the effect size <code>d</code>, for each comparison using Holm’s method.</li>
 <li>Removed class <code>CAISER_powercurve</code> and all associated methods (print, summary, plot) as these were (very) rarely used.</li>
 </ul>
 </div>
@@ -135,7 +135,7 @@
 <a href="#caiser-0-3-2" class="anchor"></a>CAISEr 0.3.2<small> Unreleased </small>
 </h1>
 <ul>
-<li>fixed rare bug in <code>calc_se()</code> that resulted in <code>NaN</code> if two vectors with the same sample mean and same sample variance were passed as arguments.</li>
+<li>fixed rare bug in <code><a href="../reference/calc_se.html">calc_se()</a></code> that resulted in <code>NaN</code> if two vectors with the same sample mean and same sample variance were passed as arguments.</li>
 </ul>
 </div>
     <div id="caiser-0-3-1" class="section level1">
@@ -143,7 +143,7 @@
 <a href="#caiser-0-3-1" class="anchor"></a>CAISEr 0.3.1<small> Unreleased </small>
 </h1>
 <ul>
-<li>Added function to consolidate partial results saved to file (<code>consolidate.partial.results()</code>)</li>
+<li>Added function to consolidate partial results saved to file (<code><a href="../reference/consolidate.partial.results.html">consolidate.partial.results()</a></code>)</li>
 <li>Minor improvements to saving partial results to file: users can now select arbitrary directory for saving</li>
 </ul>
 </div>
@@ -153,9 +153,9 @@
 </h1>
 <ul>
 <li>
-<code>run_experiment()</code> can now be run in parallel using multiple cores.</li>
+<code><a href="../reference/run_experiment.html">run_experiment()</a></code> can now be run in parallel using multiple cores.</li>
 <li>
-<code>run_experiment()</code> and <code>calc_nreps2()</code> can now save results to files.</li>
+<code><a href="../reference/run_experiment.html">run_experiment()</a></code> and <code>calc_nreps2()</code> can now save results to files.</li>
 </ul>
 </div>
     <div id="caiser-0-2-4" class="section level1">
@@ -164,7 +164,7 @@
 </h1>
 <ul>
 <li>
-<code>run_experiment()</code> now forces the use of all available instances if <code>power &gt;= 1</code>.</li>
+<code><a href="../reference/run_experiment.html">run_experiment()</a></code> now forces the use of all available instances if <code>power &gt;= 1</code>.</li>
 </ul>
 </div>
     <div id="caiser-0-2-3" class="section level1">

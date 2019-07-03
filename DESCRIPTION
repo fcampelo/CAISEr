@@ -2,12 +2,12 @@ Package: CAISEr
 Type: Package
 Title: Comparison of Algorithms with Iterative Sample Size Estimation
 Version: 1.0.0
-Date: 2019-06-30
+Date: 2019-07-03
 Authors@R: as.person(c(
     "Felipe Campelo <fcampelo@ufmg.br> [aut, cre]", 
     "Fernanda Takahashi <fernandact@ufmg.br> [ctb]",
     "Elizabeth Wanner <e.wanner@aston.ac.uk> [ctb]"))
-Maintainer: Felipe Campelo <fcampelo@ufmg.br>
+Maintainer: Felipe Campelo <f.campelo@aston.ac.uk>
 Description: Functions for performing experimental comparisons of algorithms 
              using adequate sample sizes for power and accuracy.
 License: GPL-2

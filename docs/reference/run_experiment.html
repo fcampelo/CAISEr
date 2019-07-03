@@ -126,7 +126,7 @@ instances</h1>
     <p>Design and run a full experiment - calculate the required number of
 instances, run the algorithms on each problem instance using the iterative
 approach based on optimal sample size ratios, and return the results of the
-experiment. This routine builds upon <code>calc_instances()</code> and <code>calc_nreps()</code>,
+experiment. This routine builds upon <code><a href='calc_instances.html'>calc_instances()</a></code> and <code><a href='calc_nreps.html'>calc_nreps()</a></code>,
 so refer to the documentation of these two functions for details.</p>
     
     </div>
@@ -147,7 +147,7 @@ so refer to the documentation of these two functions for details.</p>
       <td><p>list object containing the definitions of the
 <em>available</em> instances. This list may (or may not) be exhausted in the
 experiment. To estimate the number of required instances,
-see <code>calc_instances()</code>. For more details, see Section <code>Instance List</code>.</p></td>
+see <code><a href='calc_instances.html'>calc_instances()</a></code>. For more details, see Section <code>Instance List</code>.</p></td>
     </tr>
     <tr>
       <th>algorithms</th>
@@ -158,7 +158,7 @@ See Section <code>Algorithms</code> for details.</p></td>
       <th>d</th>
       <td><p>minimally relevant effect size (MRES), expressed as a standardized
 effect size, i.e., "deviation from H0" / "standard deviation".
-See <code>calc_instances()</code> for details.</p></td>
+See <code><a href='calc_instances.html'>calc_instances()</a></code> for details.</p></td>
     </tr>
     <tr>
       <th>se.max</th>
@@ -168,14 +168,14 @@ difference between pairs of algorithms. See Section
     </tr>
     <tr>
       <th>power</th>
-      <td><p>(desired) test power. See <code>calc_instances()</code> for details.
+      <td><p>(desired) test power. See <code><a href='calc_instances.html'>calc_instances()</a></code> for details.
 Any value equal to or greater than one will force the method to use all
 available instances in <code>Instance.list</code>.</p></td>
     </tr>
     <tr>
       <th>sig.level</th>
       <td><p>family-wise significance level (alpha) for the experiment.
-See <code>calc_instances()</code> for details.</p></td>
+See <code><a href='calc_instances.html'>calc_instances()</a></code> for details.</p></td>
     </tr>
     <tr>
       <th>power.target</th>
@@ -198,7 +198,7 @@ and all pairwise comparisons are desired).</p></td>
     <tr>
       <th>alternative</th>
       <td><p>type of alternative hypothesis ("two.sided" or
-"one.sided"). See <code>calc_instances()</code> for details.</p></td>
+"one.sided"). See <code><a href='calc_instances.html'>calc_instances()</a></code> for details.</p></td>
     </tr>
     <tr>
       <th>test</th>
@@ -265,7 +265,7 @@ the algorithms on each instance</p></td>
     
     <p>Parameter <code>instances</code> must contain a list of instance objects, where
 each field is itself a list, as defined in the documentation of function
-<code>calc_nreps()</code>. In short, each element of <code>instances</code> is an <code>instance</code>, i.e.,
+<code><a href='calc_nreps.html'>calc_nreps()</a></code>. In short, each element of <code>instances</code> is an <code>instance</code>, i.e.,
 a named list containing all relevant parameters that define the problem
 instance. This list must contain at least the field <code>instance$FUN</code>, with the
 name of the problem instance function, that is, a routine that calculates
