@@ -83,6 +83,7 @@ summary.CAISEr <- function(object, test = NULL,
     tmp <- object$data.summary[algopairs == unique(algopairs)[i], ]
     my.tests[[i]]$comparison <- unique(algopairs)[i]
     my.tests[[i]]$data <- tmp
+    my.tests[[i]]$d <- mean(tmp$Phi) / stats::sd(tmp$Phi)
 
     if (test == "t.test"){
       my.tests[[i]]$test <- stats::t.test(tmp$Phi,
@@ -174,7 +175,8 @@ summary.CAISEr <- function(object, test = NULL,
                                   binomial = "prob"),
         "\t="), signif(my.tests[[i]]$test$estimate, 4))
     cat("\n CI{1-alpha}\t= [", signif(my.tests[[i]]$test$conf.int, 4), "]")
+    cat("\n d\t\t=", my.tests[[i]]$d)
   }
-
+  cat("\n#====================================")
   invisible(TRUE)
 }

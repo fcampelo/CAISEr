@@ -23,3 +23,5 @@
 .Rproj.user
 # Rprof temporary files
 Rprof.out
+doc
+Meta

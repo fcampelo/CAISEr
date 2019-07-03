@@ -50,6 +50,7 @@ all function names are different, no need for aliases).
 ```{r}
 suppressPackageStartupMessages(library(smoof))
 suppressPackageStartupMessages(library(MOEADr))
+suppressPackageStartupMessages(library(CAISEr))
 
 ### Build function names (instances: UF1 - UF7, dimensions 10 - 40)
 fname   <- paste0("UF_", 1:7)
@@ -203,10 +204,9 @@ With the definitions above it is possible now to run an experiment
 using the iterative sample size determination implemented in CAISEr. For 
 that, all we have to do is define the desired experimental parameters and 
 use `run_experiment()`. **IMPORTANT NOTICE:** running this experiment takes a 
-while (about 10 hours in my Core i7 iMac with 16Gb RAM, using 7 cores). 
+while (about 4 hours in a 3.6 GHz Intel Core i7 iMac with 16Gb RAM, using 7 cores). 
 
 ```{r, eval=FALSE}
-library(CAISEr)
 my.results <- run_experiment(instances  = instances,
                              algorithms = algorithms,
                              power = 0.8,      # Desired power: 80%
@@ -239,43 +239,55 @@ For instance, we can check if all paired differences in performance
 are (at least approximately) Normal, so that we can assume a Normal sampling 
 distribution of the means and use t-tests without much worry:
 
-```{r, fig.align="center", fig.width=5, fig.height=4}
+```{r, fig.align="center", fig.width=6, fig.height=10}
 suppressPackageStartupMessages(library(car))
 
 algopairs <- paste(my.results$data.summary$Alg1, 
                    my.results$data.summary$Alg2,
                    sep = " - ")
 
+par(mfrow = c(3, 2))
 for (i in seq_along(unique(algopairs))){
   tmp <- my.results$data.summary[algopairs == unique(algopairs)[i], ]
   car::qqPlot(tmp$Phi, 
-            pch = 20, las = 1, main = unique(algopairs)[i],
+            pch = 16, las = 1, main = unique(algopairs)[i],
             ylab = "observed", xlab = "theoretical quantiles")
 }
-
+par(mfrow = c(1, 1))
 ```
 
-The normal QQ plots indicate some deviation from normality, but nothing too 
-severe. This which gives us confidence in using the t test as our inferential 
-procedure of choice (as the sampling distribution of the means will be even more "well-behaved" than the data distribution).
+The normal QQ plots indicate some deviation from normality, with the `MOEA/D-DE` vs. `MOEA/D-DE2` comparison having a particularly longer left tail. We can check visually the effect of this in the sampling distribution of the means:
 
-Some preliminary graphical analysis can be quite informative:
+```{r, fig.align="center", fig.width=6, fig.height=8}
+par(mfrow = c(3, 2))
+for (i in seq_along(unique(algopairs))){
+  tmp <- my.results$data.summary[algopairs == unique(algopairs)[i], ]
+  boot.means <- CAISEr::boot_sdm(tmp$Phi, boot.R = 999)
+  hist(boot.means, breaks = 30, main = unique(algopairs)[i], las = 1)
+}
+par(mfrow = c(1, 1))
+```
+
+The deviations does not seem to be too severe, but are enough to justify using a nonparametric alternative (e.g., Wilcoxon's Rank-Sum tests) instead of the t-test. This will sacrifice a little power for borderline cases (i.e., comparisons where the actual effect size is close to the value of $d^*$ used in the design of the experiment), but give us more confidence in the comparisons that end up being statistically significant.
+
+Some other graphical analysis can be quite informative:
 ```{r, fig.align="center", fig.width=6, fig.height=4}
-df <- cbind(my.results$data.summary, Comparison = algopairs)
+df <- cbind(Comparison = algopairs, my.results$data.summary)
 
 suppressPackageStartupMessages(library(ggplot2))
 mp <- ggplot(df, aes(x = Comparison, y = Phi, fill = Comparison))
 mp + 
-  geom_violin(alpha = 0.6, show.legend = FALSE) + 
+  geom_violin(alpha = 0.6, show.legend = FALSE, scale = "width") + 
   geom_boxplot(alpha = 0, show.legend = FALSE, 
                outlier.shape = NA, width = .15) + 
   geom_point(shape = 16, col = "black", fill = "black", alpha = 0.6,
              position = position_jitter(width = .15)) + 
   geom_abline(slope = 0, intercept = 0, col = "red", lty = 2) + 
-  ylab("Percent difference in IGD") + xlab("")
+  ylab("Percent difference in IGD") + xlab("") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-Recall first that `smaller = better` for the quality indicator used in this experiment. Looking at the plot below shows that the differences between all pairs of algorithms were quite high - e.g., differences of up to 150\% in the case of the `Original 2 x MOEAD-DE` comparison. In general the `MOEA/D-DE` seems to generate better (lower) IGD values than both `Original` versions, and `Original 1` seems generally better than `Original 2`. Also, while the variability seem to be reasonably high for all comparisons, they are all generally of the same magnitude, with no large discrepancies in spread.
+Recall first that `smaller = better` for the quality indicator used in this experiment. Looking at the plot above shows that the differences between all pairs of algorithms were quite high - e.g., differences of up to 200\% in the case of the `Original 2` versus both MOEA/D-DE versions. In general both `MOEA/D-DE` versions seem to generate better (lower) IGD values than the `Original` versions, and `MOEA/D-DE` seems generally better than `MOEA/D-DE2` (first comparison to the left. Also, the variability seem to be reasonably high for all comparisons.
 
 We can also visualise the individual estimates (with their standard errors):
 
@@ -292,12 +304,13 @@ mp +
 
 Notice that the standard errors of the estimators are in most cases smaller than the marker used for the point estimate. Also notice that the observations fall, for each comparison, mainly on one side of the zero-line, which is an almost sure indicator that the comparisons will be statistically significant.
 
-Finally, we can examine our hypothesis tests. If you just want to perform the same tests that were used to design the experiment, the `summary` method of 
-class `CAISEr` already outputs the desired information.
+Finally, we can examine our hypothesis tests. The `summary` method of class `CAISEr` already outputs the desired information:
 
 ```{r, fig.align="center", fig.width=6, fig.height=8}
-summary(my.results)
+summary(my.results, test = "wilcoxon")
 ```
+
+All differences were found to be different at the $95\%$ joint significance level.
 
 Finally, the full data of the experiment is contained in other fields of 
 the output list `my.results`, and the user is encouraged to explore these. 

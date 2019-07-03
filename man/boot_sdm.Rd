@@ -4,7 +4,7 @@
 \alias{boot_sdm}
 \title{Bootstrap the sampling distribution of the mean}
 \usage{
-boot_sdm(x, boot.R = 999, ncpus = 2, seed = NULL)
+boot_sdm(x, boot.R = 999, ncpus = 1, seed = NULL)
 }
 \arguments{
 \item{x}{vector of observations}

@@ -46,7 +46,7 @@
 # TESTED
 boot_sdm <- function(x,             # vector of observations
                      boot.R = 999,  # number of bootstrap resamples
-                     ncpus  = 2,    # number of cores to use
+                     ncpus  = 1,    # number of cores to use
                      seed   = NULL) # PRNG seed
 {
 
@@ -58,9 +58,7 @@ boot_sdm <- function(x,             # vector of observations
   # ==================================== #
 
   # set PRNG seed
-  if (is.null(seed)) {
-    seed <- .Random.seed #i.e., do not change anything
-  } else {
+  if (!is.null(seed)) {
     set.seed(seed)
   }
 
