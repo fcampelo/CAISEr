@@ -4,23 +4,33 @@
 \alias{se_boot}
 \title{Bootstrap standard errors}
 \usage{
-se_boot(x1, x2, dif, boot.R = 999)
+se_boot(Xk, dif = "simple", comparisons = "all.vs.all", boot.R = 999)
 }
 \arguments{
-\item{x1}{vector of observations}
+\item{Xk}{list object where each position contains a vector of observations
+of algorithm k on a given problem instance.}
 
-\item{x2}{vector of observations}
+\item{dif}{name of the difference for which the SEs are desired.
+Accepts "perc" (for percent differences) or "simple" (for simple
+differences)}
 
-\item{dif}{name of the difference for which the SE is desired. Accepts
-"simple" (simple differences) or "perc" (percent differences).}
+\item{comparisons}{standard errors to be calculated. Accepts "all.vs.first"
+(in which cases the first object in \code{algorithms} is considered to be
+the reference algorithm) or "all.vs.all" (if there is no reference
+and all pairwise SEs are desired).}
 
-\item{boot.R}{(optional) number of bootstrap resamples}
+\item{boot.R}{(optional) number of bootstrap resamples
+(if \code{method == "boot"})}
+
+\item{...}{other parameters (used only for compatibility with calls to
+\code{\link[=se_boot]{se_boot()}}, unused in this function)}
 }
 \value{
-estimated standard error
+Data frame containing, for each pair of interest, the estimated
+difference (column "Phi") and the sample standard error (column "SE")
 }
 \description{
-Calculates the standard error of a given statistic using bootstrap
+Calculates the standard errors of a given statistic using bootstrap
 }
 \section{References}{
 
@@ -29,22 +39,22 @@ Calculates the standard error of a given statistic using bootstrap
 Bootstrap methods and their application. Cambridge University Press (1997)
 \item F. Campelo, F. Takahashi:
 Sample size estimation for power and accuracy in the experimental
-comparison of algorithms (submitted, 2017).
+comparison of algorithms. Journal of Heuristics 25(2):305-338, 2019.
 }
 }
 
 \examples{
-# two vectors of normally distributed observations
+# three vectors of normally distributed observations
 set.seed(1234)
-x1 <- rnorm(100, 5, 1)  # mean = 5, sd = 1
-x2 <- rnorm(200, 10, 2) # mean = 10, sd = 2
+Xk <- list(rnorm(10, 5, 1),  # mean = 5, sd = 1,
+           rnorm(20, 10, 2), # mean = 10, sd = 2,
+           rnorm(20, 15, 5)) # mean = 15, sd = 3
 
-# Theoretical SE for simple difference: 0.1732051
-se_boot(x1, x2, dif = "simple")
-
-# Theoretical (Fieller, no covariance) SE for percent differences: 0.04
-se_boot(x1, x2, dif = "perc")
+se_boot(Xk, dif = "simple", comparisons = "all.vs.all")
+se_boot(Xk, dif = "perc", comparisons = "all.vs.first")
+se_boot(Xk, dif = "perc", comparisons = "all.vs.all")
 }
 \author{
-Felipe Campelo (\email{fcampelo@ufmg.br})
+Felipe Campelo (\email{fcampelo@ufmg.br},
+\email{f.campelo@aston.ac.uk})
 }

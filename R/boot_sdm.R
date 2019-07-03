@@ -7,23 +7,24 @@
 #'    Bootstrap methods and their application. Cambridge University Press (1997)
 #' - F. Campelo, F. Takahashi:
 #'    Sample size estimation for power and accuracy in the experimental
-#'    comparison of algorithms (submitted, 2017).
+#'    comparison of algorithms. Journal of Heuristics 25(2):305-338, 2019.
 #'
 #' @param x vector of observations
-#' @param boot.R (optional) number of bootstrap resamples
-#' #@param ncpus (optional) number of cores to use #//DoParallel
+#' @param boot.R number of bootstrap resamples
+#' @param ncpus number of cores to use
 #' @param seed seed for the PRNG
 #'
 #' @return vector of bootstrap estimates of the sample mean
 #'
-#' @author Felipe Campelo (\email{fcampelo@@ufmg.br})
+#' @author Felipe Campelo (\email{fcampelo@@ufmg.br},
+#' \email{f.campelo@@aston.ac.uk})
 #'
 #' @export
 #'
 #' @examples
 #' x <- rnorm(15, mean = 4, sd = 1)
 #' my.sdm <- boot_sdm(x)
-#' hist(my.sdm)
+#' hist(my.sdm, breaks = 30)
 #' qqnorm(my.sdm, pch = 20)
 #'
 #' x <- runif(12)
@@ -45,59 +46,38 @@
 # TESTED
 boot_sdm <- function(x,             # vector of observations
                      boot.R = 999,  # number of bootstrap resamples
-                     #ncpus  = 1,    # number of cores to use   #//DoParallel
+                     ncpus  = 1,    # number of cores to use
                      seed   = NULL) # PRNG seed
 {
 
   # ========== Error catching ========== #
   assertthat::assert_that(
     is.numeric(x), length(x) > 1,
-    assertthat::is.count(boot.R), boot.R > 1)
-    #assertthat::is.count(ncpus)) #//doParallel
+    assertthat::is.count(boot.R), boot.R > 1,
+    assertthat::is.count(ncpus))
   # ==================================== #
 
   # set PRNG seed
-  if (is.null(seed)) {
-    seed <- .Random.seed #i.e., do not change anything
-  } else {
+  if (!is.null(seed)) {
     set.seed(seed)
   }
 
-
-  # # Set up doParallel   #//DoParallel
-  # local.cluster <- FALSE
-  # if (ncpus > 1){
-  #   cl.workers <- getDoParWorkers()
-  #   if (cl.workers < ncpus){
-  #     available.cores <- parallel::detectCores()
-  #     if (ncpus >= available.cores){
-  #       warning("ncpus too large, we only have ", available.cores, " cores. ",
-  #               "Using ", available.cores - 1, " cores.")
-  #       ncpus <- available.cores - 1
-  #     }
-  #     if (cl.workers < ncpus){
-  #       cl.boot_sdm <- parallel::makeCluster(ncpus)
-  #       doParallel::registerDoParallel(cl.boot_sdm)
-  #       local.cluster <- TRUE
-  #     }
-  #   }
-  # }
-
   # Perform bootstrap
-  x.boot <- numeric(boot.R)
-  for(i in 1:boot.R){
-    x.boot[i] <- mean(sample(x, size = length(x), replace = TRUE))
+  if(ncpus > 1){
+    x.boot <- parallel::mclapply(1:boot.R,
+                                 function(i){
+                                   mean(sample(x,
+                                               size = length(x),
+                                               replace = TRUE))},
+                                 mc.cores = ncpus)
+  } else {
+    x.boot <- lapply(1:boot.R,
+                     function(i){
+                       mean(sample(x,
+                                   size = length(x),
+                                   replace = TRUE))})
   }
 
-  #//DoParallel
-  # x.boot <- foreach(i = 1:boot.R, .combine = c) %dopar%
-  # {
-  #   xbar <- mean(sample(x, size = length(x), replace = TRUE))
-  # }
-
-  # unregister cluster if needed          #//DoParallel
-  # if (local.cluster) { stopCluster(cl.boot_sdm) }
-
   # Return standard error
-  return(x.boot)
+  return(unlist(x.boot))
 }

@@ -2,25 +2,34 @@
 % Please edit documentation in R/calc_instances.R
 \name{calc_instances}
 \alias{calc_instances}
-\title{Calculates number of instances for the comparison of two algorithms}
+\title{Calculates number of instances for the comparison of multiple algorithms}
 \usage{
-calc_instances(ninstances = NULL, power = NULL, d, sig.level = 0.05,
-  alternative = "two.sided", test.type = "t.test")
+calc_instances(ncomparisons, d, ninstances = NULL, power = NULL,
+  sig.level = 0.05, alternative = "two.sided", test = "t.test",
+  power.target = "mean")
 }
 \arguments{
-\item{ninstances}{the number of instances to be used in the experiment.}
-
-\item{power}{(desired) test power}
+\item{ncomparisons}{number of comparisons planned}
 
 \item{d}{minimally relevant effect size (MRES, expressed as a standardized
 effect size, i.e., "deviation from H0" / "standard deviation")}
 
-\item{sig.level}{significance level (alpha) for the experiment}
+\item{ninstances}{the number of instances to be used in the experiment.}
 
-\item{alternative}{type of alternative hypothesis ("two.sided" or
-"one.sided")}
+\item{power}{target power for the comparisons (see \code{Details})}
 
-\item{test.type}{type of test ("t.test", "wilcoxon", "binomial")}
+\item{sig.level}{desired family-wise significance level (alpha) for the
+experiment}
+
+\item{alternative}{type of alternative hypothesis to be performed
+("two.sided" or "one.sided")}
+
+\item{test}{type of test to be used
+("t.test", "wilcoxon" or "binomial")}
+
+\item{power.target}{which comparison should have the desired \code{power}?
+Accepts "mean", "median", or "worst.case" (this last one
+is equivalent to the Bonferroni correction).}
 }
 \value{
 a list object containing the following items:
@@ -30,32 +39,98 @@ a list object containing the following items:
 \item \code{d} - the effect size
 \item \code{sig.level} - significance level
 \item \code{alternative} - type of alternative hypothesis
-\item \code{test.type} - type of test
+\item \code{test} - type of test
 }
 }
 \description{
-Calculates either the number of instances, the standardized effect size, or
-the power of a comparison of two algorithms
+Calculates either the number of instances, the standardized effect sizes
+detectable at a given power setting, or the power(s) of the comparisons of
+multiple algorithms.
 }
 \details{
-This routine uses the closed formula of the t-test to calculate the number
-of instances required for a comparison of two algorithms, considering a
-desired power, standardized effect size, and significance level.
-for cases where the number of instances is predefined, it can return the
-test power instead.
+The main use of this routine uses the closed formula of the t-test to
+calculate the number of instances required for the comparison of pairs of
+algorithms, given a desired power and standardized effect size of
+interest. Significance levels of each comparison are adjusted using
+Holm's step-down correction (the default). The routine also takes into
+account whether the desired statistical power refers to the mean power
+(the default), median, or worst-case (which is equivalent to
+designing the experiment for the more widely-known Bonferroni correction).
+See the reference by \code{Campelo and Wanner} for details.
 }
 \section{Sample Sizes for Nonparametric Methods}{
 
-If the parameter \code{test.type} is set to either \code{Wilcoxon} or \code{Binomial}, this
+If the parameter \code{test} is set to either \code{Wilcoxon} or \code{Binomial}, this
 routine approximates the number of instances using the ARE of these tests
-in relation to the paired t.test, using the formulas:
-\itemize{
-\item \deqn{n.wilcox = n.ttest / 0.86 = 1.163 * n.ttest}
-\item \deqn{n.binom = n.ttest / 0.637 = 1.570 * n.ttest}
-}
+in relation to the paired t.test, using the formulas (see reference by
+\code{Campelo and Takahashi} for details):
+
+\deqn{n.wilcox = n.ttest / 0.86 = 1.163 * n.ttest}
+\deqn{n.binom = n.ttest / 0.637 = 1.570 * n.ttest}
 }
 
+\examples{
+# Calculate sample size for mean-case power
+K      <- 10   # number of comparisons
+alpha  <- 0.05 # significance level
+power  <- 0.9  # desired power
+d      <- 0.5  # MRES
+
+out <- calc_instances(K, d,
+                      power     = power,
+                      sig.level = alpha)
+
+# Plot power of each comparison to detect differences of magnitude d
+plot(1:K, out$power,
+     type = "b", pch = 20, las = 1, ylim = c(0, 1), xlab = "comparison",
+     ylab = "power", xaxs = "i", xlim = c(0, 11))
+grid(11, NA)
+points(c(0, K+1), c(power, power), type = "l", col = 2, lty = 2, lwd = .5)
+text(1, 0.93, sprintf("Mean power = \%2.2f for N = \%d",
+                     out$mean.power, out$ninstances), adj = 0)
+
+# Check sample size if planning for Wilcoxon tests:
+calc_instances(K, d,
+               power     = power,
+               sig.level = alpha,
+               test = "wilcoxon")$ninstances
+
+
+# Calculate power profile for predefined sample size
+N <- 45
+out2 <- calc_instances(K, d, ninstances = N, sig.level = alpha)
+
+points(1:K, out2$power, type = "b", pch = 19, col = 3)
+text(6, .7, sprintf("Mean power = \%2.2f for N = \%d",
+                     out2$mean.power, out2$ninstances), adj = 0)
+
+# Sample size for worst-case (Bonferroni) power of 0.8, using Wilcoxon
+out3 <- calc_instances(K, d, power = 0.9, sig.level = alpha,
+                       test = "wilcoxon", power.target = "worst.case")
+out3$ninstances
+
+# For median power:
+out4 <- calc_instances(K, d, power = 0.9, sig.level = alpha,
+                       test = "wilcoxon", power.target = "median")
+out4$ninstances
+out4$power
+
+}
+\references{
+\itemize{
+\item P. Mathews.
+Sample size calculations: Practical methods for engineers and scientists.
+Mathews Malnar and Bailey, 2010.
+\item F. Campelo, F. Takahashi:
+Sample size estimation for power and accuracy in the experimental
+comparison of algorithms. Journal of Heuristics 25(2):305-338, 2019.
+\item F. Campelo, E. Wanner:
+Sample size calculations for the experimental comparison of multiple
+algorithms on multiple problem instances.
+Submitted, Journal of Heuristics, 2019.
+}
+}
 \author{
-Felipe Campelo (\email{fcampelo@ufmg.br}),
-Fernanda Takahashi (\email{fernandact@ufmg.br})
+Felipe Campelo (\email{fcampelo@ufmg.br},
+\email{f.campelo@aston.ac.uk})
 }

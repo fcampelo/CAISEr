@@ -1,6 +1,6 @@
 #' Parametric standard errors
 #'
-#' Calculates the standard error of a given statistic using parametric formulas
+#' Calculates the standard errors of a given statistic using parametric formulas
 #'
 #' @section References:
 #' -  E.C. Fieller:
@@ -13,66 +13,110 @@
 #'    Applied Statistics and Probability for Engineers, 6th ed. Wiley (2013)
 #' - F. Campelo, F. Takahashi:
 #'    Sample size estimation for power and accuracy in the experimental
-#'    comparison of algorithms (submitted, 2017).
+#'    comparison of algorithms. Journal of Heuristics 25(2):305-338, 2019.
 #'
-#' @param x1 vector of observations
-#' @param x2 vector of observations
-#' @param dif name of the difference for which the SE is desired. Accepts
-#'            "simple" (simple differences) or "perc" (percent differences).
+#' @inheritParams calc_se
 #' @param ... other parameters (used only for compatibility with calls to
 #'            [se_boot()], unused in this function)
 #'
-#' @return estimated standard error
+#' @return Data frame containing, for each pair of interest, the estimated
+#'      difference (column "Phi") and the sample standard error (column "SE")
 #'
-#' @author Felipe Campelo (\email{fcampelo@@ufmg.br})
+#' @author Felipe Campelo (\email{fcampelo@@ufmg.br},
+#' \email{f.campelo@@aston.ac.uk})
 #'
 #' @export
 #'
 #' @examples
-#' # two vectors of normally distributed observations
+#' # three vectors of normally distributed observations
 #' set.seed(1234)
-#' x1 <- rnorm(100, 5, 1)  # mean = 5, sd = 1
-#' x2 <- rnorm(200, 10, 2) # mean = 10, sd = 2
+#' Xk <- list(rnorm(10, 5, 1),  # mean = 5, sd = 1,
+#'            rnorm(20, 10, 2), # mean = 10, sd = 2,
+#'            rnorm(20, 15, 5)) # mean = 15, sd = 3
 #'
-#' # Theoretical SE for simple difference: 0.1732051
-#' se_param(x1, x2, dif = "simple")
-#'
-#' # Theoretical (Fieller, no covariance) SE for percent differences: 0.04
-#' se_param(x1, x2, dif = "perc")
+#' se_param(Xk, dif = "simple", comparisons = "all.vs.all")
+#' se_param(Xk, dif = "perc", comparisons = "all.vs.first")
+#' se_param(Xk, dif = "perc", comparisons = "all.vs.all")
 
-# TESTED
-se_param <- function(x1,  # vector of observations
-                     x2,  # vector of observations
-                     dif, # type of statistic
+# TESTED: OK
+se_param <- function(Xk,                  # vector of observations
+                     dif = "simple",      # type of difference
+                     comparisons = "all.vs.all", # standard errors to calculate
                      ...)
 {
 
     # ========== Error catching ========== #
     assertthat::assert_that(
-        is.numeric(x1), is.vector(x1), length(x1) > 1,
-        is.numeric(x2), is.vector(x2), length(x2) > 1,
-        dif %in% c('simple', 'perc'))
+      is.list(Xk),
+      all(sapply(Xk, is.numeric)),
+      all(sapply(Xk, function(x){length(x) >= 2})),
+      dif %in% c('simple', 'perc'),
+      comparisons %in% c("all.vs.all", "all.vs.first"))
     # ==================================== #
 
     # Estimates
-    v1    <- stats::var(x1)
-    v2    <- stats::var(x2)
-    xbar1 <- mean(x1)
-    xbar2 <- mean(x2)
-    n1    <- length(x1)
-    n2    <- length(x2)
+    nalgs    <- length(Xk)
+    Vark     <- sapply(Xk, stats::var)
+    Xbark    <- sapply(Xk, mean)
+    Nk       <- sapply(Xk, length)
+    Xbar.all <- mean(Xbark)
 
-    # Calculate SE
-    if (dif == "simple") {
-        se <- sqrt(v1 / n1 + v2 / n2)
-    } else if (dif == "perc") {
-        phi1 <- xbar2 - xbar1
-        phi2 <- (xbar2 - xbar1) / xbar1
-        c1 <- v1 * (1 / (phi1 ^ 2) + 1 / (xbar1 ^ 2))
-        c2 <- v2 / (phi1 ^ 2)
-        se <- abs(phi2) * sqrt(c1 / n1 + c2 / n2)
-    } else stop ("dif option", dif, "not recognized.")
+    # Get pairs for comparison
+    algo.pairs <- t(utils::combn(1:length(Xk), 2))
+    if (comparisons == "all.vs.first") algo.pairs <- algo.pairs[1:(nalgs - 1), ]
 
-    # Return standard error
-    return(se)
+    # Calculate point estimates and standard errors for all required pairs
+    Phik  <- numeric(nrow(algo.pairs))
+    SEk   <- numeric(nrow(algo.pairs))
+    Roptk <- numeric(nrow(algo.pairs))
+    for (i in 1:nrow(algo.pairs)){
+      ind <- as.numeric(algo.pairs[i, ])
+      if (dif == "simple") {
+        # mu1 - mu2
+        Phik[i]  <- Xbark[ind[1]] - Xbark[ind[2]]
+        # se = s1/sqrt(n1) + s2/sqrt(n2)
+        SEk[i]   <- sqrt(sum(Vark[ind] / Nk[ind]))
+        # r = s1 / s2
+        Roptk[i] <- sqrt(Vark[ind[1]] / Vark[ind[2]])
+        #
+      } else if (dif == "perc"){
+        if (comparisons == "all.vs.all"){
+          # (mu1 - mu2) / mu
+          Phik[i] <- (Xbark[ind[1]] - Xbark[ind[2]]) / Xbar.all
+          # c1 = 1/mu^2 + (mu1 - mu2)^2 / (A * mu^2)^2
+          #    = (1 + phi^2 / A^2) / mu^2
+          C1 <- (1 + Phik[i] ^ 2 / nalgs ^ 2) / Xbar.all ^ 2
+          # c2 = sum_{k!=ind}(s_k^2/n_k^2) * phi^2 / (A^2 * mu^2)
+          C2 <- sum(Vark[-ind] / Nk[-ind]) * Phik[i] ^ 2 / (nalgs ^ 2 * Xbar.all ^ 2)
+          # se = sqrt(c1 (s1^2/n1 + s2^2/n2) + c2)
+          SEk[i] <- sqrt(C1 * (sum(Vark[ind] / Nk[ind])) + C2)
+          # r = s1 / s2
+          Roptk[i] <- sqrt(Vark[ind[1]] / Vark[ind[2]])
+          #
+        } else if (comparisons == "all.vs.first"){
+          # 1 - mu2/mu1
+          Phik[i] <- 1 - Xbark[ind[2]] / Xbark[ind[1]]
+          # c1 = s1^2 * (mu_2 / mu_1^2)^2
+          C1 <- Vark[ind[1]] * (Xbark[ind[2]] / (Xbark[ind[1]] ^ 2)) ^2
+          # c2 = s2^2 / mu_1^2
+          C2 <- Vark[ind[2]] / (Xbark[ind[1]] ^ 2)
+          # se = sqrt(c1 / n1 + c2 / n2)
+          SEk[i] <- sqrt(C1 / Nk[ind[1]] + C2 / Nk[ind[2]])
+          # r* = s1/s2 * mu2/mu1
+          Roptk[i] <- sqrt(Vark[ind[1]] / Vark[ind[2]]) * (Xbark[ind[2]] / Xbark[ind[1]])
+          #
+        } else stop("comparisons option *", comparisons, "* not recognized.")
+      } else stop ("dif option *", dif, "* not recognized.")
+    }
+
+    # Assemble data frame with results
+    output <- data.frame(Alg1 = algo.pairs[, 1],
+                         Alg2 = algo.pairs[, 2],
+                         N1   = Nk[algo.pairs[, 1]],
+                         N2   = Nk[algo.pairs[, 2]],
+                         Phi  = Phik,
+                         SE   = SEk,
+                         r    = Nk[algo.pairs[, 1]] / Nk[algo.pairs[, 2]],
+                         ropt = Roptk)
+    return(output)
 }

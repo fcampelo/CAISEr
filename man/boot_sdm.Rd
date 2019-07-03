@@ -4,13 +4,14 @@
 \alias{boot_sdm}
 \title{Bootstrap the sampling distribution of the mean}
 \usage{
-boot_sdm(x, boot.R = 999, seed = NULL)
+boot_sdm(x, boot.R = 999, ncpus = 1, seed = NULL)
 }
 \arguments{
 \item{x}{vector of observations}
 
-\item{boot.R}{(optional) number of bootstrap resamples
-#@param ncpus (optional) number of cores to use #//DoParallel}
+\item{boot.R}{number of bootstrap resamples}
+
+\item{ncpus}{number of cores to use}
 
 \item{seed}{seed for the PRNG}
 }
@@ -27,14 +28,14 @@ Bootstraps the sampling distribution of the means for a given vector of observat
 Bootstrap methods and their application. Cambridge University Press (1997)
 \item F. Campelo, F. Takahashi:
 Sample size estimation for power and accuracy in the experimental
-comparison of algorithms (submitted, 2017).
+comparison of algorithms. Journal of Heuristics 25(2):305-338, 2019.
 }
 }
 
 \examples{
 x <- rnorm(15, mean = 4, sd = 1)
 my.sdm <- boot_sdm(x)
-hist(my.sdm)
+hist(my.sdm, breaks = 30)
 qqnorm(my.sdm, pch = 20)
 
 x <- runif(12)
@@ -54,5 +55,6 @@ hist(boot_sdm(x3), breaks = 25, main = "SDM, n = 40")
 par(mfrow = c(1, 1))
 }
 \author{
-Felipe Campelo (\email{fcampelo@ufmg.br})
+Felipe Campelo (\email{fcampelo@ufmg.br},
+\email{f.campelo@aston.ac.uk})
 }

@@ -8,10 +8,10 @@ get_observations(algo, instance, n = 1)
 }
 \arguments{
 \item{algo}{a list object containing the definitions of the algorithm.
-See \code{\link[=calc_nreps2]{calc_nreps2()}} for details.}
+See \code{\link[=calc_nreps]{calc_nreps()}} for details.}
 
 \item{instance}{a list object containing the definitions of the problem
-instance. See \code{\link[=calc_nreps2]{calc_nreps2()}} for details.}
+instance. See \code{\link[=calc_nreps]{calc_nreps()}} for details.}
 
 \item{n}{number of observations to generate.}
 }
@@ -22,16 +22,21 @@ vector of observed performance values
 Call algorithm routine for the solution of a problem instance
 }
 \examples{
-algorithm <- list(FUN = "dummyalgo", alias = "myalgo",
-                  distribution.fun = "rnorm",
-                  distribution.pars = list(mean = 50, sd = 10))
-instance <- list(FUN = "dummyinstance")
+# Make a dummy instance with a centered (zero-mean) exponential distribution:
+instance <- list(FUN = "dummyinstance", distr = "rexp", rate = 5, bias = -1/5)
+
+# Simulate a dummy algorithm that has a uniform distribution of expected
+# performance values, between -25 and 50.
+algorithm <- list(FUN = "dummyalgo",
+                 distribution.fun = "runif",
+                 distribution.pars = list(min = -25, max = 50))
 x <- get_observations(algorithm, instance, n = 1000)
 hist(x)
 }
 \seealso{
-\link{calc_nreps2}
+\code{\link[=calc_nreps]{calc_nreps()}}
 }
 \author{
-Felipe Campelo (\email{fcampelo@ufmg.br})
+Felipe Campelo (\email{fcampelo@ufmg.br},
+\email{f.campelo@aston.ac.uk})
 }
