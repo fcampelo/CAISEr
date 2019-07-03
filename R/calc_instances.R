@@ -133,7 +133,7 @@ calc_instances <- function(ncomparisons,               # number of comparisons
 
   # ========== Error catching ========== #
   assertthat::assert_that(
-    assertthat::is.count(ncomparisons), ncomparisons > 1,
+    assertthat::is.count(ncomparisons),
     is.null(ninstances) || (assertthat::is.count(ninstances) && ninstances > 1),
     is.null(power) || (is.numeric(power) && power > 0 && power < 1),
     is.null(d) || (is.numeric(d) && d > 0),

@@ -186,8 +186,9 @@
 #'                              dif = "perc", comparisons = "all.vs.all",
 #'                              seed = 1234)
 #'
-#' # Take a look at the summary table
-#' head(my.results$data.summary, 25)
+#' # Take a look at the results
+#' summary(my.results)
+#' print(my.results)
 #'}
 #'
 
