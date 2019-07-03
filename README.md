@@ -5,11 +5,12 @@
 ***
 
 ## CAISEr: Comparing Algorithms with Iterative Sample-size Estimation in R
-Felipe Campelo ([f.campelo@aston.ac.uk](mailto:f.campelo@aston.ac.uk)) [1,2]  
+**Author/maintainer**:
+* Felipe Campelo ([f.campelo@aston.ac.uk](mailto:f.campelo@aston.ac.uk)) [1,2]  
 
-* Contributors:
-- Fernanda Takahashi ([fernandact@ufmg.br](mailto:fernandact@ufmg.br))[2]
-- Elizabeth Wanner ([e.wanner@aston.ac.uk](mailto:e.wanner@aston.ac.uk))[1]
+**Contributors:**
+- Elizabeth Wanner ([e.wanner@aston.ac.uk](mailto:e.wanner@aston.ac.uk))[1] (2019-)
+- Fernanda Takahashi ([fernandact@ufmg.br](mailto:fernandact@ufmg.br))[2] (2016-2018)
 
 [1] Department of Computer Science, Aston University, Birmingham UK  
 [2] Operations Research and Complex Systems Laboratory, Universidade Federal de Minas Gerais, Belo Horizonte, Brazil  
