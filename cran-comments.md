@@ -1,6 +1,9 @@
 ## Changes and notes
-* Major change in the package. Not backward compatible.
-* Added function `calc_nreps()` to calculate the number of repetitions in the case of multiple (>2) algorithms. This replaces `calc_nreps2()`
+* Major change in the package. **Not backward compatible with versions 0.XX**
+  * The previous version can be installed from
+[https://cran.r-project.org/src/contrib/CAISEr_0.3.3.tar.gz](https://cran.r-project.org/src/contrib/CAISEr_0.3.3.tar.gz) or using `devtools::install_github('fcampelo/CAISEr@')`
+* Function `calc_nreps()` replaces `calc_nreps2()`, to calculate the number of 
+repetitions in the case of multiple (>2) algorithms. This 
 * function `calc_se()` now performs point estimate and standard error 
 calculations for all pairs of interest in the case of multiple algorithms
 
