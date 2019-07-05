@@ -8,7 +8,7 @@ calc_nreps(instance, algorithms, se.max, dif = "simple",
   comparisons = "all.vs.all", method = "param", nstart = 20,
   nmax = 200, seed = NULL, boot.R = 499, ncpus = 1,
   force.balanced = FALSE, save.to.file = FALSE,
-  folder = "./nreps_files")
+  load.from.file = FALSE, folder = "./nreps_files")
 }
 \arguments{
 \item{instance}{a list object containing the definitions of the problem
@@ -47,10 +47,11 @@ See Section \code{Initial Number of Observations} for details.}
 \item{force.balanced}{logical flag to force the use of balanced sampling for
 the algorithms on each instance}
 
-\item{save.to.file}{logical flag: should the results be saved to a file
-in the current working directory?}
+\item{save.to.file}{logical flag: should the results be saved to a file?}
 
-\item{folder}{directory to save files (if \code{save.to.file == TRUE})}
+\item{load.from.file}{logical flag: should the results be loaded from a file?}
+
+\item{folder}{directory to save/load files}
 }
 \value{
 a list object containing the following items:

@@ -9,6 +9,7 @@ repetitions in the case of multiple (>2) algorithms.
 calculations for all pairs of interest in the case of multiple algorithms.
 * function `calc_instances()` uses Holm's step-down method to calculate the sample 
 sizes for multiple comparisons.
+* The package now supports saving and (re)loading partially executed experiments.
 
 ## Test environments
 * macOS Mojave 10.14.5, R 3.6.0 (2019-04-26), x86_64-apple-darwin15.6.0 (64-bit), 

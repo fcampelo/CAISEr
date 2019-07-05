@@ -104,9 +104,9 @@
 #' @param ncpus number of cores to use
 #' @param force.balanced logical flag to force the use of balanced sampling for
 #'        the algorithms on each instance
-#' @param save.to.file logical flag: should the results be saved to a file
-#'        in the current working directory?
-#' @param folder directory to save files (if `save.to.file == TRUE`)
+#' @param save.to.file logical flag: should the results be saved to a file?
+#' @param load.from.file logical flag: should the results be loaded from a file?
+#' @param folder directory to save/load files
 #'
 #'
 #' @return a list object containing the following items:
@@ -190,6 +190,7 @@ calc_nreps <- function(instance,            # instance parameters
                        ncpus  = 1,          # number of cores to use
                        force.balanced = FALSE,   # force balanced sampling?
                        save.to.file  = FALSE,    # save results to tmp file?
+                       load.from.file = FALSE,   # load results from file?
                        folder = "./nreps_files") # directory to save tmp file
 {
 
@@ -211,7 +212,8 @@ calc_nreps <- function(instance,            # instance parameters
     is.null(seed) || seed == seed %/% 1,
     assertthat::is.count(boot.R), boot.R > 1,
     is.logical(force.balanced), length(force.balanced) == 1,
-    is.logical(save.to.file), length(save.to.file) == 1)
+    is.logical(save.to.file), length(save.to.file) == 1,
+    is.logical(load.from.file), length(load.from.file) == 1)
   # ==================================== #
 
   # set PRNG seed
@@ -225,6 +227,20 @@ calc_nreps <- function(instance,            # instance parameters
   # Get/set instance alias
   if (!("alias" %in% names(instance))) {
     instance$alias <- instance$FUN
+  }
+
+  if (load.from.file){
+    # Get the filename
+    filename <- paste0(folder, "/",
+                       instance$alias,
+                       ".rds")
+
+    if (file.exists(filename)){
+      output <- readRDS(filename)
+      cat("\nSampling of instance", instance$alias, "loaded from file.")
+      return(output)
+    } else
+      cat("\n**NOTE: Instance file", filename, "not found.**")
   }
 
   # Echo some information for the user
@@ -291,14 +307,14 @@ calc_nreps <- function(instance,            # instance parameters
 
   # Assemble output list
   names(Nk) <- lapply(algorithms, function(x)x$alias)
-  output    <- list(instance = instance$alias,
-                    Xk       = Xk,
-                    Nk       = Nk,
-                    Diffk    = Diffk,
-                    dif      = dif,
-                    method   = method,
-                    comparisons     = comparisons,
-                    seed     = seed)
+  output    <- list(instance    = instance$alias,
+                    Xk          = Xk,
+                    Nk          = Nk,
+                    Diffk       = Diffk,
+                    dif         = dif,
+                    method      = method,
+                    comparisons = comparisons,
+                    seed        = seed)
 
   # Save to file if required
   if (save.to.file){

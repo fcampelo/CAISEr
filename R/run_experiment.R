@@ -116,6 +116,8 @@
 #' @param alternative type of alternative hypothesis ("two.sided" or
 #'        "one.sided"). See [calc_instances()] for details.
 #' @param save.partial.results logical, should partial results be saved to file?
+#' @param load.partial.results logical, should previously saved partial results
+#'                             be reloaded as part of the experiment?
 #'
 #' @return a list object containing the following fields:
 #' \itemize{
@@ -202,6 +204,7 @@ run_experiment <- function(instances, algorithms, d, se.max,
                            force.balanced = FALSE,
                            ncpus = 2, boot.R = 499, seed = NULL,
                            save.partial.results = FALSE,
+                           load.partial.results = FALSE,
                            folder = "./nreps_files")
 {
 
@@ -300,6 +303,7 @@ run_experiment <- function(instances, algorithms, d, se.max,
                                         boot.R         = boot.R,
                                         force.balanced = force.balanced,
                                         save.to.file   = save.partial.results,
+                                        load.from.file = load.partial.results,
                                         folder         = folder,
                                         # other pbmclapply arguments:
                                         mc.cores = ncpus)
@@ -317,6 +321,7 @@ run_experiment <- function(instances, algorithms, d, se.max,
                          boot.R         = boot.R,
                          force.balanced = force.balanced,
                          save.to.file   = save.partial.results,
+                         load.from.file = load.partial.results,
                          folder         = folder)
   }
   # Consolidate raw data

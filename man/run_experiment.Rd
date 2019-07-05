@@ -11,7 +11,7 @@ run_experiment(instances, algorithms, d, se.max, power = 0.8,
   test = "t.test", method = "param", nstart = 20, nmax = 100 *
   length(algorithms), force.balanced = FALSE, ncpus = 2,
   boot.R = 499, seed = NULL, save.partial.results = FALSE,
-  folder = "./nreps_files")
+  load.partial.results = FALSE, folder = "./nreps_files")
 }
 \arguments{
 \item{instances}{list object containing the definitions of the
@@ -74,7 +74,10 @@ the algorithms on each instance}
 
 \item{save.partial.results}{logical, should partial results be saved to file?}
 
-\item{folder}{directory to save files (if \code{save.to.file == TRUE})}
+\item{load.partial.results}{logical, should previously saved partial results
+be reloaded as part of the experiment?}
+
+\item{folder}{directory to save/load files}
 }
 \value{
 a list object containing the following fields:

@@ -1,4 +1,4 @@
-# CAISEr 1.0.0
+# CAISEr 1.0.1
 * Major update: package can now deal with comparisons of multiple (>2) algorithms. 
 This version is **not** backward compatible with versions 0.xx. To use the previous versions (e.g., to replicate the results from the paper "Sample Size Estimation 
 for Power and Accuracy in the Experimental Comparison of Algorithms", Journal of 
@@ -16,6 +16,7 @@ Holm's method.
 * Removed class `CAISER_powercurve` and all associated methods (print, summary, 
 plot) as these were (very) rarely used.
 * Updated `print` and `summary` methods.
+* The package now supports saving and (re)loading partially executed experiments.
  
 # CAISEr 0.3.3
 * fixed problem with printing version in the vignette.
