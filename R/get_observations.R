@@ -37,8 +37,9 @@ get_observations <- function(algo,        # algorithm parameters
 
   # ========== Error catching ========== #
   # Most of error catching is already performed by the calling routine
-  # run_nreps2(), so no need to do much here, except:
-  assertthat::assert_that(assertthat::is.count(n))
+  # run_nreps(), so no need to do much here, except:
+  assertthat::assert_that(is.numeric(n) || is.integer(n),
+                          n %% 1 == 0)
   # ==================================== #
 
 
