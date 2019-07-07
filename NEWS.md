@@ -1,4 +1,4 @@
-# CAISEr 1.0.1
+# CAISEr 1.0.2
 * Major update: package can now deal with comparisons of multiple (>2) algorithms. 
 This version is **not** backward compatible with versions 0.xx. To use the previous versions (e.g., to replicate the results from the paper "Sample Size Estimation 
 for Power and Accuracy in the Experimental Comparison of Algorithms", Journal of 

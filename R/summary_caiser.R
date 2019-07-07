@@ -11,6 +11,9 @@
 #' @param ... other parameters to be passed down to specific
 #'            summary functions (currently unused)
 #'
+#' @return A list object is returned invisibly, containing the details of all
+#'         tests performed as well as information on the total number of runs
+#'         dedicated to each algorithm.
 #' @examples
 #' # Example using four dummy algorithms and 100 dummy instances.
 #' # See [dummyalgo()] and [dummyinstance()] for details.
@@ -161,6 +164,7 @@ summary.CAISEr <- function(object, test = NULL,
   for (i in seq_along(my.tests)){
     if (!stflag && (my.tests[[i]]$pval > alpha[i])){
       cat("\n\n ----- Stop rejecting H0 at this point -----\n")
+      stflag <- TRUE
     } else cat("\n")
     cat("\n Test", i, ":", my.tests[[i]]$comparison)
     cat("\n H0:", switch(test,
@@ -178,5 +182,10 @@ summary.CAISEr <- function(object, test = NULL,
     cat("\n d\t\t=", my.tests[[i]]$d)
   }
   cat("\n#====================================")
-  invisible(TRUE)
+
+  # Return invisibly
+  invisible(list(test.info = my.tests,
+                 algoruns  = algoruns,
+                 algonames = algonames,
+                 algopairs = algopairs))
 }

@@ -23,6 +23,11 @@ experiment}
 \item{...}{other parameters to be passed down to specific
 summary functions (currently unused)}
 }
+\value{
+A list object is returned invisibly, containing the details of all
+tests performed as well as information on the total number of runs
+dedicated to each algorithm.
+}
 \description{
 S3 method for summarizing \emph{CAISEr} objects output by \code{\link[=run_experiment]{run_experiment()}}).
 Input parameters \code{test}, \code{alternative} and \code{sig.level} can be used to

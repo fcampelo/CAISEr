@@ -65,7 +65,7 @@ the pairwise differences in performance is controlled at a predefined level." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">CAISEr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
       </span>
     </div>
 
@@ -128,7 +128,7 @@ the pairwise differences in performance is controlled at a predefined level.</p>
   <span class='kw'>comparisons</span> <span class='kw'>=</span> <span class='st'>"all.vs.all"</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"param"</span>, <span class='kw'>nstart</span> <span class='kw'>=</span> <span class='fl'>20</span>,
   <span class='kw'>nmax</span> <span class='kw'>=</span> <span class='fl'>200</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>boot.R</span> <span class='kw'>=</span> <span class='fl'>499</span>, <span class='kw'>ncpus</span> <span class='kw'>=</span> <span class='fl'>1</span>,
   <span class='kw'>force.balanced</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>save.to.file</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>folder</span> <span class='kw'>=</span> <span class='st'>"./nreps_files"</span>)</pre>
+  <span class='kw'>load.from.file</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>folder</span> <span class='kw'>=</span> <span class='st'>"./nreps_files"</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -195,12 +195,15 @@ the algorithms on each instance</p></td>
     </tr>
     <tr>
       <th>save.to.file</th>
-      <td><p>logical flag: should the results be saved to a file
-in the current working directory?</p></td>
+      <td><p>logical flag: should the results be saved to a file?</p></td>
+    </tr>
+    <tr>
+      <th>load.from.file</th>
+      <td><p>logical flag: should the results be loaded from a file?</p></td>
     </tr>
     <tr>
       <th>folder</th>
-      <td><p>directory to save files (if <code>save.to.file == TRUE</code>)</p></td>
+      <td><p>directory to save/load files</p></td>
     </tr>
     </table>
     
