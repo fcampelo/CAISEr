@@ -25,7 +25,7 @@ To install the most up-to-date version directly from Github, simply type:
 
 ```
 library(devtools)
-devtools::install_github("fcampelo/CAISEr@devel")
+devtools::install_github("fcampelo/CAISEr")
 ```
 
 The most recent CRAN release of the package is also available for installation directly 
