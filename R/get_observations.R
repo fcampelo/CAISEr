@@ -42,19 +42,21 @@ get_observations <- function(algo,        # algorithm parameters
                           n %% 1 == 0)
   # ==================================== #
 
-
-  # remove '$FUN' field from list of arguments
+  # remove '$FUN' and '$alias' fields from list of arguments
   # and include the problem definition as field 'instance'
   myargs          <- algo[names(algo) != "FUN"]
   myargs          <- myargs[names(myargs) != "alias"]
   myargs$instance <- instance
 
   # Get observation(s)
+
   f <- numeric(n)
-  for (i in 1:n){
-    result <- do.call(algo$FUN,
-                      myargs)
-    f[i] <- result$value
+  if (n > 0){
+    for (i in 1:n){
+      result <- do.call(algo$FUN,
+                        myargs)
+      f[i] <- result$value
+    }
   }
   return(f)
 }
