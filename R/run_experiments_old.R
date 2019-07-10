@@ -115,26 +115,9 @@
 #'        See [calc_instances()] for details.
 #' @param alternative type of alternative hypothesis ("two.sided" or
 #'        "one.sided"). See [calc_instances()] for details.
-#' @param save.partial.results should partial results be saved to files? Can be
-#'                             either `NULL` (do not save) or a character string
-#'                             pointing to a folder. File names are generated
-#'                             based on the instance aliases. **Existing files with
-#'                             matching names will be overwritten.**
-#'                             `run_experiment()` uses **.RDS** files for saving
-#'                             and loading.
-#' @param load.partial.results should partial results be loaded from files? Can
-#'                             be either `NULL` (do not save) or a character
-#'                             string pointing to a folder containing the
-#'                             file(s) to be loaded. `run_experiment()` will
-#'                             use .RDS file(s) with a name(s) matching instance
-#'                             `alias`es. `run_experiment()` uses **.RDS** files
-#'                             for saving and loading.
-#' @param save.final.result should the final results be saved to file?
-#'                          Receives either `FALSE` (do not save), `TRUE`
-#'                          (save to a file with automatically-generated name)
-#'                          or a character string containing the desired file
-#'                          name. `run_experiment()` uses **.RDS** files
-#'                             for saving and loading.
+#' @param save.partial.results logical, should partial results be saved to file?
+#' @param load.partial.results logical, should previously saved partial results
+#'                             be reloaded as part of the experiment?
 #'
 #' @return a list object containing the following fields:
 #' \itemize{
@@ -211,7 +194,7 @@
 #'}
 #'
 
-run_experiment <- function(instances, algorithms, d, se.max,
+run_experiment_old <- function(instances, algorithms, d, se.max,
                            power = 0.8, sig.level = 0.05,
                            power.target = "mean",
                            dif = "simple", comparisons = "all.vs.all",
@@ -220,22 +203,21 @@ run_experiment <- function(instances, algorithms, d, se.max,
                            nstart = 20, nmax = 100 * length(algorithms),
                            force.balanced = FALSE,
                            ncpus = 2, boot.R = 499, seed = NULL,
-                           save.partial.results = NULL,
-                           load.partial.results = NULL,
-                           save.final.result    = NULL)
+                           save.partial.results = FALSE,
+                           load.partial.results = FALSE,
+                           folder = "./nreps_files")
 {
 
   # TODO:
-  # save/load.partial.results can be either a folder, a list of
+  # save/load.partial.results can be either a folder, a vector of
   # file names, or NULL
   # If it is a folder, then filenames are generated based on instance aliases
   #
   # The call to calc_nreps will need to be changed from lapply to mapply
 
-  # ====== Most error catching to be performed by specific subroutines ====== #
+  # ======== Most error catching to be performed by specific routines ======== #
   assertthat::assert_that(assertthat::is.count(ncpus),
                           is.null(seed) || seed == seed %/% 1)
-
   if (alternative == "one.sided"){
     assertthat::assert_that(comparisons == "all.vs.first")
   }
@@ -243,12 +225,17 @@ run_experiment <- function(instances, algorithms, d, se.max,
   # Fix a common mistake
   if (tolower(dif) == "percent") dif <- "perc"
 
-  # set PRNG seed
-  if (is.null(seed)) seed <- as.numeric(Sys.time())
-  set.seed(seed)
-
-  # Capture input parameters to be returned later
+  # Capture input parameters
   var.input.pars <- as.list(environment())
+
+  # set PRNG seed
+  if (is.null(seed)) {
+    if (!exists(".Random.seed")) stats::runif(1)
+    seed <- .Random.seed #i.e., do not change anything
+  } else {
+    set.seed(seed)
+  }
+
 
   # Set up parallel processing
   if ((.Platform$OS.type == "windows") & (ncpus > 1)){
@@ -266,14 +253,11 @@ run_experiment <- function(instances, algorithms, d, se.max,
   }
 
   # Fill up algorithm and instance aliases if needed
-  assertthat::assert_that(is.list(instances), length(instances) > 1)
   for (i in 1:length(instances)){
     if (!("alias" %in% names(instances[[i]]))) {
       instances[[i]]$alias <- instances[[i]]$FUN
     }
   }
-
-  assertthat::assert_that(is.list(algorithms), length(algorithms) > 1)
   for (i in 1:length(algorithms)){
     if (!("alias" %in% names(algorithms[[i]]))) {
       algorithms[[i]]$alias <- algorithms[[i]]$FUN
@@ -284,7 +268,7 @@ run_experiment <- function(instances, algorithms, d, se.max,
   n.available   <- length(instances)
   n.algs        <- length(algorithms)
   n.comparisons <- switch(comparisons,
-                          all.vs.all   = n.algs * (n.algs - 1) / 2,
+                          all.vs.all = n.algs * (n.algs - 1) / 2,
                           all.vs.first = n.algs - 1)
 
   ss.calc <- calc_instances(ncomparisons = n.comparisons,
@@ -297,7 +281,7 @@ run_experiment <- function(instances, algorithms, d, se.max,
   if (power >= 1) {
     N.star <- n.available
   } else {
-    N.star <- ceiling(ss.calc$ninstances)
+    N.star <- ss.calc$ninstances
     if (N.star < n.available){
       # Randomize order of presentation for available instances
       instances <- instances[sample.int(n.available)]
@@ -388,11 +372,6 @@ run_experiment <- function(instances, algorithms, d, se.max,
                  samplesize.calc   = ss.calc)
 
   class(output) <- c("CAISEr", "list")
-
-  # Save output (if required)
-  if(!is.null(save.final.result)){
-
-  }
 
   return(output)
 }

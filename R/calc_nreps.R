@@ -38,7 +38,7 @@
 #' That is, it must be able to run if called as:
 #'
 #'    \preformatted{
-#'          # remove '$FUN' and '$alias' field from list of arguments
+#'          # remove '$FUN' and '$alias' fields from list of arguments
 #'          # and include the problem definition as field 'instance'
 #'          myargs          <- algorithm[names(algorithm) != "FUN"]
 #'          myargs          <- myargs[names(myargs) != "alias"]
@@ -104,10 +104,11 @@
 #' @param ncpus number of cores to use
 #' @param force.balanced logical flag to force the use of balanced sampling for
 #'        the algorithms on each instance
-#' @param save.to.file logical flag: should the results be saved to a file?
-#' @param load.from.file logical flag: should the results be loaded from a file?
-#' @param folder directory to save/load files
-#'
+#' @param load.file file to load existing results from. Must be a .RDS file
+#'        (or `NULL`).
+#' @param save.folder name of folder to save the results. Use either "" or
+#'        "./" for the current working directory. Accepts relative paths.
+#'        Use `NULL` for not saving.
 #'
 #' @return a list object containing the following items:
 #' \itemize{
@@ -142,41 +143,41 @@
 #' - D.C. Montgomery, C.G. Runger:
 #'    Applied Statistics and Probability for Engineers, 6th ed. Wiley (2013)
 #'
-#' @export
-#'
 #' @examples
 #' # Example using dummy algorithms and instances. See ?dummyalgo for details.
-#' # We generate 4 dummy algorithms, with true means 15, 10, 30, 15; and true
-#' # standard deviations 2, 4, 6, 8.
+#' # We generate dummy algorithms with true means 15, 10, 30, 15, 20; and true
+#' # standard deviations 2, 4, 6, 8, 10.
 #' algorithms <- mapply(FUN = function(i, m, s){
 #'                           list(FUN   = "dummyalgo",
 #'                                alias = paste0("algo", i),
 #'                                distribution.fun  = "rnorm",
 #'                                distribution.pars = list(mean = m, sd = s))},
-#'                      i = c(alg1 = 1, alg2 = 2, alg3 = 3, alg4 = 4),
-#'                      m = c(15, 10, 30, 15),
-#'                      s = c(2, 4, 6, 8),
+#'                      i = c(alg1 = 1, alg2 = 2, alg3 = 3, alg4 = 4, alg5 = 5),
+#'                      m = c(15, 10, 30, 15, 20),
+#'                      s = c(2, 4, 6, 8, 10),
 #'                      SIMPLIFY = FALSE)
 #'
 #' # Make a dummy instance with a centered (zero-mean) exponential distribution:
 #' instance = list(FUN = "dummyinstance", distr = "rexp", rate = 5, bias = -1/5)
 #'
-#' se.max = 0.05
-#' dif = "perc"
-#' comparisons = "all.vs.all"
-#' method = "param"
-#' seed = 1234
-#' nstart = 20
-#' nmax   = 1000
-#' ncpus  = 1
-#'
-#' myreps <- calc_nreps(instance = instance, algorithms = algorithms,
-#'                      se.max = se.max,   dif = dif,
-#'                      comparisons = comparisons, method = method,
-#'                      nstart = nstart, nmax = nmax, seed = seed)
+#' # Explicitate all other parameters (just this one time:
+#' # most have reasonable default values)
+#' myreps <- calc_nreps(instance   = instance,
+#'                       algorithms = algorithms,
+#'                       se.max     = 0.05,          # desired (max) standard error
+#'                       dif        = "perc",        # type of difference
+#'                       comparisons = "all.vs.all", # differences to consider
+#'                       method     = "param",       # method ("param", "boot")
+#'                       nstart     = 15,            # initial number of samples
+#'                       nmax       = 1000,          # maximum allowed sample size
+#'                       seed       = 1234,          # seed for PRNG
+#'                       boot.R     = 499,           # number of bootstrap resamples (unused)
+#'                       ncpus      = 1,             # number of cores to use
+#'                       force.balanced = FALSE,     # force balanced sampling?
+#'                       load.file   = NULL,         # file to load results from
+#'                       save.folder = "./inst/extdata/nreps_files")         # folder to save results
 #' myreps$Diffk
 
-# TESTED: OK
 calc_nreps <- function(instance,            # instance parameters
                        algorithms,          # algorithm parameters
                        se.max,              # desired (max) standard error
@@ -184,14 +185,13 @@ calc_nreps <- function(instance,            # instance parameters
                        comparisons = "all.vs.all", # differences to consider
                        method = "param",    # method ("param", "boot")
                        nstart = 20,         # initial number of samples
-                       nmax   = 200,        # maximum allowed sample size
+                       nmax   = 1000,       # maximum allowed sample size
                        seed   = NULL,       # seed for PRNG
                        boot.R = 499,        # number of bootstrap resamples
                        ncpus  = 1,          # number of cores to use
-                       force.balanced = FALSE,   # force balanced sampling?
-                       save.to.file  = FALSE,    # save results to tmp file?
-                       load.from.file = FALSE,   # load results from file?
-                       folder = "./nreps_files") # directory to save tmp file
+                       force.balanced = FALSE, # force balanced sampling?
+                       load.file = NULL,    # file to load results from
+                       save.folder = NULL)  # folder to save results to
 {
 
   # ========== Error catching ========== #
@@ -212,48 +212,73 @@ calc_nreps <- function(instance,            # instance parameters
     is.null(seed) || seed == seed %/% 1,
     assertthat::is.count(boot.R), boot.R > 1,
     is.logical(force.balanced), length(force.balanced) == 1,
-    is.logical(save.to.file), length(save.to.file) == 1,
-    is.logical(load.from.file), length(load.from.file) == 1)
+    is.null(save.file) || (length(save.file) == 1 && is.character(save.file)),
+    is.null(load.file) || (length(load.file) == 1 && is.character(load.file)))
   # ==================================== #
 
   # set PRNG seed
-  if (is.null(seed)) {
-    if (!exists(".Random.seed")) stats::runif(1)
-    seed <- .Random.seed #i.e., do not change anything
-  } else{
-    set.seed(seed)
-  }
+  if (is.null(seed)) seed <- as.numeric(Sys.time())
+  set.seed(seed)
 
-  # Get/set instance alias
+  # Set instance alias if needed
   if (!("alias" %in% names(instance))) {
     instance$alias <- instance$FUN
   }
 
-  if (load.from.file){
-    # Get the filename
-    filename <- paste0(folder, "/",
-                       instance$alias,
-                       ".rds")
-
-    if (file.exists(filename)){
-      output <- readRDS(filename)
-      cat("\nSampling of instance", instance$alias, "loaded from file.")
-      return(output)
-    } else
-      cat("\n**NOTE: Instance file", filename, "not found.**")
+  # Set algorithm aliases if needed
+  for (i in seq_along(algorithms)){
+    if (!("alias" %in% names(algorithms[[i]]))) {
+      algorithms[[i]]$alias <- algorithms[[i]]$FUN
+    }
   }
+
+  # Initialize vectors
+  Xk <- vector(mode = "list", length = length(algorithms))
+  Nk <- numeric(length(algorithms))
+  names(Xk) <- sapply(algorithms, function(x)x$alias)
+  names(Nk) <- names(Xk)
+
+  # Load results (if required)
+  if (!is.null(load.file)){
+    if (file.exists(load.file)){
+      data.in.file  <- readRDS(load.file)
+      algos.in.file <- names(data.in.file$Nk)
+      cat(paste0("\nExisting data loaded for instance: ", instance$alias,
+                 "\nInstance alias in file: ", data.in.file$instance))
+      # Extract relevant observations from loaded results
+      for (i in seq_along(algos.in.file)){
+        if (algos.in.file[i] %in% names(Xk)){
+          indx <- which(algos.in.file[i] == names(Xk))
+          Xk[[indx]] <- data.in.file$Xk[[i]]
+          Nk[[indx]] <- data.in.file$Nk[[i]]
+          cat("\n", Nk[[indx]],
+              "observations retrieved for algorithm:", algos.in.file[i])
+        }
+      }
+    } else
+      cat("\nNOTE: Instance file '", load.file, "' not found.")
+  }
+  n.loaded <- Nk
 
   # Echo some information for the user
   cat("\nSampling algorithms on instance", instance$alias, ": ")
 
-  # generate initial samples
-  Nk <- rep(nstart, length(algorithms))
-  Xk <- parallel::mcmapply(FUN      = get_observations,
-                           algo     = algorithms,
-                           n        = Nk,
-                           MoreArgs = list(instance = instance),
-                           mc.cores = ncpus,
-                           SIMPLIFY = FALSE)
+  # generate initial samples (if required)
+  n0 <- ifelse(rep(force.balanced, length(Nk)),
+               yes = max(c(Nk, nstart)) - Nk,
+               no  = nstart - pmin(nstart, Nk))
+
+  newX <- parallel::mcmapply(FUN      = get_observations,
+                             algo     = algorithms,
+                             n        = n0,
+                             MoreArgs = list(instance = instance),
+                             mc.cores = ncpus,
+                             SIMPLIFY = FALSE)
+
+  # Append new observation to each algo list and update sample size counters
+  Xk <- mapply(FUN = c, Xk, newX,
+               SIMPLIFY = FALSE)
+  Nk <- sapply(Xk, length)
 
   # Calculate point estimates, SEs, and sample size ratios (current x optimal)
   Diffk <- calc_se(Xk     = Xk,
@@ -262,54 +287,53 @@ calc_nreps <- function(instance,            # instance parameters
                    method = method,
                    boot.R = boot.R)
 
-  while(any(Diffk$SE > se.max) & (sum(Nk) < nmax)){
+  while(any(Diffk$SE > se.max) & (sum(Nk) - sum(n.loaded) < nmax)){
     # Echo something for the user
     if (!(sum(Nk) %% nstart)) cat(".")
 
-    if (force.balanced) {
-      # Generate a single new observation for each algorithm
-      newX <- parallel::mcmapply(FUN      = get_observations,
-                                 algo     = algorithms,
-                                 n        = 1,
-                                 MoreArgs = list(instance = instance),
-                                 mc.cores = ncpus,
-                                 SIMPLIFY = FALSE)
-
-      # Append new observation to each algo list and update sample size counters
-      Xk <- mapply(FUN = c, Xk, newX,
-                   SIMPLIFY = FALSE)
-      Nk <- Nk + 1
+    # Determine which algorithm(s) should get new observation
+    n <- numeric(length(algorithms))
+    if(force.balanced){
+      ind <- 1:length(algorithms)
     } else {
       # Get pair that has the worst SE
       worst.se <- Diffk[which.max(Diffk$SE), ]
 
-      # Determine algorithm that should receive a new observation
+      # Determine algorithm from worst.se that should receive a new observation
       if (worst.se$r <= worst.se$ropt){
         ind <- worst.se[1, 1]
       } else {
         ind <- worst.se[1, 2]
       }
-      # Generate new observation and update Nk counter
-      Xk[[ind]] <- c(Xk[[ind]],
-                     get_observations(algo = algorithms[[ind]],
-                                      instance = instance,
-                                      n = 1))
-      Nk[ind] <- Nk[ind] + 1
-
-      # Recalculate point estimates, SEs, and sample size ratios
-      Diffk <- calc_se(Xk     = Xk,
-                       dif    = dif,
-                       comparisons   = comparisons,
-                       method = method,
-                       boot.R = boot.R)
     }
+    n[ind] <- 1
+
+    # Generate new observation(s)
+    newX <- parallel::mcmapply(FUN      = get_observations,
+                               algo     = algorithms,
+                               n        = n,
+                               MoreArgs = list(instance = instance),
+                               mc.cores = ncpus,
+                               SIMPLIFY = FALSE)
+
+    # Append new observation(s) and update sample size counters
+    Xk <- mapply(FUN = c, Xk, newX,
+                 SIMPLIFY = FALSE)
+    Nk[ind] <- Nk[ind] + 1
+
+    # Recalculate point estimates, SEs, and sample size ratios
+    Diffk <- calc_se(Xk     = Xk,
+                     dif    = dif,
+                     comparisons   = comparisons,
+                     method = method,
+                     boot.R = boot.R)
   }
 
   # Assemble output list
-  names(Nk) <- lapply(algorithms, function(x)x$alias)
   output    <- list(instance    = instance$alias,
                     Xk          = Xk,
                     Nk          = Nk,
+                    n.loaded    = n.loaded,
                     Diffk       = Diffk,
                     dif         = dif,
                     method      = method,
@@ -317,19 +341,48 @@ calc_nreps <- function(instance,            # instance parameters
                     seed        = seed)
 
   # Save to file if required
-  if (save.to.file){
-    # Get folder
-    if(!dir.exists(folder)) dir.create(folder)
+  if (!is.null(save.folder)){
+    # Check save folder
+    if(save.folder == "") save.folder <- "./"
+    save.folder <- normalizePath(save.folder)
+    if(!dir.exists(save.folder)) dir.create(save.folder)
 
-    # Get a unique filename
-    filename <- paste0(folder, "/",
-                       instance$alias,
-                       ".rds")
+    # Prepare save filename
+    save.file <- normalizePath(paste0(save.folder, "/",
+                                      instance$alias, ".rds"))
 
     # save output to file
-    saveRDS(output, file = filename)
+    cat("\nWriting file", basename(save.file))
+    saveRDS(output, file = save.file)
   }
 
   # Return output
   return(output)
 }
+
+# # To test re-loading of configurations
+# algo2 <- mapply(FUN = function(i, m, s){
+#                           list(FUN   = "dummyalgo",
+#                                alias = paste0("algo", i),
+#                                distribution.fun  = "rnorm",
+#                                distribution.pars = list(mean = m, sd = s))},
+#                      i = c(alg1 = 1, alg2 = 2, alg6 = 3),
+#                      m = c(15, 10, 35),
+#                      s = c(2, 4, 15),
+#                      SIMPLIFY = FALSE)
+# algo2[[3]]$alias <- "algo6"
+#
+# myreps <- calc_nreps(instance   = instance,
+#                       algorithms = algo2,
+#                       se.max     = 0.05,          # desired (max) standard error
+#                       dif        = "perc",        # type of difference
+#                       comparisons = "all.vs.all", # differences to consider
+#                       method     = "param",       # method ("param", "boot")
+#                       nstart     = 15,            # initial number of samples
+#                       nmax       = 1000,          # maximum allowed sample size
+#                       seed       = 1234,          # seed for PRNG
+#                       boot.R     = 499,           # number of bootstrap resamples (unused)
+#                       ncpus      = 1,             # number of cores to use
+#                       force.balanced = FALSE,     # force balanced sampling?
+#                       load.file  = "./inst/extdata/nreps_files/dummyinstance.rds",          # file to load results from
+#                       save.folder  = NULL)

@@ -1,8 +1,7 @@
 #' Calculates number of instances for the comparison of multiple algorithms
 #'
-#' Calculates either the number of instances, the standardized effect sizes
-#' detectable at a given power setting, or the power(s) of the comparisons of
-#' multiple algorithms.
+#' Calculates either the number of instances, or the power(s) of the
+#' comparisons of multiple algorithms.
 #'
 #' The main use of this routine uses the closed formula of the t-test to
 #' calculate the number of instances required for the comparison of pairs of

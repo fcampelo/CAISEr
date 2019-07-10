@@ -43,9 +43,8 @@ a list object containing the following items:
 }
 }
 \description{
-Calculates either the number of instances, the standardized effect sizes
-detectable at a given power setting, or the power(s) of the comparisons of
-multiple algorithms.
+Calculates either the number of instances, or the power(s) of the
+comparisons of multiple algorithms.
 }
 \details{
 The main use of this routine uses the closed formula of the t-test to

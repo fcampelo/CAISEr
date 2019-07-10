@@ -1,4 +1,4 @@
-## CAISEr package version 1.0.2
+## CAISEr package version 1.0.5
 [![Build Status](https://api.travis-ci.org/fcampelo/CAISEr.png)](https://travis-ci.org/fcampelo/CAISEr) [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/CAISEr)](https://CRAN.R-project.org/package=CAISEr)
 [![CRAN Downloads](https://cranlogs.r-pkg.org/badges/CAISEr)](https://CRAN.R-project.org/package=CAISEr)
 
@@ -18,8 +18,7 @@
 ***
 
 Implementation of R package _CAISEr_, with routines for automatically 
-determining the sample size needed for performing comparative experiments with 
-multiple algorithms on multiple problem instances.
+determining the sample size needed for performing comparative experiments with multiple algorithms on multiple problem instances.
 
 To install the most up-to-date version directly from Github, simply type:
 
