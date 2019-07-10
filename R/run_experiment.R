@@ -266,6 +266,7 @@ run_experiment <- function(instances, algorithms, d, se.max,
 
   if (power >= 1) {
     N.star <- n.available
+    ss.calc <- NULL
   } else {
     ss.calc <- calc_instances(ncomparisons = n.comparisons,
                               d            = d,
@@ -351,6 +352,8 @@ run_experiment <- function(instances, algorithms, d, se.max,
   rownames(data.summary) <- NULL
   data.summary$Alg1 <- as.factor(algonames[data.summary$Alg1])
   data.summary$Alg2 <- as.factor(algonames[data.summary$Alg2])
+
+
   # Assemble output
   output <- list(Configuration     = var.input.pars,
                  data.raw          = data.raw,
