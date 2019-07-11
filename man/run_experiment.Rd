@@ -72,24 +72,20 @@ the algorithms on each instance}
 
 \item{seed}{seed for the random number generator}
 
-\item{save.partial.results}{should partial results be saved to file? Can be
-either \code{NULL} (do not save), a character string
-pointing to a folder (in which case file names
-are generated based on the instance aliases) or
-a named character vector with the same length as
-\code{instances}, containing the desired file names
-for the results of each instance.
+\item{save.partial.results}{should partial results be saved to files? Can be
+either \code{NULL} (do not save) or a character string
+pointing to a folder. File names are generated
+based on the instance aliases. \strong{Existing files with
+matching names will be overwritten.}
 \code{run_experiment()} uses \strong{.RDS} files for saving
 and loading.}
 
-\item{load.partial.results}{should partial results be loaded from file? Can
-be either \code{NULL} (do not save), a character
-string pointing to a folder (in which case the
-file names will be matched against the instance
-aliases) or a named character vector with the
-same length as \code{instances}, containing the
-names of files containing the results for each
-instance. \code{run_experiment()} uses \strong{.RDS} files
+\item{load.partial.results}{should partial results be loaded from files? Can
+be either \code{NULL} (do not save) or a character
+string pointing to a folder containing the
+file(s) to be loaded. \code{run_experiment()} will
+use .RDS file(s) with a name(s) matching instance
+\code{alias}es. \code{run_experiment()} uses \strong{.RDS} files
 for saving and loading.}
 
 \item{save.final.result}{should the final results be saved to file?

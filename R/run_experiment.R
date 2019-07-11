@@ -116,25 +116,25 @@
 #' @param alternative type of alternative hypothesis ("two.sided" or
 #'        "one.sided"). See [calc_instances()] for details.
 #' @param save.partial.results should partial results be saved to files? Can be
-#'                             either `NULL` (do not save) or a character string
+#'                             either `NA` (do not save) or a character string
 #'                             pointing to a folder. File names are generated
 #'                             based on the instance aliases. **Existing files with
 #'                             matching names will be overwritten.**
 #'                             `run_experiment()` uses **.RDS** files for saving
 #'                             and loading.
 #' @param load.partial.results should partial results be loaded from files? Can
-#'                             be either `NULL` (do not save) or a character
+#'                             be either `NA` (do not save) or a character
 #'                             string pointing to a folder containing the
 #'                             file(s) to be loaded. `run_experiment()` will
 #'                             use .RDS file(s) with a name(s) matching instance
 #'                             `alias`es. `run_experiment()` uses **.RDS** files
 #'                             for saving and loading.
 #' @param save.final.result should the final results be saved to file?
-#'                          Receives either `FALSE` (do not save), `TRUE`
-#'                          (save to a file with automatically-generated name)
-#'                          or a character string containing the desired file
-#'                          name. `run_experiment()` uses **.RDS** files
-#'                             for saving and loading.
+#'                          Receives either `FALSE` (do not save) or `TRUE`,
+#'                          in which case the final output is saved to a file
+#'                          with automatically-generated name.
+#'                          `run_experiment()` uses **.RDS** files
+#'                          for saving and loading.
 #'
 #' @return a list object containing the following fields:
 #' \itemize{
@@ -220,22 +220,13 @@ run_experiment <- function(instances, algorithms, d, se.max,
                            nstart = 20, nmax = 100 * length(algorithms),
                            force.balanced = FALSE,
                            ncpus = 2, boot.R = 499, seed = NULL,
-                           save.partial.results = NULL,
-                           load.partial.results = NULL,
-                           save.final.result    = NULL)
+                           save.partial.results = NA,
+                           load.partial.results = NA,
+                           save.final.result    = FALSE)
 {
 
-  # TODO:
-  # save/load.partial.results can be either a folder, a list of
-  # file names, or NULL
-  # If it is a folder, then filenames are generated based on instance aliases
-  #
-  # The call to calc_nreps will need to be changed from lapply to mapply
-
-  # ====== Most error catching to be performed by specific subroutines ====== #
-  assertthat::assert_that(assertthat::is.count(ncpus),
-                          is.null(seed) || seed == seed %/% 1)
-
+  # ================ Preliminary bureaucracies ================ #
+  # one-sided tests only make sense for all-vs-one experiments
   if (alternative == "one.sided"){
     assertthat::assert_that(comparisons == "all.vs.first")
   }
@@ -244,6 +235,7 @@ run_experiment <- function(instances, algorithms, d, se.max,
   if (tolower(dif) == "percent") dif <- "perc"
 
   # set PRNG seed
+  assertthat::assert_that(is.null(seed) || seed == seed %/% 1)
   if (is.null(seed)) seed <- as.numeric(Sys.time())
   set.seed(seed)
 
@@ -251,6 +243,7 @@ run_experiment <- function(instances, algorithms, d, se.max,
   var.input.pars <- as.list(environment())
 
   # Set up parallel processing
+  assertthat::assert_that(assertthat::is.count(ncpus))
   if ((.Platform$OS.type == "windows") & (ncpus > 1)){
     cat("\nAttention: multicore not currently available for Windows.\n
         Forcing ncpus = 1.")
@@ -280,6 +273,21 @@ run_experiment <- function(instances, algorithms, d, se.max,
     }
   }
 
+
+  # Set up filenames for loading (if required)
+  if(is.na(load.partial.results)){
+    load.files <- rep(NA, length(instances))
+  } else {
+    assertthat::assert_that(is.character(load.partial.results),
+                            length(load.partial.results) == 1)
+    if(load.partial.results == "") load.partial.results <- "./"
+    load.folder <- normalizePath(load.partial.results)
+    load.files <- paste0(load.folder, "/",
+                         sapply(instances, function(x)x$alias), ".rds")
+  }
+
+  # ================ Start the actual method ================ #
+
   # Calculate N*
   n.available   <- length(instances)
   n.algs        <- length(algorithms)
@@ -287,22 +295,31 @@ run_experiment <- function(instances, algorithms, d, se.max,
                           all.vs.all   = n.algs * (n.algs - 1) / 2,
                           all.vs.first = n.algs - 1)
 
-  ss.calc <- calc_instances(ncomparisons = n.comparisons,
-                            d            = d,
-                            power        = power,
-                            sig.level    = sig.level,
-                            alternative  = alternative,
-                            test         = test,
-                            power.target = power.target)
   if (power >= 1) {
+    ss.calc <- calc_instances(ncomparisons = n.comparisons,
+                              d            = d,
+                              ninstances   = n.available,
+                              sig.level    = sig.level,
+                              alternative  = alternative,
+                              test         = test,
+                              power.target = power.target)
     N.star <- n.available
   } else {
+    ss.calc <- calc_instances(ncomparisons = n.comparisons,
+                              d            = d,
+                              power        = power,
+                              sig.level    = sig.level,
+                              alternative  = alternative,
+                              test         = test,
+                              power.target = power.target)
+
     N.star <- ceiling(ss.calc$ninstances)
     if (N.star < n.available){
       # Randomize order of presentation for available instances
       instances <- instances[sample.int(n.available)]
     }
   }
+  inst.to.use <- min(N.star, n.available)
 
   # Echo some information for the user
   cat("CAISEr running")
@@ -313,25 +330,28 @@ run_experiment <- function(instances, algorithms, d, se.max,
   cat("\n-----------------------------")
 
   # Sample instances
-  if(ncpus > 1){
-    my.results <- pbmcapply::pbmclapply(X = instances[1:min(N.star, n.available)],
-                                        FUN            = calc_nreps,
-                                        # Arguments for calc_nreps:
-                                        algorithms     = algorithms,
-                                        se.max         = se.max,
-                                        dif            = dif,
-                                        comparisons    = comparisons,
-                                        method         = method,
-                                        nstart         = nstart,
-                                        nmax           = nmax,
-                                        boot.R         = boot.R,
-                                        force.balanced = force.balanced,
-                                        load.file      = NULL,
-                                        save.file      = NULL,
+  if(ncpus > 1){ # Get it back to lapply. Make calc_nreps use only automatic names
+    my.results <- pbmcapply::pbmcmapply(FUN       = calc_nreps,
+                                        # Arguments to iterate over
+                                        instance  = instances[1:inst.to.use],
+                                        load.file = load.files,
+                                        # Other arguments for calc_nreps:
+                                        MoreArgs = list(
+                                          algorithms     = algorithms,
+                                          se.max         = se.max,
+                                          dif            = dif,
+                                          comparisons    = comparisons,
+                                          method         = method,
+                                          nstart         = nstart,
+                                          nmax           = nmax,
+                                          boot.R         = boot.R,
+                                          force.balanced = force.balanced,
+                                          save.folder    = save.partial.results
+                                        ),
                                         # other pbmclapply arguments:
                                         mc.cores       = ncpus)
   } else {
-    my.results <- lapply(X = instances[1:min(N.star, n.available)],
+    my.results <- mapply(X = instances[1:min(N.star, n.available)],
                          FUN            = calc_nreps,
                          # Arguments for calc_nreps:
                          algorithms     = algorithms,
@@ -390,7 +410,7 @@ run_experiment <- function(instances, algorithms, d, se.max,
   class(output) <- c("CAISEr", "list")
 
   # Save output (if required)
-  if(!is.null(save.final.result)){
+  if(!is.na(save.final.result)){
 
   }
 

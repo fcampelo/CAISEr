@@ -105,10 +105,10 @@
 #' @param force.balanced logical flag to force the use of balanced sampling for
 #'        the algorithms on each instance
 #' @param load.file file to load existing results from. Must be a .RDS file
-#'        (or `NULL`).
+#'        (or `NA` for not loading).
 #' @param save.folder name of folder to save the results. Use either "" or
 #'        "./" for the current working directory. Accepts relative paths.
-#'        Use `NULL` for not saving.
+#'        Use `NA` for not saving.
 #'
 #' @return a list object containing the following items:
 #' \itemize{
@@ -174,8 +174,8 @@
 #'                       boot.R     = 499,           # number of bootstrap resamples (unused)
 #'                       ncpus      = 1,             # number of cores to use
 #'                       force.balanced = FALSE,     # force balanced sampling?
-#'                       load.file   = NULL,         # file to load results from
-#'                       save.folder = "./inst/extdata/nreps_files")         # folder to save results
+#'                       load.file   = NA,         # file to load results from
+#'                       save.folder = NA)         # folder to save results
 #' myreps$Diffk
 
 calc_nreps <- function(instance,            # instance parameters
@@ -190,8 +190,8 @@ calc_nreps <- function(instance,            # instance parameters
                        boot.R = 499,        # number of bootstrap resamples
                        ncpus  = 1,          # number of cores to use
                        force.balanced = FALSE, # force balanced sampling?
-                       load.file = NULL,    # file to load results from
-                       save.folder = NULL)  # folder to save results to
+                       load.file = NA,      # file to load results from
+                       save.folder = NA)    # folder to save results to
 {
 
   # ========== Error catching ========== #
@@ -212,8 +212,8 @@ calc_nreps <- function(instance,            # instance parameters
     is.null(seed) || seed == seed %/% 1,
     assertthat::is.count(boot.R), boot.R > 1,
     is.logical(force.balanced), length(force.balanced) == 1,
-    is.null(save.file) || (length(save.file) == 1 && is.character(save.file)),
-    is.null(load.file) || (length(load.file) == 1 && is.character(load.file)))
+    is.na(save.file) || (length(save.file) == 1 && is.character(save.file)),
+    is.na(load.file) || (length(load.file) == 1 && is.character(load.file)))
   # ==================================== #
 
   # set PRNG seed
@@ -239,7 +239,7 @@ calc_nreps <- function(instance,            # instance parameters
   names(Nk) <- names(Xk)
 
   # Load results (if required)
-  if (!is.null(load.file)){
+  if (!is.na(load.file)){
     if (file.exists(load.file)){
       data.in.file  <- readRDS(load.file)
       algos.in.file <- names(data.in.file$Nk)
@@ -341,7 +341,7 @@ calc_nreps <- function(instance,            # instance parameters
                     seed        = seed)
 
   # Save to file if required
-  if (!is.null(save.folder)){
+  if (!is.na(save.folder)){
     # Check save folder
     if(save.folder == "") save.folder <- "./"
     save.folder <- normalizePath(save.folder)
@@ -385,4 +385,4 @@ calc_nreps <- function(instance,            # instance parameters
 #                       ncpus      = 1,             # number of cores to use
 #                       force.balanced = FALSE,     # force balanced sampling?
 #                       load.file  = "./inst/extdata/nreps_files/dummyinstance.rds",          # file to load results from
-#                       save.folder  = NULL)
+#                       save.folder  = NA)
