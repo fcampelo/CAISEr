@@ -5,7 +5,7 @@
 \title{Calculates number of instances for the comparison of multiple algorithms}
 \usage{
 calc_instances(ncomparisons, d, ninstances = NULL, power = NULL,
-  sig.level = 0.05, alternative = "two.sided", test = "t.test",
+  sig.level = 0.05, alternative.side = "two.sided", test = "t.test",
   power.target = "mean")
 }
 \arguments{
@@ -21,7 +21,7 @@ effect size, i.e., "deviation from H0" / "standard deviation")}
 \item{sig.level}{desired family-wise significance level (alpha) for the
 experiment}
 
-\item{alternative}{type of alternative hypothesis to be performed
+\item{alternative.side}{type of alternative hypothesis to be performed
 ("two.sided" or "one.sided")}
 
 \item{test}{type of test to be used
@@ -38,7 +38,7 @@ a list object containing the following items:
 \item \code{power} - the power of the comparison
 \item \code{d} - the effect size
 \item \code{sig.level} - significance level
-\item \code{alternative} - type of alternative hypothesis
+\item \code{alternative.side} - type of alternative hypothesis
 \item \code{test} - type of test
 }
 }

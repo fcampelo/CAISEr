@@ -7,7 +7,7 @@
 calc_nreps(instance, algorithms, se.max, dif = "simple",
   comparisons = "all.vs.all", method = "param", nstart = 20,
   nmax = 1000, seed = NULL, boot.R = 499, ncpus = 1,
-  force.balanced = FALSE, load.file = NA, save.folder = NA)
+  force.balanced = FALSE, load.folder = NA, save.folder = NA)
 }
 \arguments{
 \item{instance}{a list object containing the definitions of the problem
@@ -35,7 +35,9 @@ and all pairwise comparisons are desired).}
 \item{nstart}{initial number of algorithm runs for each algorithm.
 See Section \code{Initial Number of Observations} for details.}
 
-\item{nmax}{maximum \strong{total} allowed sample size.}
+\item{nmax}{maximum \strong{total} allowed number of runs to execute. Loaded
+results (see \code{load.folder} below) do not count towards this
+total.}
 
 \item{seed}{seed for the random number generator}
 
@@ -46,8 +48,10 @@ See Section \code{Initial Number of Observations} for details.}
 \item{force.balanced}{logical flag to force the use of balanced sampling for
 the algorithms on each instance}
 
-\item{load.file}{file to load existing results from. Must be a .RDS file
-(or \code{NA} for not loading).}
+\item{load.folder}{name of folder to load results from. Use either "" or
+"./" for the current working directory. Accepts relative paths.
+Use \code{NA} for not saving. \code{calc_nreps()} will look for a .RDS file
+with the same name}
 
 \item{save.folder}{name of folder to save the results. Use either "" or
 "./" for the current working directory. Accepts relative paths.
@@ -186,7 +190,7 @@ myreps <- calc_nreps(instance   = instance,
                       boot.R     = 499,           # number of bootstrap resamples (unused)
                       ncpus      = 1,             # number of cores to use
                       force.balanced = FALSE,     # force balanced sampling?
-                      load.file   = NA,         # file to load results from
+                      load.folder   = NA,         # file to load results from
                       save.folder = NA)         # folder to save results
 myreps$Diffk
 }

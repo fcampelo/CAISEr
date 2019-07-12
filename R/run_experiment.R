@@ -114,7 +114,10 @@
 #' @param sig.level family-wise significance level (alpha) for the experiment.
 #'        See [calc_instances()] for details.
 #' @param alternative type of alternative hypothesis ("two.sided" or
-#'        "one.sided"). See [calc_instances()] for details.
+#'        "less" or "greater"). See [calc_instances()] for details.
+#' @param nmax maximum number of runs to execute on each instance (see
+#'             [calc_nreps()]). Loaded results (see `load.partial.results`
+#'             below) do not count towards this maximum.
 #' @param save.partial.results should partial results be saved to files? Can be
 #'                             either `NA` (do not save) or a character string
 #'                             pointing to a folder. File names are generated
@@ -129,12 +132,12 @@
 #'                             use .RDS file(s) with a name(s) matching instance
 #'                             `alias`es. `run_experiment()` uses **.RDS** files
 #'                             for saving and loading.
-#' @param save.final.result should the final results be saved to file?
-#'                          Receives either `FALSE` (do not save) or `TRUE`,
-#'                          in which case the final output is saved to a file
-#'                          with automatically-generated name.
-#'                          `run_experiment()` uses **.RDS** files
-#'                          for saving and loading.
+#' @param save.final.result should the final results be saved to file? Can be
+#'                             either `NA` (do not save) or a character string
+#'                             pointing to a folder where the results will be
+#'                             saved on a **.RDS** file starting with
+#'                             `CAISEr_results_` and ending with 12-digit
+#'                             datetime tag in the format `YYYYMMDDhhmmss`.
 #'
 #' @return a list object containing the following fields:
 #' \itemize{
@@ -175,7 +178,6 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
 #' # Example using four dummy algorithms and 100 dummy instances.
 #' # See [dummyalgo()] and [dummyinstance()] for details.
 #' # Generating 4 dummy algorithms here, with means 15, 10, 30, 15 and standard
@@ -203,12 +205,11 @@
 #'                              power = .9, sig.level = .05,
 #'                              power.target = "mean",
 #'                              dif = "perc", comparisons = "all.vs.all",
-#'                              seed = 1234)
+#'                              ncpus = 1, seed = 1234)
 #'
 #' # Take a look at the results
 #' summary(my.results)
 #' print(my.results)
-#'}
 #'
 
 run_experiment <- function(instances, algorithms, d, se.max,
@@ -222,13 +223,17 @@ run_experiment <- function(instances, algorithms, d, se.max,
                            ncpus = 2, boot.R = 499, seed = NULL,
                            save.partial.results = NA,
                            load.partial.results = NA,
-                           save.final.result    = FALSE)
+                           save.final.result    = NA)
 {
 
   # ================ Preliminary bureaucracies ================ #
+
   # one-sided tests only make sense for all-vs-one experiments
-  if (alternative == "one.sided"){
+  if (alternative %in% c("less", "greater")){
     assertthat::assert_that(comparisons == "all.vs.first")
+    alternative.side <- "one.sided"
+  } else {
+    alternative.side <- "two.sided"
   }
 
   # Fix a common mistake
@@ -258,7 +263,7 @@ run_experiment <- function(instances, algorithms, d, se.max,
     }
   }
 
-  # Fill up algorithm and instance aliases if needed
+  # Fill up instance aliases if needed
   assertthat::assert_that(is.list(instances), length(instances) > 1)
   for (i in 1:length(instances)){
     if (!("alias" %in% names(instances[[i]]))) {
@@ -266,24 +271,12 @@ run_experiment <- function(instances, algorithms, d, se.max,
     }
   }
 
+  # Fill up algorithm aliases if needed
   assertthat::assert_that(is.list(algorithms), length(algorithms) > 1)
   for (i in 1:length(algorithms)){
     if (!("alias" %in% names(algorithms[[i]]))) {
       algorithms[[i]]$alias <- algorithms[[i]]$FUN
     }
-  }
-
-
-  # Set up filenames for loading (if required)
-  if(is.na(load.partial.results)){
-    load.files <- rep(NA, length(instances))
-  } else {
-    assertthat::assert_that(is.character(load.partial.results),
-                            length(load.partial.results) == 1)
-    if(load.partial.results == "") load.partial.results <- "./"
-    load.folder <- normalizePath(load.partial.results)
-    load.files <- paste0(load.folder, "/",
-                         sapply(instances, function(x)x$alias), ".rds")
   }
 
   # ================ Start the actual method ================ #
@@ -300,7 +293,7 @@ run_experiment <- function(instances, algorithms, d, se.max,
                               d            = d,
                               ninstances   = n.available,
                               sig.level    = sig.level,
-                              alternative  = alternative,
+                              alternative.side  = alternative.side,
                               test         = test,
                               power.target = power.target)
     N.star <- n.available
@@ -309,7 +302,7 @@ run_experiment <- function(instances, algorithms, d, se.max,
                               d            = d,
                               power        = power,
                               sig.level    = sig.level,
-                              alternative  = alternative,
+                              alternative.side  = alternative.side,
                               test         = test,
                               power.target = power.target)
 
@@ -329,30 +322,27 @@ run_experiment <- function(instances, algorithms, d, se.max,
   cat("\nUsing", ncpus, "cores.")
   cat("\n-----------------------------")
 
-  # Sample instances
-  if(ncpus > 1){ # Get it back to lapply. Make calc_nreps use only automatic names
-    my.results <- pbmcapply::pbmcmapply(FUN       = calc_nreps,
-                                        # Arguments to iterate over
-                                        instance  = instances[1:inst.to.use],
-                                        load.file = load.files,
-                                        # Other arguments for calc_nreps:
-                                        MoreArgs = list(
-                                          algorithms     = algorithms,
-                                          se.max         = se.max,
-                                          dif            = dif,
-                                          comparisons    = comparisons,
-                                          method         = method,
-                                          nstart         = nstart,
-                                          nmax           = nmax,
-                                          boot.R         = boot.R,
-                                          force.balanced = force.balanced,
-                                          save.folder    = save.partial.results
-                                        ),
-                                        # other pbmclapply arguments:
+  # Sample algorithms on instances
+  if(ncpus > 1){
+    my.results <- pbmcapply::pbmclapply(X   = instances[1:inst.to.use],
+                                        FUN = calc_nreps,
+                                        # Arguments for calc_nreps:
+                                        algorithms     = algorithms,
+                                        se.max         = se.max,
+                                        dif            = dif,
+                                        comparisons    = comparisons,
+                                        method         = method,
+                                        nstart         = nstart,
+                                        nmax           = nmax,
+                                        boot.R         = boot.R,
+                                        force.balanced = force.balanced,
+                                        save.folder    = save.partial.results,
+                                        load.folder    = load.partial.results,
+                                        # other arguments for pbmclapply:
                                         mc.cores       = ncpus)
   } else {
-    my.results <- mapply(X = instances[1:min(N.star, n.available)],
-                         FUN            = calc_nreps,
+    my.results <- lapply(X   = instances[1:inst.to.use],
+                         FUN = calc_nreps,
                          # Arguments for calc_nreps:
                          algorithms     = algorithms,
                          se.max         = se.max,
@@ -363,10 +353,10 @@ run_experiment <- function(instances, algorithms, d, se.max,
                          nmax           = nmax,
                          boot.R         = boot.R,
                          force.balanced = force.balanced,
-                         save.to.file   = save.partial.results,
-                         load.from.file = load.partial.results,
-                         folder         = folder)
+                         save.folder    = save.partial.results,
+                         load.folder    = load.partial.results)
   }
+
   # Consolidate raw data
   data.raw <- lapply(X   = my.results,
                      FUN = function(x){
@@ -410,8 +400,23 @@ run_experiment <- function(instances, algorithms, d, se.max,
   class(output) <- c("CAISEr", "list")
 
   # Save output (if required)
+  assertthat::assert_that(is.na(save.final.result) ||
+                            (is.character(save.final.result) &
+                            length(save.final.result) == 1))
   if(!is.na(save.final.result)){
+    # Check save folder
+    if(save.final.result == "") save.final.result <- "./"
+    save.folder <- normalizePath(save.final.result)
+    if(!dir.exists(save.folder)) dir.create(save.folder)
 
+    # Prepare save filename
+    filepath <- paste0(save.folder, "/CAISEr_results_",
+                       gsub("[- ::alpha::]", "", Sys.time()),
+                       ".rds")
+
+    # save output to file
+    cat("\nWriting file", basename(filepath))
+    saveRDS(output, file = filepath)
   }
 
   return(output)

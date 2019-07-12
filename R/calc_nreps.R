@@ -98,14 +98,18 @@
 #'          "param" (for parametric) or "boot" (for bootstrap)
 #' @param nstart initial number of algorithm runs for each algorithm.
 #'      See Section `Initial Number of Observations` for details.
-#' @param nmax maximum **total** allowed sample size.
+#' @param nmax maximum **total** allowed number of runs to execute. Loaded
+#'             results (see `load.folder` below) do not count towards this
+#'             total.
 #' @param seed seed for the random number generator
 #' @param boot.R number of bootstrap resamples to use (if `method == "boot"`)
 #' @param ncpus number of cores to use
 #' @param force.balanced logical flag to force the use of balanced sampling for
 #'        the algorithms on each instance
-#' @param load.file file to load existing results from. Must be a .RDS file
-#'        (or `NA` for not loading).
+#' @param load.folder name of folder to load results from. Use either "" or
+#'        "./" for the current working directory. Accepts relative paths.
+#'        Use `NA` for not saving. `calc_nreps()` will look for a .RDS file
+#'        with the same name
 #' @param save.folder name of folder to save the results. Use either "" or
 #'        "./" for the current working directory. Accepts relative paths.
 #'        Use `NA` for not saving.
@@ -124,6 +128,8 @@
 #' }
 #'
 #' @author Felipe Campelo (\email{fcampelo@@gmail.com})
+#'
+#' @export
 #'
 #' @references
 #' - F. Campelo, F. Takahashi:
@@ -174,7 +180,7 @@
 #'                       boot.R     = 499,           # number of bootstrap resamples (unused)
 #'                       ncpus      = 1,             # number of cores to use
 #'                       force.balanced = FALSE,     # force balanced sampling?
-#'                       load.file   = NA,         # file to load results from
+#'                       load.folder   = NA,         # file to load results from
 #'                       save.folder = NA)         # folder to save results
 #' myreps$Diffk
 
@@ -190,7 +196,7 @@ calc_nreps <- function(instance,            # instance parameters
                        boot.R = 499,        # number of bootstrap resamples
                        ncpus  = 1,          # number of cores to use
                        force.balanced = FALSE, # force balanced sampling?
-                       load.file = NA,      # file to load results from
+                       load.folder = NA,    # folder to load results from
                        save.folder = NA)    # folder to save results to
 {
 
@@ -212,8 +218,8 @@ calc_nreps <- function(instance,            # instance parameters
     is.null(seed) || seed == seed %/% 1,
     assertthat::is.count(boot.R), boot.R > 1,
     is.logical(force.balanced), length(force.balanced) == 1,
-    is.na(save.file) || (length(save.file) == 1 && is.character(save.file)),
-    is.na(load.file) || (length(load.file) == 1 && is.character(load.file)))
+    is.na(save.folder) || (length(save.folder) == 1 && is.character(save.folder)),
+    is.na(load.folder) || (length(load.folder) == 1 && is.character(load.folder)))
   # ==================================== #
 
   # set PRNG seed
@@ -239,28 +245,36 @@ calc_nreps <- function(instance,            # instance parameters
   names(Nk) <- names(Xk)
 
   # Load results (if required)
-  if (!is.na(load.file)){
-    if (file.exists(load.file)){
-      data.in.file  <- readRDS(load.file)
-      algos.in.file <- names(data.in.file$Nk)
-      cat(paste0("\nExisting data loaded for instance: ", instance$alias,
-                 "\nInstance alias in file: ", data.in.file$instance))
-      # Extract relevant observations from loaded results
-      for (i in seq_along(algos.in.file)){
-        if (algos.in.file[i] %in% names(Xk)){
-          indx <- which(algos.in.file[i] == names(Xk))
-          Xk[[indx]] <- data.in.file$Xk[[i]]
-          Nk[[indx]] <- data.in.file$Nk[[i]]
-          cat("\n", Nk[[indx]],
-              "observations retrieved for algorithm:", algos.in.file[i])
+  if (!is.na(load.folder)){
+    if(load.folder == "") load.folder <- "./"
+    # Check that folder exists
+    if (dir.exists(load.folder)){
+      filepath <- paste0(normalizePath(load.folder),
+                         "/", instance$alias, ".rds")
+      # Check that a file for this instance exists in the folder
+      if (file.exists(filepath)){
+        data.in.file  <- readRDS(filepath)
+        algos.in.file <- names(data.in.file$Nk)
+        cat("\nExisting data loaded for instance:", instance$alias)
+        # Extract relevant observations from loaded results
+        for (i in seq_along(algos.in.file)){
+          if (algos.in.file[i] %in% names(Xk)){
+            indx <- which(algos.in.file[i] == names(Xk))
+            Xk[[indx]] <- data.in.file$Xk[[i]]
+            Nk[[indx]] <- data.in.file$Nk[[i]]
+            cat("\n", Nk[[indx]],
+                "observations retrieved for algorithm:", algos.in.file[i])
+          }
         }
+      } else {
+        cat("\nNOTE: Instance file '", filepath, "' not found.")
       }
-    } else
-      cat("\nNOTE: Instance file '", load.file, "' not found.")
+    } else {
+      cat("\nNOTE: folder '", normalizePath(load.folder), "' not found.")
+    }
   }
   n.loaded <- Nk
 
-  # Echo some information for the user
   cat("\nSampling algorithms on instance", instance$alias, ": ")
 
   # generate initial samples (if required)
@@ -348,8 +362,7 @@ calc_nreps <- function(instance,            # instance parameters
     if(!dir.exists(save.folder)) dir.create(save.folder)
 
     # Prepare save filename
-    save.file <- normalizePath(paste0(save.folder, "/",
-                                      instance$alias, ".rds"))
+    save.file <- paste0(save.folder, "/", instance$alias, ".rds")
 
     # save output to file
     cat("\nWriting file", basename(save.file))
@@ -359,30 +372,3 @@ calc_nreps <- function(instance,            # instance parameters
   # Return output
   return(output)
 }
-
-# # To test re-loading of configurations
-# algo2 <- mapply(FUN = function(i, m, s){
-#                           list(FUN   = "dummyalgo",
-#                                alias = paste0("algo", i),
-#                                distribution.fun  = "rnorm",
-#                                distribution.pars = list(mean = m, sd = s))},
-#                      i = c(alg1 = 1, alg2 = 2, alg6 = 3),
-#                      m = c(15, 10, 35),
-#                      s = c(2, 4, 15),
-#                      SIMPLIFY = FALSE)
-# algo2[[3]]$alias <- "algo6"
-#
-# myreps <- calc_nreps(instance   = instance,
-#                       algorithms = algo2,
-#                       se.max     = 0.05,          # desired (max) standard error
-#                       dif        = "perc",        # type of difference
-#                       comparisons = "all.vs.all", # differences to consider
-#                       method     = "param",       # method ("param", "boot")
-#                       nstart     = 15,            # initial number of samples
-#                       nmax       = 1000,          # maximum allowed sample size
-#                       seed       = 1234,          # seed for PRNG
-#                       boot.R     = 499,           # number of bootstrap resamples (unused)
-#                       ncpus      = 1,             # number of cores to use
-#                       force.balanced = FALSE,     # force balanced sampling?
-#                       load.file  = "./inst/extdata/nreps_files/dummyinstance.rds",          # file to load results from
-#                       save.folder  = NA)

@@ -14,8 +14,8 @@
 \item{test}{type of test to be used
 ("t.test", "wilcoxon" or "binomial")}
 
-\item{alternative}{type of alternative hypothesis to be performed
-("two.sided" or "one.sided")}
+\item{alternative}{type of alternative hypothesis ("two.sided" or
+"less" or "greater"). See \code{\link[=calc_instances]{calc_instances()}} for details.}
 
 \item{sig.level}{desired family-wise significance level (alpha) for the
 experiment}

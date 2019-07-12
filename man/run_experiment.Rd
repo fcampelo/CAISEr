@@ -10,8 +10,8 @@ run_experiment(instances, algorithms, d, se.max, power = 0.8,
   comparisons = "all.vs.all", alternative = "two.sided",
   test = "t.test", method = "param", nstart = 20, nmax = 100 *
   length(algorithms), force.balanced = FALSE, ncpus = 2,
-  boot.R = 499, seed = NULL, save.partial.results = NULL,
-  load.partial.results = NULL, save.final.result = NULL)
+  boot.R = 499, seed = NULL, save.partial.results = NA,
+  load.partial.results = NA, save.final.result = NA)
 }
 \arguments{
 \item{instances}{list object containing the definitions of the
@@ -50,7 +50,7 @@ the reference algorithm) or "all.vs.all" (if there is no reference
 and all pairwise comparisons are desired).}
 
 \item{alternative}{type of alternative hypothesis ("two.sided" or
-"one.sided"). See \code{\link[=calc_instances]{calc_instances()}} for details.}
+"less" or "greater"). See \code{\link[=calc_instances]{calc_instances()}} for details.}
 
 \item{test}{type of test to be used
 ("t.test", "wilcoxon" or "binomial")}
@@ -61,7 +61,9 @@ and all pairwise comparisons are desired).}
 \item{nstart}{initial number of algorithm runs for each algorithm.
 See Section \code{Initial Number of Observations} for details.}
 
-\item{nmax}{maximum \strong{total} allowed sample size.}
+\item{nmax}{maximum number of runs to execute on each instance (see
+\code{\link[=calc_nreps]{calc_nreps()}}). Loaded results (see \code{load.partial.results}
+below) do not count towards this maximum.}
 
 \item{force.balanced}{logical flag to force the use of balanced sampling for
 the algorithms on each instance}
@@ -73,7 +75,7 @@ the algorithms on each instance}
 \item{seed}{seed for the random number generator}
 
 \item{save.partial.results}{should partial results be saved to files? Can be
-either \code{NULL} (do not save) or a character string
+either \code{NA} (do not save) or a character string
 pointing to a folder. File names are generated
 based on the instance aliases. \strong{Existing files with
 matching names will be overwritten.}
@@ -81,19 +83,19 @@ matching names will be overwritten.}
 and loading.}
 
 \item{load.partial.results}{should partial results be loaded from files? Can
-be either \code{NULL} (do not save) or a character
+be either \code{NA} (do not save) or a character
 string pointing to a folder containing the
 file(s) to be loaded. \code{run_experiment()} will
 use .RDS file(s) with a name(s) matching instance
 \code{alias}es. \code{run_experiment()} uses \strong{.RDS} files
 for saving and loading.}
 
-\item{save.final.result}{should the final results be saved to file?
-Receives either \code{FALSE} (do not save), \code{TRUE}
-(save to a file with automatically-generated name)
-or a character string containing the desired file
-name. \code{run_experiment()} uses \strong{.RDS} files
-for saving and loading.}
+\item{save.final.result}{should the final results be saved to file? Can be
+either \code{NA} (do not save) or a character string
+pointing to a folder where the results will be
+saved on a \strong{.RDS} file starting with
+\code{CAISEr_results_} and ending with 12-digit
+datetime tag in the format \code{YYYYMMDDhhmmss}.}
 }
 \value{
 a list object containing the following fields:
@@ -219,7 +221,6 @@ in relation to the paired t.test:
 }
 
 \examples{
-\dontrun{
 # Example using four dummy algorithms and 100 dummy instances.
 # See [dummyalgo()] and [dummyinstance()] for details.
 # Generating 4 dummy algorithms here, with means 15, 10, 30, 15 and standard
@@ -247,12 +248,11 @@ my.results <- run_experiment(instances, algorithms,
                              power = .9, sig.level = .05,
                              power.target = "mean",
                              dif = "perc", comparisons = "all.vs.all",
-                             seed = 1234)
+                             ncpus = 1, seed = 1234)
 
 # Take a look at the results
 summary(my.results)
 print(my.results)
-}
 
 }
 \references{

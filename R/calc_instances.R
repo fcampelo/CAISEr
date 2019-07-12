@@ -29,7 +29,7 @@
 #' @param power target power for the comparisons (see `Details`)
 #' @param sig.level desired family-wise significance level (alpha) for the
 #'                  experiment
-#' @param alternative type of alternative hypothesis to be performed
+#' @param alternative.side type of alternative hypothesis to be performed
 #'                    ("two.sided" or "one.sided")
 #' @param test type of test to be used
 #'                  ("t.test", "wilcoxon" or "binomial")
@@ -43,7 +43,7 @@
 #'    \item \code{power} - the power of the comparison
 #'    \item \code{d} - the effect size
 #'    \item \code{sig.level} - significance level
-#'    \item \code{alternative} - type of alternative hypothesis
+#'    \item \code{alternative.side} - type of alternative hypothesis
 #'    \item \code{test} - type of test
 #' }
 #'
@@ -117,14 +117,14 @@ calc_instances <- function(ncomparisons,               # number of comparisons
                            ninstances   = NULL,        # number of instances
                            power        = NULL,        # power
                            sig.level    = 0.05,        # significance level
-                           alternative  = "two.sided", # type of H1
+                           alternative.side = "two.sided", # type of H1
                            test         = "t.test",    # type of test
                            power.target = "mean")      # target power design
 {
 
   test    <- match.arg(tolower(test),
                        c("t.test", "wilcoxon", "binomial"))
-  alternative  <- match.arg(tolower(alternative),
+  alternative.side  <- match.arg(tolower(alternative.side),
                             c("one.sided", "two.sided"))
   power.target <- match.arg(tolower(power.target),
                             c("worst.case", "mean", "median"))
@@ -138,7 +138,7 @@ calc_instances <- function(ncomparisons,               # number of comparisons
     is.null(d) || (is.numeric(d) && d > 0),
     sum(c(is.null(ninstances), is.null(power), is.null(d))) == 1,
     is.numeric(sig.level) && sig.level > 0 && sig.level < 1,
-    alternative %in% c("one.sided", "two.sided"),
+    alternative.side %in% c("one.sided", "two.sided"),
     test %in% c("t.test", "wilcoxon", "binomial"),
     power.target %in% c("worst.case", "mean", "median"))
   # ==================================== #
@@ -157,7 +157,7 @@ calc_instances <- function(ncomparisons,               # number of comparisons
       N <- stats::power.t.test(delta = d, sd = 1,
                                sig.level = sig.level, power = power,
                                type = "paired",
-                               alternative = alternative)$n - 1
+                               alternative = alternative.side)$n - 1
 
       p.mean <- 0 # mean power
       while (p.mean < power){
@@ -168,7 +168,7 @@ calc_instances <- function(ncomparisons,               # number of comparisons
           ss <- stats::power.t.test(delta = d, sd = 1, n = N,
                                     sig.level = sig.level / (ncomparisons - i + 1),
                                     type = "paired",
-                                    alternative = alternative)
+                                    alternative = alternative.side)
           p[i] <- ss$power
           a[i] <- ss$sig.level
         }
@@ -183,7 +183,7 @@ calc_instances <- function(ncomparisons,               # number of comparisons
       N <- stats::power.t.test(delta = d, sd = 1,
                                sig.level = sig.level / (ncomparisons - r + 1),
                                power = power,
-                               type = "paired", alternative = alternative)$n
+                               type = "paired", alternative = alternative.side)$n
 
       # Calculate individual power of each comparison, + mean and median power
       p <- numeric(ncomparisons)
@@ -192,7 +192,7 @@ calc_instances <- function(ncomparisons,               # number of comparisons
         ss <- stats::power.t.test(delta = d, sd = 1, n = ceiling(N),
                                   sig.level = sig.level / (ncomparisons - i + 1),
                                   type = "paired",
-                                  alternative = alternative)
+                                  alternative = alternative.side)
         p[i] <- ss$power
         a[i] <- ss$sig.level
       }
@@ -211,7 +211,7 @@ calc_instances <- function(ncomparisons,               # number of comparisons
       ss <- stats::power.t.test(delta = d, sd = 1, n = ceiling(N / corr.factor),
                                 sig.level = sig.level / (ncomparisons - i + 1),
                                 type = "paired",
-                                alternative = alternative)
+                                alternative = alternative.side)
       p[i] <- ss$power
       a[i] <- ss$sig.level
     }
@@ -226,7 +226,7 @@ calc_instances <- function(ncomparisons,               # number of comparisons
                  median.power = p.median,
                  d            = d,
                  sig.level    = a,
-                 alternative  = alternative,
+                 alternative  = alternative.side,
                  test         = test,
                  power.target = power.target)
 

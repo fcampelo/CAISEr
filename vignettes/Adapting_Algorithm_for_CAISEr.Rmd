@@ -203,8 +203,11 @@ algorithms <- list(list(FUN   = "myalgo",
 With the definitions above it is possible now to run an experiment 
 using the iterative sample size determination implemented in CAISEr. For 
 that, all we have to do is define the desired experimental parameters and 
-use `run_experiment()`. **IMPORTANT NOTICE:** running this experiment takes a 
+use `run_experiment()`. 
+
+**IMPORTANT NOTICE:** running this experiment takes a 
 while (about 4 hours in a 3.6 GHz Intel Core i7 iMac with 16Gb RAM, using 7 cores). 
+If you want a (much) faster example, check the documentation of `run_experiment()`.
 
 ```{r, eval=FALSE}
 my.results <- run_experiment(instances  = instances,
@@ -292,9 +295,8 @@ Recall first that `smaller = better` for the quality indicator used in this expe
 We can also visualise the individual estimates (with their standard errors):
 
 ```{r, fig.align="center", fig.width=6, fig.height=8}
-mp <- ggplot(df, aes(x = Instance, y = Phi, colour = Comparison,
-                     ymin = Phi - SE, ymax = Phi + SE))
-mp + 
+ggplot(df, aes(x = Instance, y = Phi, colour = Comparison,
+                     ymin = Phi - SE, ymax = Phi + SE)) + 
   geom_pointrange(show.legend = FALSE) + 
   geom_abline(slope = 0, intercept = 0, col = 1, lty = 2) + 
   facet_grid(Comparison ~ .) + 
