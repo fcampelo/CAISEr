@@ -65,7 +65,7 @@ override the ones used in the call to run_experiment()." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">CAISEr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.5</span>
       </span>
     </div>
 
@@ -143,8 +143,8 @@ override the ones used in the call to <code><a href='run_experiment.html'>run_ex
     </tr>
     <tr>
       <th>alternative</th>
-      <td><p>type of alternative hypothesis to be performed
-("two.sided" or "one.sided")</p></td>
+      <td><p>type of alternative hypothesis ("two.sided" or
+"less" or "greater"). See <code><a href='calc_instances.html'>calc_instances()</a></code> for details.</p></td>
     </tr>
     <tr>
       <th>sig.level</th>
@@ -199,31 +199,31 @@ dedicated to each algorithm.</p>
 #&gt; Available number of instances: 100
 #&gt; Using 1 cores.
 #&gt; -----------------------------
-#&gt; Sampling algorithms on instance Inst.28 : ...
-#&gt; Sampling algorithms on instance Inst.80 : .
-#&gt; Sampling algorithms on instance Inst.22 : .
-#&gt; Sampling algorithms on instance Inst.9 : .
+#&gt; Sampling algorithms on instance Inst.28 : ..
+#&gt; Sampling algorithms on instance Inst.80 : ..
+#&gt; Sampling algorithms on instance Inst.22 : ..
+#&gt; Sampling algorithms on instance Inst.9 : ..
 #&gt; Sampling algorithms on instance Inst.5 : ..
 #&gt; Sampling algorithms on instance Inst.38 : ..
 #&gt; Sampling algorithms on instance Inst.16 : ..
-#&gt; Sampling algorithms on instance Inst.4 : .
+#&gt; Sampling algorithms on instance Inst.4 : ..
 #&gt; Sampling algorithms on instance Inst.86 : ..
-#&gt; Sampling algorithms on instance Inst.90 : ..
-#&gt; Sampling algorithms on instance Inst.70 : ..
-#&gt; Sampling algorithms on instance Inst.79 : ..
+#&gt; Sampling algorithms on instance Inst.90 : .
+#&gt; Sampling algorithms on instance Inst.70 : .
+#&gt; Sampling algorithms on instance Inst.79 : .
 #&gt; Sampling algorithms on instance Inst.78 : .
 #&gt; Sampling algorithms on instance Inst.14 : .
 #&gt; Sampling algorithms on instance Inst.56 : .
-#&gt; Sampling algorithms on instance Inst.62 : ..
-#&gt; Sampling algorithms on instance Inst.93 : ...</div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/summary'>summary</a></span>(<span class='no'>my.results</span>)</div><div class='output co'>#&gt; #====================================
+#&gt; Sampling algorithms on instance Inst.62 : .
+#&gt; Sampling algorithms on instance Inst.93 : .</div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/summary'>summary</a></span>(<span class='no'>my.results</span>)</div><div class='output co'>#&gt; #====================================
 #&gt;  CAISEr object:
 #&gt;  Number of instances sampled: 17
 #&gt;  Number of instances required: 17
 #&gt;  Adequate power: TRUE
 #&gt;  Total runs of algo1 : 340
-#&gt;  Total runs of algo2 : 342
-#&gt;  Total runs of algo3 : 485
-#&gt;  Total runs of algo4 : 615
+#&gt;  Total runs of algo2 : 367
+#&gt;  Total runs of algo3 : 462
+#&gt;  Total runs of algo4 : 593
 #&gt; #====================================
 #&gt;  Pairwise comparisons of interest:
 #&gt;  Test: t.test
@@ -235,55 +235,53 @@ dedicated to each algorithm.</p>
 #&gt; #====================================
 #&gt; Tests using Holm's step-down procedure:
 #&gt; 
-#&gt;  Test 1 : algo2 - algo3
+#&gt;  Test 1 : algo1 - algo2
 #&gt;  H0: mean = 0
 #&gt;  alpha		= 0.008333 
-#&gt;  p-value	= 2.184e-21
-#&gt;  Est. mean	= -1.153
-#&gt;  CI{1-alpha}	= [ -1.202 -1.103 ]
-#&gt;  d		= -17.11161
+#&gt;  p-value	= 3.719e-27
+#&gt;  Est. mean	= 0.3414
+#&gt;  CI{1-alpha}	= [ 0.3351 0.3477 ]
+#&gt;  d		= 39.29895
 #&gt; 
-#&gt;  Test 2 : algo1 - algo3
+#&gt;  Test 2 : algo2 - algo3
 #&gt;  H0: mean = 0
 #&gt;  alpha		= 0.01 
-#&gt;  p-value	= 1.456e-19
-#&gt;  Est. mean	= -0.8596
-#&gt;  CI{1-alpha}	= [ -0.9059 -0.8133 ]
-#&gt;  d		= -13.14756
+#&gt;  p-value	= 1.729e-25
+#&gt;  Est. mean	= -1.259
+#&gt;  CI{1-alpha}	= [ -1.287 -1.23 ]
+#&gt;  d		= -30.9096
 #&gt; 
-#&gt;  Test 3 : algo3 - algo4
+#&gt;  Test 3 : algo1 - algo3
 #&gt;  H0: mean = 0
 #&gt;  alpha		= 0.0125 
-#&gt;  p-value	= 8.321e-16
-#&gt;  Est. mean	= 0.8654
-#&gt;  CI{1-alpha}	= [ 0.7879 0.9429 ]
-#&gt;  d		= 7.618046
+#&gt;  p-value	= 9.208e-25
+#&gt;  Est. mean	= -0.9172
+#&gt;  CI{1-alpha}	= [ -0.9397 -0.8947 ]
+#&gt;  d		= -27.83839
 #&gt; 
-#&gt;  Test 4 : algo1 - algo2
+#&gt;  Test 4 : algo3 - algo4
 #&gt;  H0: mean = 0
 #&gt;  alpha		= 0.01667 
-#&gt;  p-value	= 9.216e-15
-#&gt;  Est. mean	= 0.293
-#&gt;  CI{1-alpha}	= [ 0.2639 0.322 ]
-#&gt;  d		= 6.537351
+#&gt;  p-value	= 3.015e-20
+#&gt;  Est. mean	= 0.9601
+#&gt;  CI{1-alpha}	= [ 0.9172 1.003 ]
+#&gt;  d		= 14.51389
 #&gt; 
 #&gt;  Test 5 : algo2 - algo4
 #&gt;  H0: mean = 0
 #&gt;  alpha		= 0.025 
-#&gt;  p-value	= 7.443e-10
-#&gt;  Est. mean	= -0.2872
-#&gt;  CI{1-alpha}	= [ -0.3424 -0.232 ]
-#&gt;  d		= -3.120645
-#&gt; 
-#&gt;  ----- Stop rejecting H0 at this point -----
+#&gt;  p-value	= 8.956e-19
+#&gt;  Est. mean	= -0.2985
+#&gt;  CI{1-alpha}	= [ -0.3137 -0.2832 ]
+#&gt;  d		= -11.72869
 #&gt; 
 #&gt;  Test 6 : algo1 - algo4
 #&gt;  H0: mean = 0
 #&gt;  alpha		= 0.05 
-#&gt;  p-value	= 0.7447
-#&gt;  Est. mean	= 0.005746
-#&gt;  CI{1-alpha}	= [ -0.03101 0.04251 ]
-#&gt;  d		= 0.08037328
+#&gt;  p-value	= 7.543e-05
+#&gt;  Est. mean	= 0.04291
+#&gt;  CI{1-alpha}	= [ 0.02567 0.06015 ]
+#&gt;  d		= 1.279462
 #&gt; #====================================</div><div class='input'>
 <span class='co'># You can override some defaults if you want:</span>
 <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/summary'>summary</a></span>(<span class='no'>my.results</span>, <span class='kw'>test</span> <span class='kw'>=</span> <span class='st'>"wilcoxon"</span>)</div><div class='output co'>#&gt; #====================================
@@ -292,9 +290,9 @@ dedicated to each algorithm.</p>
 #&gt;  Number of instances required: 17
 #&gt;  Adequate power: TRUE
 #&gt;  Total runs of algo1 : 340
-#&gt;  Total runs of algo2 : 342
-#&gt;  Total runs of algo3 : 485
-#&gt;  Total runs of algo4 : 615
+#&gt;  Total runs of algo2 : 367
+#&gt;  Total runs of algo3 : 462
+#&gt;  Total runs of algo4 : 593
 #&gt; #====================================
 #&gt;  Pairwise comparisons of interest:
 #&gt;  Test: wilcoxon
@@ -310,51 +308,49 @@ dedicated to each algorithm.</p>
 #&gt;  H0: median = 0
 #&gt;  alpha		= 0.008333 
 #&gt;  p-value	= 1.526e-05
-#&gt;  Est. median	= 0.2909
-#&gt;  CI{1-alpha}	= [ 0.2612 0.3291 ]
-#&gt;  d		= 6.537351
+#&gt;  Est. median	= 0.3409
+#&gt;  CI{1-alpha}	= [ 0.3337 0.348 ]
+#&gt;  d		= 39.29895
 #&gt; 
 #&gt;  Test 2 : algo1 - algo3
 #&gt;  H0: median = 0
 #&gt;  alpha		= 0.01 
 #&gt;  p-value	= 1.526e-05
-#&gt;  Est. median	= -0.8593
-#&gt;  CI{1-alpha}	= [ -0.9039 -0.8122 ]
-#&gt;  d		= -13.14756
+#&gt;  Est. median	= -0.9196
+#&gt;  CI{1-alpha}	= [ -0.9497 -0.8875 ]
+#&gt;  d		= -27.83839
 #&gt; 
-#&gt;  Test 3 : algo2 - algo3
+#&gt;  Test 3 : algo1 - algo4
 #&gt;  H0: median = 0
 #&gt;  alpha		= 0.0125 
 #&gt;  p-value	= 1.526e-05
-#&gt;  Est. median	= -1.16
-#&gt;  CI{1-alpha}	= [ -1.191 -1.104 ]
-#&gt;  d		= -17.11161
+#&gt;  Est. median	= 0.04423
+#&gt;  CI{1-alpha}	= [ 0.01293 0.0758 ]
+#&gt;  d		= 1.279462
 #&gt; 
-#&gt;  Test 4 : algo2 - algo4
+#&gt;  Test 4 : algo2 - algo3
 #&gt;  H0: median = 0
 #&gt;  alpha		= 0.01667 
 #&gt;  p-value	= 1.526e-05
-#&gt;  Est. median	= -0.2855
-#&gt;  CI{1-alpha}	= [ -0.3484 -0.2209 ]
-#&gt;  d		= -3.120645
+#&gt;  Est. median	= -1.261
+#&gt;  CI{1-alpha}	= [ -1.3 -1.221 ]
+#&gt;  d		= -30.9096
 #&gt; 
-#&gt;  Test 5 : algo3 - algo4
+#&gt;  Test 5 : algo2 - algo4
 #&gt;  H0: median = 0
 #&gt;  alpha		= 0.025 
 #&gt;  p-value	= 1.526e-05
-#&gt;  Est. median	= 0.8694
-#&gt;  CI{1-alpha}	= [ 0.7915 0.9407 ]
-#&gt;  d		= 7.618046
+#&gt;  Est. median	= -0.2973
+#&gt;  CI{1-alpha}	= [ -0.3207 -0.2732 ]
+#&gt;  d		= -11.72869
 #&gt; 
-#&gt;  ----- Stop rejecting H0 at this point -----
-#&gt; 
-#&gt;  Test 6 : algo1 - algo4
+#&gt;  Test 6 : algo3 - algo4
 #&gt;  H0: median = 0
 #&gt;  alpha		= 0.05 
-#&gt;  p-value	= 0.6777
-#&gt;  Est. median	= 0.00572
-#&gt;  CI{1-alpha}	= [ -0.03342 0.0452 ]
-#&gt;  d		= 0.08037328
+#&gt;  p-value	= 1.526e-05
+#&gt;  Est. median	= 0.9634
+#&gt;  CI{1-alpha}	= [ 0.9013 1.025 ]
+#&gt;  d		= 14.51389
 #&gt; #====================================</div><div class='input'>
 </div></pre>
   </div>

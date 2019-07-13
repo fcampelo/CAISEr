@@ -32,9 +32,8 @@
 
 <meta property="og:title" content="Calculates number of instances for the comparison of multiple algorithms — calc_instances" />
 
-<meta property="og:description" content="Calculates either the number of instances, the standardized effect sizes
-detectable at a given power setting, or the power(s) of the comparisons of
-multiple algorithms." />
+<meta property="og:description" content="Calculates either the number of instances, or the power(s) of the
+comparisons of multiple algorithms." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -65,7 +64,7 @@ multiple algorithms." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">CAISEr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.5</span>
       </span>
     </div>
 
@@ -118,14 +117,13 @@ multiple algorithms." />
 
     <div class="ref-description">
     
-    <p>Calculates either the number of instances, the standardized effect sizes
-detectable at a given power setting, or the power(s) of the comparisons of
-multiple algorithms.</p>
+    <p>Calculates either the number of instances, or the power(s) of the
+comparisons of multiple algorithms.</p>
     
     </div>
 
     <pre class="usage"><span class='fu'>calc_instances</span>(<span class='no'>ncomparisons</span>, <span class='no'>d</span>, <span class='kw'>ninstances</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>power</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>sig.level</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>alternative</span> <span class='kw'>=</span> <span class='st'>"two.sided"</span>, <span class='kw'>test</span> <span class='kw'>=</span> <span class='st'>"t.test"</span>,
+  <span class='kw'>sig.level</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>alternative.side</span> <span class='kw'>=</span> <span class='st'>"two.sided"</span>, <span class='kw'>test</span> <span class='kw'>=</span> <span class='st'>"t.test"</span>,
   <span class='kw'>power.target</span> <span class='kw'>=</span> <span class='st'>"mean"</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -154,7 +152,7 @@ effect size, i.e., "deviation from H0" / "standard deviation")</p></td>
 experiment</p></td>
     </tr>
     <tr>
-      <th>alternative</th>
+      <th>alternative.side</th>
       <td><p>type of alternative hypothesis to be performed
 ("two.sided" or "one.sided")</p></td>
     </tr>
@@ -178,7 +176,7 @@ is equivalent to the Bonferroni correction).</p></td>
 <li><p><code>power</code> - the power of the comparison</p></li>
 <li><p><code>d</code> - the effect size</p></li>
 <li><p><code>sig.level</code> - significance level</p></li>
-<li><p><code>alternative</code> - type of alternative hypothesis</p></li>
+<li><p><code>alternative.side</code> - type of alternative hypothesis</p></li>
 <li><p><code>test</code> - type of test</p></li>
 </ul>
 

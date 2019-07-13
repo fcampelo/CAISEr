@@ -64,7 +64,7 @@ run_experiment())." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">CAISEr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.5</span>
       </span>
     </div>
 
@@ -123,7 +123,7 @@ run_experiment())." />
     </div>
 
     <pre class="usage"><span class='co'># S3 method for CAISEr</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>x</span>, <span class='no'>...</span>, <span class='kw'>echo</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>6</span>, <span class='kw'>right</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>x</span>, <span class='no'>...</span>, <span class='kw'>echo</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>right</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>breakrows</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -162,8 +162,7 @@ placing the bottom half to the right of the top half.</p></td>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>data frame object of class <code>xtable</code> containint a LaTeX-formatted
-summary</p>
+    <p>data frame object containing the summary table (invisibly)</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -200,127 +199,127 @@ summary</p>
 #&gt; Available number of instances: 100
 #&gt; Using 1 cores.
 #&gt; -----------------------------
-#&gt; Sampling algorithms on instance Inst.28 : ...
+#&gt; Sampling algorithms on instance Inst.28 : .
 #&gt; Sampling algorithms on instance Inst.80 : .
 #&gt; Sampling algorithms on instance Inst.22 : .
 #&gt; Sampling algorithms on instance Inst.9 : .
-#&gt; Sampling algorithms on instance Inst.5 : ...
+#&gt; Sampling algorithms on instance Inst.5 : .
 #&gt; Sampling algorithms on instance Inst.38 : .
-#&gt; Sampling algorithms on instance Inst.16 : ..
+#&gt; Sampling algorithms on instance Inst.16 : .
 #&gt; Sampling algorithms on instance Inst.4 : .
-#&gt; Sampling algorithms on instance Inst.86 : ..
-#&gt; Sampling algorithms on instance Inst.90 : ...
-#&gt; Sampling algorithms on instance Inst.70 : ..
-#&gt; Sampling algorithms on instance Inst.79 : ...
+#&gt; Sampling algorithms on instance Inst.86 : .
+#&gt; Sampling algorithms on instance Inst.90 : .
+#&gt; Sampling algorithms on instance Inst.70 : .
+#&gt; Sampling algorithms on instance Inst.79 : .
 #&gt; Sampling algorithms on instance Inst.78 : .
 #&gt; Sampling algorithms on instance Inst.14 : .
-#&gt; Sampling algorithms on instance Inst.56 : .
+#&gt; Sampling algorithms on instance Inst.56 : ..
 #&gt; Sampling algorithms on instance Inst.62 : ..
-#&gt; Sampling algorithms on instance Inst.93 : ...</div><div class='input'><span class='no'>my.results</span></div><div class='output co'>#&gt; #====================================
+#&gt; Sampling algorithms on instance Inst.93 : ..</div><div class='input'><span class='no'>my.results</span></div><div class='output co'>#&gt; #====================================
 #&gt;  Summary table of CAISEr object
-#&gt;  Instance  Alg1  Alg2 N1 N2         Phi        SE
-#&gt;   Inst.28 algo1 algo2 20 20  0.30135611 0.0513877
-#&gt;   Inst.28 algo1 algo3 20 41 -0.89607296 0.0743116
-#&gt;   Inst.28 algo1 algo4 20 40  0.03763992 0.0696286
-#&gt;   Inst.28 algo2 algo3 20 41 -1.19742908 0.0895029
-#&gt;   Inst.28 algo2 algo4 20 40 -0.26371619 0.0831964
-#&gt;   Inst.28 algo3 algo4 41 40  0.93371288 0.0993461
-#&gt;   Inst.80 algo1 algo2 20 20  0.22022455 0.0672364
-#&gt;   Inst.80 algo1 algo3 20 22 -0.82231502 0.0678596
-#&gt;   Inst.80 algo1 algo4 20 34 -0.00473195 0.0772926
-#&gt;   Inst.80 algo2 algo3 20 22 -1.04253957 0.0929724
-#&gt;   Inst.80 algo2 algo4 20 34 -0.22495650 0.0985140
-#&gt;   Inst.80 algo3 algo4 22 34  0.81758307 0.0988977
-#&gt;   Inst.22 algo1 algo2 20 20  0.37184808 0.0563262
-#&gt;   Inst.22 algo1 algo3 20 28 -0.71688951 0.0776416
-#&gt;   Inst.22 algo1 algo4 20 29 -0.07926681 0.0769530
-#&gt;   Inst.22 algo2 algo3 20 28 -1.08873759 0.0870713
-#&gt;   Inst.22 algo2 algo4 20 29 -0.45111489 0.0842763
-#&gt;   Inst.22 algo3 algo4 28 29  0.63762270 0.0991086
-#&gt;    Inst.9 algo1 algo2 20 20  0.29457130 0.0640940
-#&gt;    Inst.9 algo1 algo3 20 23 -0.81286230 0.0693580
-#&gt;    Inst.9 algo1 algo4 20 36  0.00840838 0.0818620
-#&gt;    Inst.9 algo2 algo3 20 23 -1.10743361 0.0879882
-#&gt;    Inst.9 algo2 algo4 20 36 -0.28616292 0.0960579
-#&gt;    Inst.9 algo3 algo4 23 36  0.82127068 0.0997257
-#&gt;    Inst.5 algo1 algo2 20 20  0.26278505 0.0606019
-#&gt;    Inst.5 algo1 algo3 20 37 -0.76630171 0.0732465
-#&gt;    Inst.5 algo1 algo4 20 44 -0.06564464 0.0770274
-#&gt;    Inst.5 algo2 algo3 20 37 -1.02908677 0.0898620
-#&gt;    Inst.5 algo2 algo4 20 44 -0.32842969 0.0913293
-#&gt;    Inst.5 algo3 algo4 37 44  0.70065707 0.0996121
-#&gt;   Inst.38 algo1 algo2 20 20  0.29963863 0.0589293
-#&gt;   Inst.38 algo1 algo3 20 23 -0.85759646 0.0677700
-#&gt;   Inst.38 algo1 algo4 20 31  0.06248101 0.0758253
-#&gt;   Inst.38 algo2 algo3 20 23 -1.15723509 0.0882698
-#&gt;   Inst.38 algo2 algo4 20 31 -0.23715762 0.0922917
-#&gt;   Inst.38 algo3 algo4 23 31  0.92007747 0.0987461
-#&gt;   Inst.16 algo1 algo2 20 20  0.25586059 0.0460065
-#&gt;   Inst.16 algo1 algo3 20 29 -0.86412110 0.0709336
-#&gt;   Inst.16 algo1 algo4 20 40 -0.07522312 0.0763743
-#&gt;   Inst.16 algo2 algo3 20 29 -1.11998169 0.0805888
-#&gt;   Inst.16 algo2 algo4 20 40 -0.33108371 0.0837119
-#&gt;   Inst.16 algo3 algo4 29 40  0.78889798 0.0990067
-#&gt;    Inst.4 algo1 algo2 20 20  0.24332668 0.0534080
-#&gt;    Inst.4 algo1 algo3 20 22 -1.00835358 0.0758112
-#&gt;    Inst.4 algo1 algo4 20 22 -0.03291983 0.0722940
-#&gt;    Inst.4 algo2 algo3 20 22 -1.25168026 0.0888005
-#&gt;    Inst.4 algo2 algo4 20 22 -0.27624650 0.0837276
-#&gt;    Inst.4 algo3 algo4 22 22  0.97543376 0.0992156
-#&gt;   Inst.86 algo1 algo2 20 24  0.36201209 0.0673946
-#&gt;   Inst.86 algo1 algo3 20 24 -0.82259606 0.0682737
-#&gt;   Inst.86 algo1 algo4 20 38 -0.03802671 0.0767129
-#&gt;   Inst.86 algo2 algo3 24 24 -1.18460815 0.0949341
-#&gt;   Inst.86 algo2 algo4 24 38 -0.40003880 0.0987413
-#&gt;   Inst.86 algo3 algo4 24 38  0.78456935 0.0989546
-#&gt;   Inst.90 algo1 algo2 20 20  0.27542936 0.0519020
-#&gt;   Inst.90 algo1 algo3 20 34 -0.85969748 0.0735961
-#&gt;   Inst.90 algo1 algo4 20 47  0.09491224 0.0782572
-#&gt;   Inst.90 algo2 algo3 20 34 -1.13512683 0.0813135
-#&gt;   Inst.90 algo2 algo4 20 47 -0.18051712 0.0832617
-#&gt;   Inst.90 algo3 algo4 34 47  0.95460971 0.0990643
-#&gt;   Inst.70 algo1 algo2 20 20  0.29911612 0.0646918
-#&gt;   Inst.70 algo1 algo3 20 33 -0.92619261 0.0797443
-#&gt;   Inst.70 algo1 algo4 20 34 -0.00138446 0.0741139
-#&gt;   Inst.70 algo2 algo3 20 33 -1.22530873 0.0956667
-#&gt;   Inst.70 algo2 algo4 20 34 -0.30050058 0.0884471
-#&gt;   Inst.70 algo3 algo4 33 34  0.92480815 0.0999709
-#&gt;   Inst.79 algo1 algo2 20 20  0.30208626 0.0415983
-#&gt;   Inst.79 algo1 algo3 20 37 -0.82892240 0.0716237
-#&gt;   Inst.79 algo1 algo4 20 45  0.06696660 0.0751496
-#&gt;   Inst.79 algo2 algo3 20 37 -1.13100865 0.0784963
-#&gt;   Inst.79 algo2 algo4 20 45 -0.23511965 0.0794315
-#&gt;   Inst.79 algo3 algo4 37 45  0.89588900 0.0990575
-#&gt;   Inst.78 algo1 algo2 20 20  0.36118165 0.0521165
-#&gt;   Inst.78 algo1 algo3 20 20 -0.82586338 0.0612370
-#&gt;   Inst.78 algo1 algo4 20 21 -0.05051365 0.0864034
-#&gt;   Inst.78 algo2 algo3 20 20 -1.18704503 0.0749130
-#&gt;   Inst.78 algo2 algo4 20 21 -0.41169530 0.0943762
-#&gt;   Inst.78 algo3 algo4 20 21  0.77534973 0.0992504
-#&gt;   Inst.14 algo1 algo2 20 20  0.32700900 0.0595986
-#&gt;   Inst.14 algo1 algo3 20 21 -0.96836082 0.0721332
-#&gt;   Inst.14 algo1 algo4 20 27  0.02831483 0.0750828
-#&gt;   Inst.14 algo2 algo3 20 21 -1.29536982 0.0899163
-#&gt;   Inst.14 algo2 algo4 20 27 -0.29869417 0.0895164
-#&gt;   Inst.14 algo3 algo4 21 27  0.99667565 0.0985968
-#&gt;   Inst.56 algo1 algo2 20 20  0.21832737 0.0560057
-#&gt;   Inst.56 algo1 algo3 20 25 -0.92284743 0.0721440
-#&gt;   Inst.56 algo1 algo4 20 32  0.04784007 0.0749301
-#&gt;   Inst.56 algo2 algo3 20 25 -1.14117480 0.0867267
-#&gt;   Inst.56 algo2 algo4 20 32 -0.17048730 0.0872327
-#&gt;   Inst.56 algo3 algo4 25 32  0.97068750 0.0987955
-#&gt;   Inst.62 algo1 algo2 20 20  0.24211158 0.0490293
-#&gt;   Inst.62 algo1 algo3 20 28 -0.81855401 0.0683251
-#&gt;   Inst.62 algo1 algo4 20 45 -0.04459220 0.0786032
-#&gt;   Inst.62 algo2 algo3 20 28 -1.06066559 0.0792886
-#&gt;   Inst.62 algo2 algo4 20 45 -0.28670378 0.0867414
-#&gt;   Inst.62 algo3 algo4 28 45  0.77396181 0.0985884
-#&gt;   Inst.93 algo1 algo2 20 20  0.34233999 0.0671274
-#&gt;   Inst.93 algo1 algo3 20 35 -0.84457216 0.0725656
-#&gt;   Inst.93 algo1 algo4 20 51  0.01479201 0.0782264
-#&gt;   Inst.93 algo2 algo3 20 35 -1.18691214 0.0937123
-#&gt;   Inst.93 algo2 algo4 20 51 -0.32754797 0.0955614
-#&gt;   Inst.93 algo3 algo4 35 51  0.85936417 0.0996077
+#&gt;  Instance  Alg1  Alg2 N1 N2       Phi      SE
+#&gt;   Inst.28 algo1 algo2 20 20  0.354985 0.05746
+#&gt;   Inst.28 algo1 algo3 20 20 -0.826208 0.06539
+#&gt;   Inst.28 algo1 algo4 20 28 -0.144601 0.08383
+#&gt;   Inst.28 algo2 algo3 20 20 -1.181193 0.08191
+#&gt;   Inst.28 algo2 algo4 20 28 -0.499586 0.09528
+#&gt;   Inst.28 algo3 algo4 20 28  0.681608 0.09891
+#&gt;   Inst.80 algo1 algo2 20 20  0.346156 0.05920
+#&gt;   Inst.80 algo1 algo3 20 20 -0.828572 0.06667
+#&gt;   Inst.80 algo1 algo4 20 28 -0.152366 0.08384
+#&gt;   Inst.80 algo2 algo3 20 20 -1.174727 0.08313
+#&gt;   Inst.80 algo2 algo4 20 28 -0.498522 0.09550
+#&gt;   Inst.80 algo3 algo4 20 28  0.676205 0.09887
+#&gt;   Inst.22 algo1 algo2 20 20  0.351935 0.05799
+#&gt;   Inst.22 algo1 algo3 20 20 -0.827025 0.06578
+#&gt;   Inst.22 algo1 algo4 20 28 -0.147283 0.08379
+#&gt;   Inst.22 algo2 algo3 20 20 -1.178960 0.08227
+#&gt;   Inst.22 algo2 algo4 20 28 -0.499218 0.09530
+#&gt;   Inst.22 algo3 algo4 20 28  0.679742 0.09885
+#&gt;    Inst.9 algo1 algo2 20 20  0.354313 0.05757
+#&gt;    Inst.9 algo1 algo3 20 20 -0.826388 0.06547
+#&gt;    Inst.9 algo1 algo4 20 28 -0.145192 0.08381
+#&gt;    Inst.9 algo2 algo3 20 20 -1.180701 0.08198
+#&gt;    Inst.9 algo2 algo4 20 28 -0.499505 0.09528
+#&gt;    Inst.9 algo3 algo4 20 28  0.681196 0.09889
+#&gt;    Inst.5 algo1 algo2 20 20  0.351413 0.05809
+#&gt;    Inst.5 algo1 algo3 20 20 -0.827165 0.06585
+#&gt;    Inst.5 algo1 algo4 20 28 -0.147743 0.08379
+#&gt;    Inst.5 algo2 algo3 20 20 -1.178577 0.08233
+#&gt;    Inst.5 algo2 algo4 20 28 -0.499155 0.09531
+#&gt;    Inst.5 algo3 algo4 20 28  0.679422 0.09884
+#&gt;   Inst.38 algo1 algo2 20 20  0.352014 0.05798
+#&gt;   Inst.38 algo1 algo3 20 20 -0.827003 0.06577
+#&gt;   Inst.38 algo1 algo4 20 28 -0.147214 0.08379
+#&gt;   Inst.38 algo2 algo3 20 20 -1.179018 0.08226
+#&gt;   Inst.38 algo2 algo4 20 28 -0.499228 0.09530
+#&gt;   Inst.38 algo3 algo4 20 28  0.679790 0.09885
+#&gt;   Inst.16 algo1 algo2 20 20  0.354849 0.05748
+#&gt;   Inst.16 algo1 algo3 20 20 -0.826245 0.06540
+#&gt;   Inst.16 algo1 algo4 20 28 -0.144721 0.08382
+#&gt;   Inst.16 algo2 algo3 20 20 -1.181094 0.08192
+#&gt;   Inst.16 algo2 algo4 20 28 -0.499569 0.09528
+#&gt;   Inst.16 algo3 algo4 20 28  0.681524 0.09890
+#&gt;    Inst.4 algo1 algo2 20 20  0.355726 0.05734
+#&gt;    Inst.4 algo1 algo3 20 20 -0.826010 0.06530
+#&gt;    Inst.4 algo1 algo4 20 28 -0.143949 0.08384
+#&gt;    Inst.4 algo2 algo3 20 20 -1.181736 0.08183
+#&gt;    Inst.4 algo2 algo4 20 28 -0.499675 0.09528
+#&gt;    Inst.4 algo3 algo4 20 28  0.682061 0.09893
+#&gt;   Inst.86 algo1 algo2 20 20  0.349479 0.05847
+#&gt;   Inst.86 algo1 algo3 20 20 -0.827682 0.06613
+#&gt;   Inst.86 algo1 algo4 20 28 -0.149443 0.08379
+#&gt;   Inst.86 algo2 algo3 20 20 -1.177161 0.08261
+#&gt;   Inst.86 algo2 algo4 20 28 -0.498922 0.09536
+#&gt;   Inst.86 algo3 algo4 20 28  0.678239 0.09884
+#&gt;   Inst.90 algo1 algo2 20 20  0.350734 0.05822
+#&gt;   Inst.90 algo1 algo3 20 20 -0.827346 0.06595
+#&gt;   Inst.90 algo1 algo4 20 28 -0.148339 0.08379
+#&gt;   Inst.90 algo2 algo3 20 20 -1.178080 0.08243
+#&gt;   Inst.90 algo2 algo4 20 28 -0.499074 0.09533
+#&gt;   Inst.90 algo3 algo4 20 28  0.679007 0.09884
+#&gt;   Inst.70 algo1 algo2 20 20  0.353934 0.05764
+#&gt;   Inst.70 algo1 algo3 20 20 -0.826489 0.06552
+#&gt;   Inst.70 algo1 algo4 20 28 -0.145525 0.08381
+#&gt;   Inst.70 algo2 algo3 20 20 -1.180424 0.08202
+#&gt;   Inst.70 algo2 algo4 20 28 -0.499459 0.09528
+#&gt;   Inst.70 algo3 algo4 20 28  0.680965 0.09888
+#&gt;   Inst.79 algo1 algo2 20 20  0.346713 0.05907
+#&gt;   Inst.79 algo1 algo3 20 20 -0.828423 0.06657
+#&gt;   Inst.79 algo1 algo4 20 28 -0.151876 0.08383
+#&gt;   Inst.79 algo2 algo3 20 20 -1.175135 0.08304
+#&gt;   Inst.79 algo2 algo4 20 28 -0.498589 0.09548
+#&gt;   Inst.79 algo3 algo4 20 28  0.676546 0.09886
+#&gt;   Inst.78 algo1 algo2 20 20  0.351067 0.05816
+#&gt;   Inst.78 algo1 algo3 20 20 -0.827257 0.06590
+#&gt;   Inst.78 algo1 algo4 20 28 -0.148047 0.08379
+#&gt;   Inst.78 algo2 algo3 20 20 -1.178324 0.08238
+#&gt;   Inst.78 algo2 algo4 20 28 -0.499114 0.09532
+#&gt;   Inst.78 algo3 algo4 20 28  0.679210 0.09884
+#&gt;   Inst.14 algo1 algo2 20 20  0.353991 0.05763
+#&gt;   Inst.14 algo1 algo3 20 20 -0.826474 0.06551
+#&gt;   Inst.14 algo1 algo4 20 28 -0.145475 0.08381
+#&gt;   Inst.14 algo2 algo3 20 20 -1.180465 0.08202
+#&gt;   Inst.14 algo2 algo4 20 28 -0.499466 0.09528
+#&gt;   Inst.14 algo3 algo4 20 28  0.680999 0.09888
+#&gt;   Inst.56 algo1 algo2 20 20  0.299893 0.05018
+#&gt;   Inst.56 algo1 algo3 20 24 -0.907481 0.07244
+#&gt;   Inst.56 algo1 algo4 20 39 -0.007720 0.08111
+#&gt;   Inst.56 algo2 algo3 20 24 -1.207374 0.07947
+#&gt;   Inst.56 algo2 algo4 20 39 -0.307613 0.08513
+#&gt;   Inst.56 algo3 algo4 24 39  0.899761 0.09981
+#&gt;   Inst.62 algo1 algo2 20 20  0.299463 0.05027
+#&gt;   Inst.62 algo1 algo3 20 25 -0.888366 0.07207
+#&gt;   Inst.62 algo1 algo4 20 38 -0.026465 0.08155
+#&gt;   Inst.62 algo2 algo3 20 25 -1.187828 0.07938
+#&gt;   Inst.62 algo2 algo4 20 38 -0.325928 0.08586
+#&gt;   Inst.62 algo3 algo4 25 38  0.861901 0.09996
+#&gt;   Inst.93 algo1 algo2 20 20  0.300734 0.05018
+#&gt;   Inst.93 algo1 algo3 20 24 -0.907181 0.07267
+#&gt;   Inst.93 algo1 algo4 20 39 -0.005546 0.08136
+#&gt;   Inst.93 algo2 algo3 20 24 -1.207916 0.07935
+#&gt;   Inst.93 algo2 algo4 20 39 -0.306281 0.08505
+#&gt;   Inst.93 algo3 algo4 24 39  0.901635 0.09994
 #&gt; 
 #&gt; #====================================</div><div class='input'>
 

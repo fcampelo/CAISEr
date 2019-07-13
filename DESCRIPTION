@@ -3,11 +3,15 @@ Type: Package
 Title: Comparison of Algorithms with Iterative Sample Size Estimation
 Version: 1.0.5
 Date: 2019-07-12
-Authors@R: as.person(c(
-    "Felipe Campelo <fcampelo@ufmg.br> [aut, cre]", 
-    "Fernanda Takahashi <fernandact@ufmg.br> [ctb]",
-    "Elizabeth Wanner <e.wanner@aston.ac.uk> [ctb]"))
-Maintainer: Felipe Campelo <f.campelo@aston.ac.uk>
+Authors@R: c(person(given = "Felipe", family = "Campelo",
+                    email = c("fcampelo@ufmg.br", "f.campelo@aston.ac.uk"),
+                    role = c("aut", "cre")),
+             person(given = "Fernanda", family = "Takahashi",
+                    email = "fernandact@ufmg.br",
+                    role = "ctb"),
+             person(given = "Elizabeth", family = "Wanner",
+                    email = "e.wanner@aston.ac.uk",
+                    role = "ctb"))
 Description: Functions for performing experimental comparisons of algorithms 
              using adequate sample sizes for power and accuracy.
 License: GPL-2

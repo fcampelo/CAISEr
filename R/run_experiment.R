@@ -61,7 +61,7 @@
 #' The `algorithm$FUN` routine must return a list containing (at
 #' least) the performance value of the final solution obtained, in a field named
 #' `value` (e.g., `result$value`) after a given run. In general it is easier to
-#' write a small wrapper funciton around existing implementations.
+#' write a small wrapper function around existing implementations.
 #'
 #' @section Initial Number of Observations:
 #' In the _general case_ the initial number of observations / algorithm /

@@ -30,7 +30,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">CAISEr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.5</span>
       </span>
     </div>
 
@@ -76,7 +76,7 @@
       <h1>Adapting Algorithms for CAISEr</h1>
                         <h4 class="author">Felipe Campelo</h4>
             
-            <h4 class="date">2019-07-07</h4>
+            <h4 class="date">2019-07-13</h4>
       
       
       <div class="hidden name"><code>Adapting_Algorithm_for_CAISEr.Rmd</code></div>
@@ -218,7 +218,8 @@ algorithms &lt;-<span class="st"> </span><span class="kw"><a href="https://www.r
 <div id="running-an-experiment-using-caiser" class="section level2">
 <h2 class="hasAnchor">
 <a href="#running-an-experiment-using-caiser" class="anchor"></a>Running an experiment using CAISEr</h2>
-<p>With the definitions above it is possible now to run an experiment using the iterative sample size determination implemented in CAISEr. For that, all we have to do is define the desired experimental parameters and use <code><a href="../reference/run_experiment.html">run_experiment()</a></code>. <strong>IMPORTANT NOTICE:</strong> running this experiment takes a while (about 4 hours in a 3.6 GHz Intel Core i7 iMac with 16Gb RAM, using 7 cores).</p>
+<p>With the definitions above it is possible now to run an experiment using the iterative sample size determination implemented in CAISEr. For that, all we have to do is define the desired experimental parameters and use <code><a href="../reference/run_experiment.html">run_experiment()</a></code>.</p>
+<p><strong>IMPORTANT NOTICE:</strong> running this experiment takes a while (about 4 hours in a 3.6 GHz Intel Core i7 iMac with 16Gb RAM, using 7 cores). If you want a (much) faster example, check the documentation of <code><a href="../reference/run_experiment.html">run_experiment()</a></code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my.results &lt;-<span class="st"> </span><span class="kw"><a href="../reference/run_experiment.html">run_experiment</a></span>(<span class="dt">instances  =</span> instances,
                              <span class="dt">algorithms =</span> algorithms,
                              <span class="dt">power =</span> <span class="fl">0.8</span>,      <span class="co"># Desired power: 80%</span>
@@ -282,9 +283,8 @@ mp <span class="op">+</span><span class="st"> </span>
 <p><img src="Adapting_Algorithm_for_CAISEr_files/figure-html/unnamed-chunk-8-1.png" width="576" style="display: block; margin: auto;"></p>
 <p>Recall first that <code>smaller = better</code> for the quality indicator used in this experiment. Looking at the plot above shows that the differences between all pairs of algorithms were quite high - e.g., differences of up to 200% in the case of the <code>Original 2</code> versus both MOEA/D-DE versions. In general both <code>MOEA/D-DE</code> versions seem to generate better (lower) IGD values than the <code>Original</code> versions, and <code>MOEA/D-DE</code> seems generally better than <code>MOEA/D-DE2</code> (first comparison to the left. Also, the variability seem to be reasonably high for all comparisons.</p>
 <p>We can also visualise the individual estimates (with their standard errors):</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mp &lt;-<span class="st"> </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(df, <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> Instance, <span class="dt">y =</span> Phi, <span class="dt">colour =</span> Comparison,
-                     <span class="dt">ymin =</span> Phi <span class="op">-</span><span class="st"> </span>SE, <span class="dt">ymax =</span> Phi <span class="op">+</span><span class="st"> </span>SE))
-mp <span class="op">+</span><span class="st"> </span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(df, <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> Instance, <span class="dt">y =</span> Phi, <span class="dt">colour =</span> Comparison,
+                     <span class="dt">ymin =</span> Phi <span class="op">-</span><span class="st"> </span>SE, <span class="dt">ymax =</span> Phi <span class="op">+</span><span class="st"> </span>SE)) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_linerange.html">geom_pointrange</a></span>(<span class="dt">show.legend =</span> <span class="ot">FALSE</span>) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_abline</a></span>(<span class="dt">slope =</span> <span class="dv">0</span>, <span class="dt">intercept =</span> <span class="dv">0</span>, <span class="dt">col =</span> <span class="dv">1</span>, <span class="dt">lty =</span> <span class="dv">2</span>) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html">facet_grid</a></span>(Comparison <span class="op">~</span><span class="st"> </span>.) <span class="op">+</span><span class="st"> </span>
