@@ -15,6 +15,7 @@ corresponding power to detect the effect size `d`, for each comparison using
 Holm's method.
 * Removed class `CAISER_powercurve` and all associated methods (print, summary, 
 plot) as these were (very) rarely used.
+* Added class `nreps` with new summary/plotting functions.
 * Updated `print` and `summary` methods.
 * The package now supports saving and (re)loading partially executed experiments.
  
