@@ -397,7 +397,7 @@ run_experiment <- function(instances, algorithms, d, se.max,
                  Underpowered      = (N.star > n.available),
                  samplesize.calc   = ss.calc)
 
-  class(output) <- c("CAISEr", "list")
+  class(output) <- c("CAISEr", "nreps", "list")
 
   # Save output (if required)
   assertthat::assert_that(is.na(save.final.result) ||
