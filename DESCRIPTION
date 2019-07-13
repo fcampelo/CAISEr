@@ -15,14 +15,13 @@ Depends: R (>= 3.6.0)
 Imports: assertthat (>= 0.2.1),
          parallel (>= 3.5.1),
          pbmcapply (>= 1.4.1),
-         xtable (>= 1.8-4)
+         ggplot2 (>= 3.1.1)
 Suggests: MOEADr,
           smoof,
           knitr,
           rmarkdown,
           car,
           dplyr,
-          ggplot2,
           pkgdown
 LazyData: TRUE
 Encoding: UTF-8

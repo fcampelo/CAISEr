@@ -192,7 +192,7 @@ myreps <- calc_nreps(instance   = instance,
                       force.balanced = FALSE,     # force balanced sampling?
                       load.folder   = NA,         # file to load results from
                       save.folder = NA)         # folder to save results
-myreps$Diffk
+summary(myreps)
 }
 \references{
 \itemize{

@@ -182,7 +182,7 @@
 #'                       force.balanced = FALSE,     # force balanced sampling?
 #'                       load.folder   = NA,         # file to load results from
 #'                       save.folder = NA)         # folder to save results
-#' myreps$Diffk
+#' summary(myreps)
 
 calc_nreps <- function(instance,            # instance parameters
                        algorithms,          # algorithm parameters
@@ -353,6 +353,7 @@ calc_nreps <- function(instance,            # instance parameters
                     method      = method,
                     comparisons = comparisons,
                     seed        = seed)
+  class(output) <- c("nreps", "list")
 
   # Save to file if required
   if (!is.na(save.folder)){

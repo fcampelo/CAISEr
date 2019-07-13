@@ -4,7 +4,7 @@
 \alias{print.CAISEr}
 \title{print.CAISEr}
 \usage{
-\method{print}{CAISEr}(x, ..., echo = TRUE, digits = 6, right = TRUE,
+\method{print}{CAISEr}(x, ..., echo = TRUE, digits = 4, right = TRUE,
   breakrows = FALSE)
 }
 \arguments{
@@ -26,8 +26,7 @@ right-aligned.}
 placing the bottom half to the right of the top half.}
 }
 \value{
-data frame object of class \code{xtable} containint a LaTeX-formatted
-summary
+data frame object containing the summary table (invisibly)
 }
 \description{
 S3 method for printing \emph{CAISEr} objects (the output of

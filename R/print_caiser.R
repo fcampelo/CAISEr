@@ -47,15 +47,14 @@
 #' my.results
 #'
 #'
-#' @return data frame object of class `xtable` containint a LaTeX-formatted
-#' summary
+#' @return data frame object containing the summary table (invisibly)
 #'
 #' @method print CAISEr
 #' @export
 #'
 print.CAISEr <- function(x, ...,
                          echo = TRUE,
-                         digits = 6,
+                         digits = 4,
                          right = TRUE,
                          breakrows = FALSE)
 {
@@ -89,5 +88,5 @@ print.CAISEr <- function(x, ...,
     cat("\n#====================================")
   }
 
-  invisible(xtable::xtable(my.table))
+  invisible(my.table)
 }
