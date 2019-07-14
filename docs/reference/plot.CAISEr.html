@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Run an algorithm on a problem. — get_observations • CAISEr</title>
+<title>plot.CAISEr — plot.CAISEr • CAISEr</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,9 +30,9 @@
 
 
 
-<meta property="og:title" content="Run an algorithm on a problem. — get_observations" />
+<meta property="og:title" content="plot.CAISEr — plot.CAISEr" />
 
-<meta property="og:description" content="Call algorithm routine for the solution of a problem instance" />
+<meta property="og:description" content="S3 method for plotting CAISEr objects output by run_experiment())." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -109,58 +109,57 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Run an algorithm on a problem.</h1>
+    <h1>plot.CAISEr</h1>
     
-    <div class="hidden name"><code>get_observations.Rd</code></div>
+    <div class="hidden name"><code>plot.CAISEr.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Call algorithm routine for the solution of a problem instance</p>
+    <p>S3 method for plotting <em>CAISEr</em> objects output by <code><a href='run_experiment.html'>run_experiment()</a></code>).</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>get_observations</span>(<span class='no'>algo</span>, <span class='no'>instance</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>1</span>)</pre>
+    <pre class="usage"><span class='co'># S3 method for CAISEr</span>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></span>(<span class='no'>x</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>, <span class='kw'>latex</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>reorder</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>show.text</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>algo</th>
-      <td><p>a list object containing the definitions of the algorithm.
-See <code><a href='calc_nreps.html'>calc_nreps()</a></code> for details.</p></td>
+      <th>x</th>
+      <td><p>list object of class <em>CAISEr</em>.</p></td>
     </tr>
     <tr>
-      <th>instance</th>
-      <td><p>a list object containing the definitions of the problem
-instance. See <code><a href='calc_nreps.html'>calc_nreps()</a></code> for details.</p></td>
+      <th>y</th>
+      <td><p>unused. Included for consistency with generic <code>plot</code> method.</p></td>
     </tr>
     <tr>
-      <th>n</th>
-      <td><p>number of observations to generate.</p></td>
+      <th>...</th>
+      <td><p>other parameters to be passed down to specific
+plotting functions (currently unused)</p></td>
+    </tr>
+    <tr>
+      <th>latex</th>
+      <td><p>logical: should labels be formatted for LaTeX? (useful for
+later saving using library <code>TikzDevice</code>)</p></td>
+    </tr>
+    <tr>
+      <th>reorder</th>
+      <td><p>logical: should the comparisons be reordered alphabetically?</p></td>
+    </tr>
+    <tr>
+      <th>show.text</th>
+      <td><p>logical: should text be plotted?</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>vector of observed performance values</p>
-    
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p><code><a href='calc_nreps.html'>calc_nreps()</a></code></p></div>
+    <p><code>ggplot</code> object (invisibly)</p>
     
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># Make a dummy instance with a centered (zero-mean) exponential distribution:</span>
-<span class='no'>instance</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>FUN</span> <span class='kw'>=</span> <span class='st'>"dummyinstance"</span>, <span class='kw'>distr</span> <span class='kw'>=</span> <span class='st'>"rexp"</span>, <span class='kw'>rate</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>bias</span> <span class='kw'>=</span> -<span class='fl'>1</span>/<span class='fl'>5</span>)
-
-<span class='co'># Simulate a dummy algorithm that has a uniform distribution of expected</span>
-<span class='co'># performance values, between -25 and 50.</span>
-<span class='no'>algorithm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>FUN</span> <span class='kw'>=</span> <span class='st'>"dummyalgo"</span>,
-                 <span class='kw'>distribution.fun</span> <span class='kw'>=</span> <span class='st'>"runif"</span>,
-                 <span class='kw'>distribution.pars</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>min</span> <span class='kw'>=</span> -<span class='fl'>25</span>, <span class='kw'>max</span> <span class='kw'>=</span> <span class='fl'>50</span>))
-<span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'>get_observations</span>(<span class='no'>algorithm</span>, <span class='no'>instance</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>1000</span>)
-<span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/hist'>hist</a></span>(<span class='no'>x</span>)</div><div class='img'><img src='get_observations-1.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -168,15 +167,8 @@ instance. See <code><a href='calc_nreps.html'>calc_nreps()</a></code> for detail
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
+          </ul>
 
-      <li><a href="#see-also">See also</a></li>
-      
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
-    <h2>Author</h2>
-    <p>Felipe Campelo (<a href='mailto:fcampelo@ufmg.br'>fcampelo@ufmg.br</a>,
-<a href='mailto:f.campelo@aston.ac.uk'>f.campelo@aston.ac.uk</a>)</p>
   </div>
 </div>
 

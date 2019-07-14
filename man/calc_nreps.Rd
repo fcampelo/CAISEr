@@ -193,6 +193,7 @@ myreps <- calc_nreps(instance   = instance,
                       load.folder   = NA,         # file to load results from
                       save.folder = NA)         # folder to save results
 summary(myreps)
+plot(myreps)
 }
 \references{
 \itemize{

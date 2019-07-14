@@ -1,0 +1,99 @@
+#' plot.CAISEr
+#'
+#' S3 method for plotting _CAISEr_ objects output by [run_experiment()]).
+#'
+#' @param x list object of class _CAISEr_.
+#' @param y unused. Included for consistency with generic `plot` method.
+#' @param ... other parameters to be passed down to specific
+#'            plotting functions (currently unused)
+#' @param latex logical: should labels be formatted for LaTeX? (useful for
+#'              later saving using library `TikzDevice`)
+#' @param reorder logical: should the comparisons be reordered alphabetically?
+#' @param show.text logical: should text be plotted?
+#'
+#' @return `ggplot` object (invisibly)
+#'
+#' @method plot CAISEr
+#'
+#' @export
+#'
+plot.CAISEr <- function(x, y = NULL, ...,
+                        latex = FALSE,
+                        reorder = FALSE,
+                        show.text = TRUE)
+{
+  assertthat::assert_that("CAISEr" %in% class(x),
+                          is.logical(latex), length(latex) == 1,
+                          is.logical(show.text), length(show.text) == 1,
+                          is.logical(reorder), length(reorder) == 1)
+
+  ignore <- capture.output(x.summary <- summary(x))
+
+  CIs <- as.data.frame(t(sapply(x.summary$test.info,
+                                FUN = function(y) y$test$conf.int)))
+  Est <- sapply(x.summary$test.info,
+                FUN = function(y) y$test$estimate)
+  Comps <- sapply(x.summary$test.info,
+                  FUN = function(y) y$comparison)
+  pvals <- sapply(x.summary$test.info,
+                  FUN = function(y) y$test$p.value)
+  alpha <- x$samplesize.calc$sig.level
+
+  df <- data.frame(Comparison = Comps,
+                   Estimate   = Est,
+                   CIl        = CIs[, 1],
+                   CIu        = CIs[, 2],
+                   p.value    = pvals,
+                   alpha      = alpha,
+                   stringsAsFactors = FALSE)
+
+  if(reorder) df <- df[order(df$Comparison), ]
+  df[, -1]  <- signif(df[, -1], 3)
+  df$Reject <- df$p.value <= df$alpha
+
+  if (latex){
+    pvaltxt  <- paste0("$p = ", df$p.value, "$")
+    alphatxt <- paste0("$\\alpha = ", df$alpha, "$")
+    CItxt    <- paste0("$CI = [", df$CIl, ", ",
+                       df$CIu, "]$")
+    ylabtxt  <- "\\hat{\\mu}_D"
+  } else {
+    pvaltxt  <- paste0("p = ", df$p.value)
+    alphatxt <- paste0("alpha = ", df$alpha)
+    CItxt    <- paste0("$CI = [", df$CIl, ", ",
+                       df$CIu, "]")
+    ylabtxt  <- "Est. Difference"
+  }
+
+  mp <- ggplot2::ggplot(df,
+                        ggplot2::aes_string(x = "Comparison",
+                                            y = "Estimate",
+                                            ymin = "CIl",
+                                            ymax = "CIu",
+                                            colour = "Reject")) +
+    ggplot2::theme_minimal() +
+    ggplot2::geom_abline(slope = 0, intercept = 0,
+                         lty = 3, lwd = 1.4, alpha = .5) +
+    ggplot2::geom_pointrange(size = 1.1, fatten = 2,
+                           show.legend = FALSE) +
+    ggplot2::ylab(ylabtxt) + ggplot2::xlab("") +
+    ggplot2::coord_flip()
+
+
+  if(show.text){
+    mp <- mp +
+      ggplot2::geom_text(ggplot2::aes(label = CItxt),
+                         nudge_x = .2, size = 2.5,
+                         col = 1) +
+      ggplot2::geom_text(ggplot2::aes(label = alphatxt),
+                         nudge_x = -.175, size = 2.5,
+                         col = 1) +
+      ggplot2::geom_text(ggplot2::aes(label = pvaltxt),
+                         nudge_x = -.35, size = 2.5,
+                         col = 1)
+  }
+
+  print(mp)
+
+  invisible(mp)
+}

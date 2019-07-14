@@ -1,3 +1,6 @@
+# CAISEr 1.0.6
+* Added plot function to class `CAISEr`
+
 # CAISEr 1.0.5
 * Major update: package can now deal with comparisons of multiple (>2) algorithms. 
 This version is **not** backward compatible with versions 0.xx. To use the previous versions (e.g., to replicate the results from the paper "Sample Size Estimation 

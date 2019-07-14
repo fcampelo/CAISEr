@@ -252,7 +252,7 @@ my.results <- run_experiment(instances, algorithms,
 
 # Take a look at the results
 summary(my.results)
-print(my.results)
+plot(my.results)
 
 }
 \references{

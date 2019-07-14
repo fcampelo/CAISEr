@@ -209,7 +209,7 @@
 #'
 #' # Take a look at the results
 #' summary(my.results)
-#' print(my.results)
+#' plot(my.results)
 #'
 
 run_experiment <- function(instances, algorithms, d, se.max,
