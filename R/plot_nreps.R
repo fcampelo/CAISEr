@@ -111,7 +111,8 @@ plot.nreps <- function(x, y = NULL, ...,
   mp <- mp + ggplot2::geom_point(size = 2.5) +
     ggplot2::coord_flip() +
     ggplot2::xlab("Pair") +
-    ggplot2::ylab(ylabtxt)
+    ggplot2::ylab(ylabtxt) +
+    ggplot2::labs(caption = paste0("Instance: ", object$instance))
 
   if(show.text & show.SE){
     mp <- mp +
