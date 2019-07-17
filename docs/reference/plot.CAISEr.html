@@ -63,7 +63,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">CAISEr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.10</span>
       </span>
     </div>
 
@@ -122,7 +122,7 @@
 
     <pre class="usage"><span class='co'># S3 method for CAISEr</span>
 <span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></span>(<span class='no'>x</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>, <span class='kw'>latex</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>reorder</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>show.text</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+  <span class='kw'>reorder</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>show.text</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>layout</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -153,11 +153,17 @@ later saving using library <code>TikzDevice</code>)</p></td>
       <th>show.text</th>
       <td><p>logical: should text be plotted?</p></td>
     </tr>
+    <tr>
+      <th>layout</th>
+      <td><p>optional parameter to override the layout of the plots (see
+<code>gridExtra::arrangeGrobs()</code> for details.</p></td>
+    </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><code>ggplot</code> object (invisibly)</p>
+    <p>list of <code>ggplot</code> objects (invisibly), with the three individual plots
+generated (useful e.g., for extending limits or refining the plots)</p>
     
 
   </div>

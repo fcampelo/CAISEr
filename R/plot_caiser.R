@@ -10,8 +10,11 @@
 #'              later saving using library `TikzDevice`)
 #' @param reorder logical: should the comparisons be reordered alphabetically?
 #' @param show.text logical: should text be plotted?
+#' @param layout optional parameter to override the layout of the plots (see
+#'               `gridExtra::arrangeGrobs()` for details.
 #'
-#' @return `ggplot` object (invisibly)
+#' @return list of `ggplot` objects (invisibly), with the three individual plots
+#'         generated (useful e.g., for extending limits or refining the plots)
 #'
 #' @method plot CAISEr
 #'
@@ -20,14 +23,18 @@
 plot.CAISEr <- function(x, y = NULL, ...,
                         latex = FALSE,
                         reorder = FALSE,
-                        show.text = TRUE)
+                        show.text = TRUE,
+                        layout = NULL)
 {
   assertthat::assert_that("CAISEr" %in% class(x),
                           is.logical(latex), length(latex) == 1,
                           is.logical(show.text), length(show.text) == 1,
-                          is.logical(reorder), length(reorder) == 1)
+                          is.logical(reorder), length(reorder) == 1,
+                          is.null(layout) || is.matrix(layout))
 
-  ignore <- capture.output(x.summary <- summary(x))
+  plots.list <- vector("list", 3)
+
+  ignore <- utils::capture.output(x.summary <- summary(x))
 
   CIs <- as.data.frame(t(sapply(x.summary$test.info,
                                 FUN = function(y) y$test$conf.int)))
@@ -75,7 +82,7 @@ plot.CAISEr <- function(x, y = NULL, ...,
     ggplot2::geom_abline(slope = 0, intercept = 0,
                          lty = 3, lwd = 1.4, alpha = .5) +
     ggplot2::geom_pointrange(size = 1.1, fatten = 2,
-                           show.legend = FALSE) +
+                             show.legend = FALSE) +
     ggplot2::ylab(ylabtxt) + ggplot2::xlab("") +
     ggplot2::coord_flip()
 
@@ -93,7 +100,47 @@ plot.CAISEr <- function(x, y = NULL, ...,
                          col = 1)
   }
 
-  print(mp)
+  plots.list[[1]] <- mp
 
-  invisible(mp)
+
+  df <- x$data.raw
+  df <- as.data.frame(t(table(df$Algorithm, df$Instance)))
+  names(df) <- c("Instance", "Algorithm", "n")
+  mp <- ggplot2::ggplot(df,
+                        ggplot2::aes_string(x    = "Algorithm",
+                                            y    = "n",
+                                            fill = "Algorithm")) +
+    ggplot2::geom_boxplot(alpha = .3,
+                          show.legend   = FALSE,
+                          outlier.shape = NA) +
+    ggplot2::geom_jitter(ggplot2::aes_string(colour = "Algorithm"),
+                         width = .2, height = .1, alpha = .7,
+                         show.legend = FALSE) +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45,
+                                                       hjust = 1)) +
+    ggplot2::ylab("Runs/Instance") + ggplot2::xlab("")
+
+  plots.list[[2]] <- mp
+
+  mp <- ggplot2::ggplot(df,
+                        ggplot2::aes_string(x    = "Algorithm",
+                                            y    = "n",
+                                            fill = "Algorithm")) +
+    ggplot2::geom_col(alpha = .5, show.legend = FALSE) +
+    ggplot2::coord_flip() +
+    ggplot2::ylab("Total number of runs") + ggplot2::xlab("")
+
+
+  plots.list[[3]] <- mp
+
+  if (!is.null(layout)) {
+    lay <- layout
+  } else {
+    lay <- rbind(c(1,1,1,1,1,1),
+                 c(1,1,1,1,1,1),
+                 c(2,2,2,3,3,3))
+  }
+  gridExtra::grid.arrange(grobs = plots.list, layout_matrix = lay)
+
+  invisible(plots.list)
 }

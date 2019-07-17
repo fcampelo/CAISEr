@@ -126,7 +126,5 @@ plot.nreps <- function(x, y = NULL, ...,
                          nudge_x = -.2, size = 2.5)
   }
 
-  print(mp)
-
-  invisible(mp)
+  return(mp)
 }

@@ -1,3 +1,7 @@
+# CAISEr 1.0.10
+* CAISEr plotting now returns a list of ggplot objects, and plots a nested 
+plot of relevant information.
+
 # CAISEr 1.0.6
 * Added plot function to class `CAISEr`
 
