@@ -118,7 +118,8 @@ plot.CAISEr <- function(x, y = NULL, ...,
                          show.legend = FALSE) +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45,
                                                        hjust = 1)) +
-    ggplot2::ylab("Runs/Instance") + ggplot2::xlab("")
+    ggplot2::ylab("Runs/Instance") + ggplot2::xlab("") +
+    ggplot2::theme_minimal()
 
   plots.list[[2]] <- mp
 
@@ -128,7 +129,8 @@ plot.CAISEr <- function(x, y = NULL, ...,
                                             fill = "Algorithm")) +
     ggplot2::geom_col(alpha = .5, show.legend = FALSE) +
     ggplot2::coord_flip() +
-    ggplot2::ylab("Total number of runs") + ggplot2::xlab("")
+    ggplot2::ylab("Total number of runs") + ggplot2::xlab("") +
+    ggplot2::theme_minimal()
 
 
   plots.list[[3]] <- mp
