@@ -119,7 +119,8 @@ plot.CAISEr <- function(x, y = NULL, ...,
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45,
                                                        hjust = 1)) +
     ggplot2::ylab("Runs/Instance") + ggplot2::xlab("") +
-    ggplot2::theme_minimal()
+    ggplot2::theme_minimal() +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1))
 
   plots.list[[2]] <- mp
 
