@@ -151,5 +151,6 @@ plot.CAISEr <- function(x, y = NULL, ...,
   }
 
   gridExtra::grid.arrange(grobs = plots.list, layout_matrix = lay)
-  invisible(list(plots.list, df.list))
+  invisible(list(ggplots = plots.list,
+                 dfs     = df.list))
 }
