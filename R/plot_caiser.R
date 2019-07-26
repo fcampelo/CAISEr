@@ -10,13 +10,12 @@
 #'              later saving using library `TikzDevice`)
 #' @param reorder logical: should the comparisons be reordered alphabetically?
 #' @param show.text logical: should text be plotted?
-#' @param return.plot logical: `FALSE` to plot and return `NULL`,
-#'                    `TRUE` to return plot list and not plot to graphical
-#'                    device.
 #' @param layout optional parameter to override the layout of the plots (see
-#'               `gridExtra::arrangeGrobs()` for details.
+#'               `gridExtra::arrangeGrobs()` for details. The default layout is
+#'               `lay = rbind(c(1,1,1,1,1,1), c(1,1,1,1,1,1), c(2,2,2,3,3,3))`
 #'
-#' @return either `NULL` or a list of `ggplot` objects.
+#' @return list containing (1) a list of of `ggplot2` objects generated, and
+#'         (2) a list of data frames used for the creation of the plots.
 #'
 #' @method plot CAISEr
 #'
@@ -26,7 +25,6 @@ plot.CAISEr <- function(x, y = NULL, ...,
                         latex = FALSE,
                         reorder = FALSE,
                         show.text = TRUE,
-                        return.plot = FALSE,
                         layout = NULL)
 {
   assertthat::assert_that("CAISEr" %in% class(x),
@@ -36,6 +34,7 @@ plot.CAISEr <- function(x, y = NULL, ...,
                           is.null(layout) || is.matrix(layout))
 
   plots.list <- vector("list", 3)
+  df.list    <- vector("list", 2)
 
   ignore <- utils::capture.output(x.summary <- summary(x))
 
@@ -106,6 +105,7 @@ plot.CAISEr <- function(x, y = NULL, ...,
   }
 
   plots.list[[1]] <- mp
+  df.list[[1]] <- df
 
 
   df <- x$data.raw
@@ -128,6 +128,7 @@ plot.CAISEr <- function(x, y = NULL, ...,
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1))
 
   plots.list[[2]] <- mp
+  df.list[[2]] <- df
 
   mp <- ggplot2::ggplot(df,
                         ggplot2::aes_string(x    = "Algorithm",
@@ -149,10 +150,6 @@ plot.CAISEr <- function(x, y = NULL, ...,
                  c(2,2,2,3,3,3))
   }
 
-  if(return.plot){
-    invisible(plots.list)
-  } else {
-    gridExtra::grid.arrange(grobs = plots.list, layout_matrix = lay)
-    invisible(NULL)
-  }
+  gridExtra::grid.arrange(grobs = plots.list, layout_matrix = lay)
+  invisible(list(plots.list, df.list))
 }
