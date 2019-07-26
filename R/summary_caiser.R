@@ -78,7 +78,7 @@ summary.CAISEr <- function(object, test = NULL,
   algoruns  <- as.numeric(table(object$data.raw$Algorithm))
   algopairs <- paste(object$data.summary$Alg1,
                      object$data.summary$Alg2,
-                     sep = " - ")
+                     sep = " x ")
 
   # perform initial tests just to calculate p-values
   # (ignoring significance correction)
