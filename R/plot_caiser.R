@@ -10,6 +10,7 @@
 #'              later saving using library `TikzDevice`)
 #' @param reorder logical: should the comparisons be reordered alphabetically?
 #' @param show.text logical: should text be plotted?
+#' @param digits how many significant digits should be used in text?
 #' @param layout optional parameter to override the layout of the plots (see
 #'               `gridExtra::arrangeGrobs()` for details. The default layout is
 #'               `lay = rbind(c(1,1,1,1,1,1), c(1,1,1,1,1,1), c(2,2,2,3,3,3))`
@@ -25,6 +26,7 @@ plot.CAISEr <- function(x, y = NULL, ...,
                         latex = FALSE,
                         reorder = FALSE,
                         show.text = TRUE,
+                        digits = 3,
                         layout = NULL)
 {
   assertthat::assert_that("CAISEr" %in% class(x),
@@ -57,7 +59,7 @@ plot.CAISEr <- function(x, y = NULL, ...,
                    stringsAsFactors = FALSE)
 
   if(reorder) df <- df[order(df$Comparison), ]
-  df[, -1]  <- signif(df[, -1], 3)
+  df[, -1]  <- signif(df[, -1], digits = digits)
   df$Reject <- df$p.value <= df$alpha
 
   if (latex){
@@ -73,6 +75,8 @@ plot.CAISEr <- function(x, y = NULL, ...,
                        df$CIu, "]")
     ylabtxt  <- "Est. Difference"
   }
+
+  df <- cbind(df, pvaltxt, alphatxt, CItxt)
 
   mp <- ggplot2::ggplot(df,
                         ggplot2::aes_string(x = "Comparison",

@@ -5,7 +5,7 @@
 \title{plot.CAISEr}
 \usage{
 \method{plot}{CAISEr}(x, y = NULL, ..., latex = FALSE,
-  reorder = FALSE, show.text = TRUE, layout = NULL)
+  reorder = FALSE, show.text = TRUE, digits = 3, layout = NULL)
 }
 \arguments{
 \item{x}{list object of class \emph{CAISEr}.}
@@ -21,6 +21,8 @@ later saving using library \code{TikzDevice})}
 \item{reorder}{logical: should the comparisons be reordered alphabetically?}
 
 \item{show.text}{logical: should text be plotted?}
+
+\item{digits}{how many significant digits should be used in text?}
 
 \item{layout}{optional parameter to override the layout of the plots (see
 \code{gridExtra::arrangeGrobs()} for details. The default layout is

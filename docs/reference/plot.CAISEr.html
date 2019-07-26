@@ -63,7 +63,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">CAISEr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.10</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.13</span>
       </span>
     </div>
 
@@ -122,7 +122,7 @@
 
     <pre class="usage"><span class='co'># S3 method for CAISEr</span>
 <span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></span>(<span class='no'>x</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>, <span class='kw'>latex</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>reorder</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>show.text</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>layout</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+  <span class='kw'>reorder</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>show.text</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>layout</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -154,16 +154,21 @@ later saving using library <code>TikzDevice</code>)</p></td>
       <td><p>logical: should text be plotted?</p></td>
     </tr>
     <tr>
+      <th>digits</th>
+      <td><p>how many significant digits should be used in text?</p></td>
+    </tr>
+    <tr>
       <th>layout</th>
       <td><p>optional parameter to override the layout of the plots (see
-<code>gridExtra::arrangeGrobs()</code> for details.</p></td>
+<code>gridExtra::arrangeGrobs()</code> for details. The default layout is
+<code>lay = rbind(c(1,1,1,1,1,1), c(1,1,1,1,1,1), c(2,2,2,3,3,3))</code></p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>list of <code>ggplot</code> objects (invisibly), with the three individual plots
-generated (useful e.g., for extending limits or refining the plots)</p>
+    <p>list containing (1) a list of of <code>ggplot2</code> objects generated, and
+(2) a list of data frames used for the creation of the plots.</p>
     
 
   </div>

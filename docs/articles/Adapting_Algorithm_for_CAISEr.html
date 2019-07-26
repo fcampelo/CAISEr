@@ -30,7 +30,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">CAISEr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.10</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.13</span>
       </span>
     </div>
 
@@ -76,7 +76,7 @@
       <h1>Adapting Algorithms for CAISEr</h1>
                         <h4 class="author">Felipe Campelo</h4>
             
-            <h4 class="date">2019-07-17</h4>
+            <h4 class="date">2019-07-26</h4>
       
       
       <div class="hidden name"><code>Adapting_Algorithm_for_CAISEr.Rmd</code></div>
@@ -314,7 +314,7 @@ do.call(algorithm$FUN, args = myargs)</code></pre>
 ## #====================================
 ## Tests using Holm's step-down procedure:
 ## 
-##  Test 1 : Original 1 - Original 2
+##  Test 1 : Original 1 x Original 2
 ##  H0: median = 0
 ##  alpha       = 0.008333 
 ##  p-value = 2.842e-14
@@ -322,7 +322,7 @@ do.call(algorithm$FUN, args = myargs)</code></pre>
 ##  CI{1-alpha} = [ -0.5658 -0.2688 ]
 ##  d       = -1.310538
 ## 
-##  Test 2 : MOEAD-DE - MOEAD-DE2
+##  Test 2 : MOEAD-DE x MOEAD-DE2
 ##  H0: median = 0
 ##  alpha       = 0.01 
 ##  p-value = 8.527e-14
@@ -330,7 +330,7 @@ do.call(algorithm$FUN, args = myargs)</code></pre>
 ##  CI{1-alpha} = [ -0.2879 -0.111 ]
 ##  d       = -0.9829994
 ## 
-##  Test 3 : Original 2 - MOEAD-DE
+##  Test 3 : Original 2 x MOEAD-DE
 ##  H0: median = 0
 ##  alpha       = 0.0125 
 ##  p-value = 4.791e-10
@@ -338,7 +338,7 @@ do.call(algorithm$FUN, args = myargs)</code></pre>
 ##  CI{1-alpha} = [ 0.7269 1.47 ]
 ##  d       = 1.270841
 ## 
-##  Test 4 : Original 1 - MOEAD-DE
+##  Test 4 : Original 1 x MOEAD-DE
 ##  H0: median = 0
 ##  alpha       = 0.01667 
 ##  p-value = 9.02e-06
@@ -346,7 +346,7 @@ do.call(algorithm$FUN, args = myargs)</code></pre>
 ##  CI{1-alpha} = [ 0.2504 0.8769 ]
 ##  d       = 0.7954248
 ## 
-##  Test 5 : Original 2 - MOEAD-DE2
+##  Test 5 : Original 2 x MOEAD-DE2
 ##  H0: median = 0
 ##  alpha       = 0.025 
 ##  p-value = 1.396e-05
@@ -354,7 +354,7 @@ do.call(algorithm$FUN, args = myargs)</code></pre>
 ##  CI{1-alpha} = [ 0.5863 1.194 ]
 ##  d       = 0.9214111
 ## 
-##  Test 6 : Original 1 - MOEAD-DE2
+##  Test 6 : Original 1 x MOEAD-DE2
 ##  H0: median = 0
 ##  alpha       = 0.05 
 ##  p-value = 0.01257
