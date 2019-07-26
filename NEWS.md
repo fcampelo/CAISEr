@@ -1,4 +1,4 @@
-# CAISEr 1.0.10
+# CAISEr 1.0.12
 * CAISEr plotting now returns a list of ggplot objects, and plots a nested 
 plot of relevant information.
 

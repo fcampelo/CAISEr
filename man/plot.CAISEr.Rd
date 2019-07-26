@@ -5,7 +5,8 @@
 \title{plot.CAISEr}
 \usage{
 \method{plot}{CAISEr}(x, y = NULL, ..., latex = FALSE,
-  reorder = FALSE, show.text = TRUE, layout = NULL)
+  reorder = FALSE, show.text = TRUE, return.plot = FALSE,
+  layout = NULL)
 }
 \arguments{
 \item{x}{list object of class \emph{CAISEr}.}
@@ -22,12 +23,15 @@ later saving using library \code{TikzDevice})}
 
 \item{show.text}{logical: should text be plotted?}
 
+\item{return.plot}{logical: \code{FALSE} to plot and return \code{NULL},
+\code{TRUE} to return plot list and not plot to graphical
+device.}
+
 \item{layout}{optional parameter to override the layout of the plots (see
 \code{gridExtra::arrangeGrobs()} for details.}
 }
 \value{
-list of \code{ggplot} objects (invisibly), with the three individual plots
-generated (useful e.g., for extending limits or refining the plots)
+either \code{NULL} or a list of \code{ggplot} objects.
 }
 \description{
 S3 method for plotting \emph{CAISEr} objects output by \code{\link[=run_experiment]{run_experiment()}}).

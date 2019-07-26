@@ -10,11 +10,13 @@
 #'              later saving using library `TikzDevice`)
 #' @param reorder logical: should the comparisons be reordered alphabetically?
 #' @param show.text logical: should text be plotted?
+#' @param return.plot logical: `FALSE` to plot and return `NULL`,
+#'                    `TRUE` to return plot list and not plot to graphical
+#'                    device.
 #' @param layout optional parameter to override the layout of the plots (see
 #'               `gridExtra::arrangeGrobs()` for details.
 #'
-#' @return list of `ggplot` objects (invisibly), with the three individual plots
-#'         generated (useful e.g., for extending limits or refining the plots)
+#' @return either `NULL` or a list of `ggplot` objects.
 #'
 #' @method plot CAISEr
 #'
@@ -24,6 +26,7 @@ plot.CAISEr <- function(x, y = NULL, ...,
                         latex = FALSE,
                         reorder = FALSE,
                         show.text = TRUE,
+                        return.plot = FALSE,
                         layout = NULL)
 {
   assertthat::assert_that("CAISEr" %in% class(x),
@@ -63,7 +66,7 @@ plot.CAISEr <- function(x, y = NULL, ...,
     alphatxt <- paste0("$\\alpha = ", df$alpha, "$")
     CItxt    <- paste0("$CI = [", df$CIl, ", ",
                        df$CIu, "]$")
-    ylabtxt  <- "\\hat{\\mu}_D"
+    ylabtxt  <- "$\\hat{\\mu}_D$"
   } else {
     pvaltxt  <- paste0("p = ", df$p.value)
     alphatxt <- paste0("alpha = ", df$alpha)
@@ -77,13 +80,15 @@ plot.CAISEr <- function(x, y = NULL, ...,
                                             y = "Estimate",
                                             ymin = "CIl",
                                             ymax = "CIu",
-                                            colour = "Reject")) +
+                                            colour = "!Reject",
+                                            shape  = "Reject")) +
     ggplot2::theme_minimal() +
     ggplot2::geom_abline(slope = 0, intercept = 0,
                          lty = 3, lwd = 1.4, alpha = .5) +
     ggplot2::geom_pointrange(size = 1.1, fatten = 2,
                              show.legend = FALSE) +
     ggplot2::ylab(ylabtxt) + ggplot2::xlab("") +
+    ggplot2::scale_shape_manual(values = c(16, 18)) +
     ggplot2::coord_flip()
 
 
@@ -143,7 +148,11 @@ plot.CAISEr <- function(x, y = NULL, ...,
                  c(1,1,1,1,1,1),
                  c(2,2,2,3,3,3))
   }
-  gridExtra::grid.arrange(grobs = plots.list, layout_matrix = lay)
 
-  invisible(plots.list)
+  if(return.plot){
+    invisible(plots.list)
+  } else {
+    gridExtra::grid.arrange(grobs = plots.list, layout_matrix = lay)
+    invisible(NULL)
+  }
 }
