@@ -63,7 +63,7 @@ se_param <- function(Xk,                  # vector of observations
 
     # Get pairs for comparison
     algo.pairs <- t(utils::combn(1:length(Xk), 2))
-    if (comparisons == "all.vs.first") algo.pairs <- algo.pairs[1:(nalgs - 1), ]
+    if (comparisons == "all.vs.first") algo.pairs <- algo.pairs[1:(nalgs - 1), , drop = FALSE]
 
     # Calculate point estimates and standard errors for all required pairs
     Phik  <- numeric(nrow(algo.pairs))
