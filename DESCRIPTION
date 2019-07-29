@@ -1,7 +1,7 @@
 Package: CAISEr
 Type: Package
 Title: Comparison of Algorithms with Iterative Sample Size Estimation
-Version: 1.0.14
+Version: 1.0.13999
 Date: 2019-07-29
 Authors@R: c(person(given = "Felipe", family = "Campelo",
                     email = c("fcampelo@ufmg.br", "f.campelo@aston.ac.uk"),
@@ -15,9 +15,9 @@ Authors@R: c(person(given = "Felipe", family = "Campelo",
 Description: Functions for performing experimental comparisons of algorithms 
              using adequate sample sizes for power and accuracy.
 License: GPL-2
-Depends: R (>= 3.3.0)
+Depends: R (>= 3.5.0)
 Imports: assertthat (>= 0.2.1),
-         parallel (>= 3.3.0),
+         parallel (>= 3.5.0),
          pbmcapply (>= 1.4.1),
          ggplot2 (>= 3.1.1),
          grid (>= 3.6.0),
