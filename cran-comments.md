@@ -1,6 +1,8 @@
 ## Changes and notes
 * Change ownership e-mail from `fcampelo@ufmg.br` to `f.campelo@aston.ac.uk`
 * Minor update: added plotting function to class `CAISEr`
+* Minor update: fixed bug when running experiment with two algorithms (due to 
+the default `drop = TRUE` when subsetting rows in `se_param()`/`se_boot()`).
 
 ## Test environments
 * macOS Mojave 10.14.5, R 3.6.0 (2019-04-26), x86_64-apple-darwin15.6.0 (64-bit), 
