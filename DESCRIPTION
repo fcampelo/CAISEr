@@ -15,7 +15,7 @@ Authors@R: c(person(given = "Felipe", family = "Campelo",
 Description: Functions for performing experimental comparisons of algorithms 
              using adequate sample sizes for power and accuracy.
 License: GPL-2
-Depends: R (>= 3.5.0)
+Depends: R (>= 3.6.0)
 Imports: assertthat (>= 0.2.1),
          parallel (>= 3.5.1),
          pbmcapply (>= 1.4.1),
