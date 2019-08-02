@@ -1,7 +1,7 @@
 Package: CAISEr
 Type: Package
 Title: Comparison of Algorithms with Iterative Sample Size Estimation
-Version: 1.0.14
+Version: 1.0.15
 Date: 2019-08-02
 Authors@R: c(person(given = "Felipe", family = "Campelo",
                     email = "f.campelo@aston.ac.uk",
@@ -20,9 +20,7 @@ Imports: assertthat (>= 0.2.1),
          parallel (>= 3.5.1),
          pbmcapply (>= 1.4.1),
          ggplot2 (>= 3.1.1),
-         grid (>= 3.6.0),
-         gridExtra (>= 2.3),
-         lattice (>= 0.20)
+         gridExtra (>= 2.3)
 Suggests: MOEADr,
           smoof,
           knitr,

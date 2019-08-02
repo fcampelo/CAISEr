@@ -1,3 +1,6 @@
+# CAISEr 1.0.15
+* Mainenance update: minor fix in imported packages to remove NOTE in CRAN checks.
+
 # CAISEr 1.0.14
 * CAISEr plotting now returns a list of ggplot objects and relevant dataframes, and plots a nested plot of relevant information.
 * fixed bug when running experiment with two algorithms (due to 
