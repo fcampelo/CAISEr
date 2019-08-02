@@ -1,5 +1,5 @@
 ## Changes and notes
-* Change ownership e-mail from `fcampelo@ufmg.br` to `f.campelo@aston.ac.uk`
+* Change ownership e-mail from `fcampelo@ufmg.br` to `f.campelo@aston.ac.uk` due to change in professional affiliation.
 * Minor update: added plotting function to class `CAISEr`
 * Minor update: fixed bug when running experiment with two algorithms (due to 
 the default `drop = TRUE` when subsetting rows in `se_param()`/`se_boot()`).
