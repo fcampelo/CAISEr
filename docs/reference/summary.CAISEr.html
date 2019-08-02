@@ -222,8 +222,8 @@ dedicated to each algorithm.</p>
 #&gt;  Adequate power: TRUE
 #&gt;  Total runs of algo1 : 340
 #&gt;  Total runs of algo2 : 340
-#&gt;  Total runs of algo3 : 542
-#&gt;  Total runs of algo4 : 745
+#&gt;  Total runs of algo3 : 632
+#&gt;  Total runs of algo4 : 617
 #&gt; #====================================
 #&gt;  Pairwise comparisons of interest:
 #&gt;  Test: t.test
@@ -235,55 +235,55 @@ dedicated to each algorithm.</p>
 #&gt; #====================================
 #&gt; Tests using Holm's step-down procedure:
 #&gt; 
-#&gt;  Test 1 : algo1 x algo3
+#&gt;  Test 1 : algo2 x algo3
 #&gt;  H0: mean = 0
 #&gt;  alpha		= 0.008333 
-#&gt;  p-value	= 7.845e-29
-#&gt;  Est. mean	= -0.9429
-#&gt;  CI{1-alpha}	= [ -0.9567 -0.9292 ]
-#&gt;  d		= -50.02262
+#&gt;  p-value	= 7.359e-23
+#&gt;  Est. mean	= -1.107
+#&gt;  CI{1-alpha}	= [ -1.145 -1.069 ]
+#&gt;  d		= -21.1615
 #&gt; 
-#&gt;  Test 2 : algo2 x algo3
+#&gt;  Test 2 : algo1 x algo3
 #&gt;  H0: mean = 0
 #&gt;  alpha		= 0.01 
-#&gt;  p-value	= 2.32e-26
-#&gt;  Est. mean	= -1.229
-#&gt;  CI{1-alpha}	= [ -1.254 -1.205 ]
-#&gt;  d		= -35.04722
+#&gt;  p-value	= 5.869e-18
+#&gt;  Est. mean	= -0.8371
+#&gt;  CI{1-alpha}	= [ -0.894 -0.7802 ]
+#&gt;  d		= -10.41952
 #&gt; 
-#&gt;  Test 3 : algo2 x algo4
+#&gt;  Test 3 : algo1 x algo2
 #&gt;  H0: mean = 0
 #&gt;  alpha		= 0.0125 
-#&gt;  p-value	= 5.706e-25
-#&gt;  Est. mean	= -0.2946
-#&gt;  CI{1-alpha}	= [ -0.3016 -0.2876 ]
-#&gt;  d		= -28.6847
+#&gt;  p-value	= 4.195e-17
+#&gt;  Est. mean	= 0.2697
+#&gt;  CI{1-alpha}	= [ 0.2497 0.2897 ]
+#&gt;  d		= 9.203787
 #&gt; 
 #&gt;  Test 4 : algo3 x algo4
 #&gt;  H0: mean = 0
 #&gt;  alpha		= 0.01667 
-#&gt;  p-value	= 1.808e-24
-#&gt;  Est. mean	= 0.9348
-#&gt;  CI{1-alpha}	= [ 0.9121 0.9575 ]
-#&gt;  d		= 26.68792
+#&gt;  p-value	= 2.333e-16
+#&gt;  Est. mean	= 0.8459
+#&gt;  CI{1-alpha}	= [ 0.7794 0.9123 ]
+#&gt;  d		= 8.257551
 #&gt; 
-#&gt;  Test 5 : algo1 x algo2
+#&gt;  Test 5 : algo2 x algo4
 #&gt;  H0: mean = 0
 #&gt;  alpha		= 0.025 
-#&gt;  p-value	= 3.647e-21
-#&gt;  Est. mean	= 0.2864
-#&gt;  CI{1-alpha}	= [ 0.276 0.2968 ]
-#&gt;  d		= 16.57025
+#&gt;  p-value	= 3.46e-13
+#&gt;  Est. mean	= -0.261
+#&gt;  CI{1-alpha}	= [ -0.2912 -0.2307 ]
+#&gt;  d		= -5.180749
 #&gt; 
 #&gt;  ----- Stop rejecting H0 at this point -----
 #&gt; 
 #&gt;  Test 6 : algo1 x algo4
 #&gt;  H0: mean = 0
 #&gt;  alpha		= 0.05 
-#&gt;  p-value	= 0.05503
-#&gt;  Est. mean	= -0.008165
-#&gt;  CI{1-alpha}	= [ -0.01653 0.0001982 ]
-#&gt;  d		= -0.5019696
+#&gt;  p-value	= 0.2136
+#&gt;  Est. mean	= 0.008755
+#&gt;  CI{1-alpha}	= [ -0.005574 0.02308 ]
+#&gt;  d		= 0.3141556
 #&gt; #====================================</div><div class='input'>
 <span class='co'># You can override some defaults if you want:</span>
 <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/summary'>summary</a></span>(<span class='no'>my.results</span>, <span class='kw'>test</span> <span class='kw'>=</span> <span class='st'>"wilcoxon"</span>)</div><div class='output co'>#&gt; #====================================
@@ -293,8 +293,8 @@ dedicated to each algorithm.</p>
 #&gt;  Adequate power: TRUE
 #&gt;  Total runs of algo1 : 340
 #&gt;  Total runs of algo2 : 340
-#&gt;  Total runs of algo3 : 542
-#&gt;  Total runs of algo4 : 745
+#&gt;  Total runs of algo3 : 632
+#&gt;  Total runs of algo4 : 617
 #&gt; #====================================
 #&gt;  Pairwise comparisons of interest:
 #&gt;  Test: wilcoxon
@@ -310,51 +310,51 @@ dedicated to each algorithm.</p>
 #&gt;  H0: median = 0
 #&gt;  alpha		= 0.008333 
 #&gt;  p-value	= 1.526e-05
-#&gt;  Est. median	= 0.2906
-#&gt;  CI{1-alpha}	= [ 0.2891 0.2913 ]
-#&gt;  d		= 16.57025
+#&gt;  Est. median	= 0.2648
+#&gt;  CI{1-alpha}	= [ 0.2394 0.2937 ]
+#&gt;  d		= 9.203787
 #&gt; 
 #&gt;  Test 2 : algo1 x algo3
 #&gt;  H0: median = 0
 #&gt;  alpha		= 0.01 
 #&gt;  p-value	= 1.526e-05
-#&gt;  Est. median	= -0.9497
-#&gt;  CI{1-alpha}	= [ -0.9527 -0.9363 ]
-#&gt;  d		= -50.02262
+#&gt;  Est. median	= -0.8452
+#&gt;  CI{1-alpha}	= [ -0.925 -0.7668 ]
+#&gt;  d		= -10.41952
 #&gt; 
 #&gt;  Test 3 : algo2 x algo3
 #&gt;  H0: median = 0
 #&gt;  alpha		= 0.0125 
 #&gt;  p-value	= 1.526e-05
-#&gt;  Est. median	= -1.241
-#&gt;  CI{1-alpha}	= [ -1.244 -1.226 ]
-#&gt;  d		= -35.04722
+#&gt;  Est. median	= -1.109
+#&gt;  CI{1-alpha}	= [ -1.164 -1.06 ]
+#&gt;  d		= -21.1615
 #&gt; 
 #&gt;  Test 4 : algo2 x algo4
 #&gt;  H0: median = 0
 #&gt;  alpha		= 0.01667 
 #&gt;  p-value	= 1.526e-05
-#&gt;  Est. median	= -0.2924
-#&gt;  CI{1-alpha}	= [ -0.3024 -0.2897 ]
-#&gt;  d		= -28.6847
+#&gt;  Est. median	= -0.2619
+#&gt;  CI{1-alpha}	= [ -0.3068 -0.2096 ]
+#&gt;  d		= -5.180749
 #&gt; 
 #&gt;  Test 5 : algo3 x algo4
 #&gt;  H0: median = 0
 #&gt;  alpha		= 0.025 
 #&gt;  p-value	= 1.526e-05
-#&gt;  Est. median	= 0.9476
-#&gt;  CI{1-alpha}	= [ 0.9243 0.9532 ]
-#&gt;  d		= 26.68792
+#&gt;  Est. median	= 0.8456
+#&gt;  CI{1-alpha}	= [ 0.7545 0.9284 ]
+#&gt;  d		= 8.257551
 #&gt; 
 #&gt;  ----- Stop rejecting H0 at this point -----
 #&gt; 
 #&gt;  Test 6 : algo1 x algo4
 #&gt;  H0: median = 0
 #&gt;  alpha		= 0.05 
-#&gt;  p-value	= 0.1202
-#&gt;  Est. median	= -0.002008
-#&gt;  CI{1-alpha}	= [ -0.01374 0.0002181 ]
-#&gt;  d		= -0.5019696
+#&gt;  p-value	= 0.3529
+#&gt;  Est. median	= 0.009778
+#&gt;  CI{1-alpha}	= [ -0.004641 0.02543 ]
+#&gt;  d		= 0.3141556
 #&gt; #====================================</div><div class='input'>
 </div></pre>
   </div>
