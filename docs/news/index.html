@@ -60,7 +60,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">CAISEr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.14</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.15</span>
       </span>
     </div>
 
@@ -110,12 +110,21 @@
       
     </div>
 
+    <div id="caiser-1-0-15" class="section level1">
+<h1 class="page-header">
+<a href="#caiser-1-0-15" class="anchor"></a>CAISEr 1.0.15<small> Unreleased </small>
+</h1>
+<ul>
+<li>Mainenance update: minor fix in imported packages to remove NOTE in CRAN checks.</li>
+</ul>
+</div>
     <div id="caiser-1-0-14" class="section level1">
 <h1 class="page-header">
-<a href="#caiser-1-0-14" class="anchor"></a>CAISEr 1.0.14<small> Unreleased </small>
+<a href="#caiser-1-0-14" class="anchor"></a>CAISEr 1.0.14<small> 2019-08-02 </small>
 </h1>
 <ul>
 <li>CAISEr plotting now returns a list of ggplot objects and relevant dataframes, and plots a nested plot of relevant information.</li>
+<li>fixed bug when running experiment with two algorithms (due to the default <code>drop = TRUE</code> when subsetting rows in <code><a href="../reference/se_param.html">se_param()</a></code>/<code><a href="../reference/se_boot.html">se_boot()</a></code>).</li>
 </ul>
 </div>
     <div id="caiser-1-0-6" class="section level1">
@@ -132,7 +141,7 @@
 <a href="#caiser-1-0-5" class="anchor"></a>CAISEr 1.0.5<small> 2019-07-13 </small>
 </h1>
 <ul>
-<li>Major update: package can now deal with comparisons of multiple (&gt;2) algorithms. This version is <strong>not</strong> backward compatible with versions 0.xx. To use the previous versions (e.g., to replicate the results from the paper “Sample Size Estimation for Power and Accuracy in the Experimental Comparison of Algorithms”, Journal of Heuristics 2019), install the previous version from <a href="https://cran.r-project.org/src/contrib/CAISEr_0.3.3.tar.gz">https://cran.r-project.org/src/contrib/CAISEr_0.3.3.tar.gz</a>.</li>
+<li>Major update: package can now deal with comparisons of multiple (&gt;2) algorithms. This version is <strong>not</strong> backward compatible with versions 0.xx. To use the previous versions (e.g., to replicate the results from the paper “Sample Size Estimation for Power and Accuracy in the Experimental Comparison of Algorithms”, Journal of Heuristics 2019), install the previous version from **<a href="https://cran.r-project.org/src/contrib/CAISEr_0.3.3.tar.gz**" class="uri">https://cran.r-project.org/src/contrib/CAISEr_0.3.3.tar.gz**</a>.</li>
 <li>Replaced function <code>calc_nreps2()</code> by <code><a href="../reference/calc_nreps.html">calc_nreps()</a></code> to calculate the number of repetitions in the case of multiple (&gt;2) algorithms.</li>
 <li>function <code><a href="../reference/calc_se.html">calc_se()</a></code> now performs point estimate and standard error calculations for all pairs of interest in the case of multiple algorithms.</li>
 <li>function <code><a href="../reference/calc_instances.html">calc_instances()</a></code> now returns the number of required instances to maintain the desired power for the family of experiments, based on Holm’s step-down correction. It also returns the sequence of alpha values and the corresponding power to detect the effect size <code>d</code>, for each comparison using Holm’s method.</li>
@@ -227,6 +236,7 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
+        <li><a href="#caiser-1-0-15">1.0.15</a></li>
         <li><a href="#caiser-1-0-14">1.0.14</a></li>
         <li><a href="#caiser-1-0-6">1.0.6</a></li>
         <li><a href="#caiser-1-0-5">1.0.5</a></li>

@@ -13,7 +13,11 @@ Authors@R: c(person(given = "Felipe", family = "Campelo",
                     email = "e.wanner@aston.ac.uk",
                     role = "ctb"))
 Description: Functions for performing experimental comparisons of algorithms 
-             using adequate sample sizes for power and accuracy.
+             using adequate sample sizes for power and accuracy. Implements the 
+             methodology originally presented in Campelo and Takahashi (2019) 
+             <[https://doi.org/10.1007/s10732-018-9396-7](https://doi.org/10.1007/s10732-018-9396-7)> 
+             for the comparison of two algorithms, and generalised in 
+             Campelo and Wanner (Submitted, 2019) <[https://arxiv.org/abs/XYZ](https://arxiv.org/abs/XYZ)>.
 License: GPL-2
 Depends: R (>= 3.6.0)
 Imports: assertthat (>= 0.2.1),
