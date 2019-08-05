@@ -1,5 +1,6 @@
 ## Changes and notes
 * Minor fix: removed `grid` and `lattice` from Imports field to remove NOTE in CRAN checks.
+* Updated DESCRIPTION with links to published work describing the methods implemented in the package.
 
 ## Test environments
 * macOS Mojave 10.14.6, R 3.6.0 (2019-04-26), x86_64-apple-darwin15.6.0 (64-bit), 
