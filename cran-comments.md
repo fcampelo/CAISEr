@@ -1,5 +1,5 @@
 ## Changes and notes
-* Minor fix: removed `grid` and `lattice` from Imports field to remove NOTE in CRAN checks.
+* Minor fix: removed `grid` and `lattice` from Imports field (not required anymore).
 * Updated DESCRIPTION with links to published work describing the methods implemented in the package.
 
 ## Test environments
