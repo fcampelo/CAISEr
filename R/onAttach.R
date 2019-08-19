@@ -1,5 +1,5 @@
 .onAttach <- function(...) {
-  packageStartupMessage("\nAttaching package CAISEr 1.0.15
-This version is not compatible with versions 0.XX
-Check https://github.com/fcampelo/CAISEr/tree/v0.3.3 for previous version")
+  packageStartupMessage("\nCAISEr version 1.0.15
+Not compatible with code developed for 0.X.Y versions
+If needed, please visit https://git.io/fjFwf for version 0.3.3")
 }

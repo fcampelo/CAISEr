@@ -1,6 +1,6 @@
 #' plot.CAISEr
 #'
-#' S3 method for plotting _CAISEr_ objects output by [run_experiment()]).
+#' S3 method for plotting _CAISEr_ objects output by [run_experiment()].
 #'
 #' @param x list object of class _CAISEr_.
 #' @param y unused. Included for consistency with generic `plot` method.
