@@ -33,5 +33,5 @@ list containing (1) a list of of \code{ggplot2} objects generated, and
 (2) a list of data frames used for the creation of the plots.
 }
 \description{
-S3 method for plotting \emph{CAISEr} objects output by \code{\link[=run_experiment]{run_experiment()}}).
+S3 method for plotting \emph{CAISEr} objects output by \code{\link[=run_experiment]{run_experiment()}}.
 }

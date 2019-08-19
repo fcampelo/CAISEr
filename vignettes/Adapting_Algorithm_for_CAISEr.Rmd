@@ -79,7 +79,7 @@ four versions of this algorithm: the two versions described in the [original MOE
 references therein for details of these methods) as solvers of the hypothetical 
 problem class represented by the available test instances. The performance of 
 each algorithm on each instance will be measured according to an indicator 
-known as _Inverted Generational Distance_ (IGD - details [here](http://ieeexplore.ieee.org/document/1197687/)), for which 
+known as _Inverted Generational Distance_ (IGD - details [here](https://ieeexplore.ieee.org/document/1197687/)), for which 
 _smaller = better_.
 
 As described in the documentation of both `run_experiment()` and 
@@ -237,8 +237,13 @@ load("../inst/extdata/vignette_results.RData")
 ```
 
 After that we can interrogate the results and perform inference, if we are so 
-inclined. 
-For instance, we can check if all paired differences in performance 
+inclined. But first, CAISEr provides a useful plot function for the output of `run_experiment()`. Let's try it (type `?plot.CAISEr` for details):
+
+```{r, fig.align="center", fig.width=8, fig.height=8}
+plot(my.results)
+```
+
+We can also check if all paired differences in performance 
 are (at least approximately) Normal, so that we can assume a Normal sampling 
 distribution of the means and use t-tests without much worry:
 
