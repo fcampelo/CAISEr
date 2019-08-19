@@ -38,7 +38,7 @@ The `instances` parameter for `run_experiment()` is simply a list or vector of
 these instance lists.
 
 To illustrate how to adapt existing implementations to this structure, we 
-assume that we are interested in comparing four multiobjective optimization 
+assume that we are interested in comparing four multi-objective optimisation 
 algorithms for a (hypothetical) problem class represented by 
 problems UF1 - UF7 (in dimensions between 10 and 40) from package 
 [smoof](https://CRAN.R-project.org/package=smoof). For this implementation to 

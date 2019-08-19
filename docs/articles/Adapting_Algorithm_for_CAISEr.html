@@ -30,7 +30,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">CAISEr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.14</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.15</span>
       </span>
     </div>
 
@@ -76,7 +76,7 @@
       <h1>Adapting Algorithms for CAISEr</h1>
                         <h4 class="author">Felipe Campelo</h4>
             
-            <h4 class="date">2019-08-02</h4>
+            <h4 class="date">2019-08-06</h4>
       
       
       <div class="hidden name"><code>Adapting_Algorithm_for_CAISEr.Rmd</code></div>
@@ -102,29 +102,29 @@
 <a href="#assembling-an-instance-list" class="anchor"></a>Assembling an instance list</h2>
 <p>As stated in the documentation of both <code><a href="../reference/run_experiment.html">run_experiment()</a></code> and <code><a href="../reference/calc_nreps.html">calc_nreps()</a></code>, each instance must be a named list containing all relevant parameters that define the problem instance. This list must contain at least the field <code>instance$FUN</code>, with the name of the problem instance function, that is, a routine that calculates <span class="math inline">\(y = f(x)\)</span>. If the instance requires additional parameters, these must also be provided as named fields. Each instance can also have an <code>alias</code>, a unique name to distinguish it from other instances. If no alias is provided, the name of the function (<code>instance$FUN</code>) is used as the instance ID.</p>
 <p>The <code>instances</code> parameter for <code><a href="../reference/run_experiment.html">run_experiment()</a></code> is simply a list or vector of these instance lists.</p>
-<p>To illustrate how to adapt existing implementations to this structure, we assume that we are interested in comparing four multiobjective optimization algorithms for a (hypothetical) problem class represented by problems UF1 - UF7 (in dimensions between 10 and 40) from package <a href="https://CRAN.R-project.org/package=smoof">smoof</a>. For this implementation to work with the <code><a href="https://www.rdocumentation.org/packages/MOEADr/topics/moead">MOEADr::moead()</a></code> routine (see next section) some manipulation is necessary, but the instance list in this case is simply a list with each element containing the name of the routine as field <code>$FUN</code> (since all function names are different, no need for aliases).</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/message">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(smoof))</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/message">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(MOEADr))</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/message">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(CAISEr))</a>
-<a class="sourceLine" id="cb1-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="co">### Build function names (instances: UF1 - UF7, dimensions 10 - 40)</span></a>
-<a class="sourceLine" id="cb1-6" data-line-number="6">fname   &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste0</a></span>(<span class="st">"UF_"</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">7</span>)</a>
-<a class="sourceLine" id="cb1-7" data-line-number="7">dims    &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">10</span><span class="op">:</span><span class="dv">40</span>)</a>
-<a class="sourceLine" id="cb1-8" data-line-number="8">allfuns &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/expand.grid">expand.grid</a></span>(fname, dims, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb1-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="co"># Assemble instances list</span></a>
-<a class="sourceLine" id="cb1-11" data-line-number="11">instances &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/vector">vector</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">nrow</a></span>(allfuns), <span class="dt">mode =</span> <span class="st">"list"</span>)</a>
-<a class="sourceLine" id="cb1-12" data-line-number="12"><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(instances)){</a>
-<a class="sourceLine" id="cb1-13" data-line-number="13">  instances[[i]]<span class="op">$</span>FUN &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste0</a></span>(allfuns[i,<span class="dv">1</span>], <span class="st">"_"</span>, allfuns[i,<span class="dv">2</span>])</a>
-<a class="sourceLine" id="cb1-14" data-line-number="14">}</a>
-<a class="sourceLine" id="cb1-15" data-line-number="15"></a>
-<a class="sourceLine" id="cb1-16" data-line-number="16"><span class="co">### Build the functions listed above (so that they can be properly used)</span></a>
-<a class="sourceLine" id="cb1-17" data-line-number="17"><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">nrow</a></span>(allfuns)){</a>
-<a class="sourceLine" id="cb1-18" data-line-number="18">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/assign">assign</a></span>(<span class="dt">x =</span> instances[[i]]<span class="op">$</span>FUN,</a>
-<a class="sourceLine" id="cb1-19" data-line-number="19">     <span class="dt">value =</span> MOEADr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/MOEADr/topics/make_vectorized_smoof">make_vectorized_smoof</a></span>(<span class="dt">prob.name  =</span> <span class="st">"UF"</span>,</a>
-<a class="sourceLine" id="cb1-20" data-line-number="20">                    <span class="dt">dimensions =</span> allfuns[i, <span class="dv">2</span>],</a>
-<a class="sourceLine" id="cb1-21" data-line-number="21">                    <span class="dt">id =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/strsplit">strsplit</a></span>(allfuns[i, <span class="dv">1</span>], <span class="st">"_"</span>)[[<span class="dv">1</span>]][<span class="dv">2</span>])))</a>
-<a class="sourceLine" id="cb1-22" data-line-number="22">}</a></code></pre></div>
+<p>To illustrate how to adapt existing implementations to this structure, we assume that we are interested in comparing four multi-objective optimisation algorithms for a (hypothetical) problem class represented by problems UF1 - UF7 (in dimensions between 10 and 40) from package <a href="https://CRAN.R-project.org/package=smoof">smoof</a>. For this implementation to work with the <code><a href="https://www.rdocumentation.org/packages/MOEADr/topics/moead">MOEADr::moead()</a></code> routine (see next section) some manipulation is necessary, but the instance list in this case is simply a list with each element containing the name of the routine as field <code>$FUN</code> (since all function names are different, no need for aliases).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/message">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(smoof))
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/message">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(MOEADr))
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/message">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(CAISEr))
+
+### Build function names (instances: UF1 - UF7, dimensions 10 - 40)
+fname   &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste0</a></span>(<span class="st">"UF_"</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">7</span>)
+dims    &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">10</span><span class="op">:</span><span class="dv">40</span>)
+allfuns &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/expand.grid">expand.grid</a></span>(fname, dims, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)
+
+<span class="co"># Assemble instances list</span>
+instances &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/vector">vector</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">nrow</a></span>(allfuns), <span class="dt">mode =</span> <span class="st">"list"</span>)
+<span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(instances)){
+  instances[[i]]<span class="op">$</span>FUN &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste0</a></span>(allfuns[i,<span class="dv">1</span>], <span class="st">"_"</span>, allfuns[i,<span class="dv">2</span>])
+}
+
+### Build the functions listed above (so that they can be properly used)
+<span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">nrow</a></span>(allfuns)){
+  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/assign">assign</a></span>(<span class="dt">x =</span> instances[[i]]<span class="op">$</span>FUN,
+     <span class="dt">value =</span> MOEADr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/MOEADr/topics/make_vectorized_smoof">make_vectorized_smoof</a></span>(<span class="dt">prob.name  =</span> <span class="st">"UF"</span>,
+                    <span class="dt">dimensions =</span> allfuns[i, <span class="dv">2</span>],
+                    <span class="dt">id =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/strsplit">strsplit</a></span>(allfuns[i, <span class="dv">1</span>], <span class="st">"_"</span>)[[<span class="dv">1</span>]][<span class="dv">2</span>])))
+}</code></pre></div>
 </div>
 <div id="adaptation-of-an-existing-algorithm-implementation" class="section level2">
 <h2 class="hasAnchor">
@@ -147,153 +147,153 @@ myargs$instance &lt;- instance
 do.call(algorithm$FUN, args = myargs)</code></pre>
 <p>Finally, the <code>algorithm$FUN</code> routine must return a list object containing (at least) the performance value of the final solution obtained after a given run, in a field named <code>value</code> (e.g., <code>result$value</code>) .</p>
 <p>To build the algorithm functions to be used in <code><a href="../reference/run_experiment.html">run_experiment()</a></code>, we encapsulate (almost) all algorithm parameters within a <code>myalgo()</code> function, which receives only two inputs: the instance to be solved (i.e., one element from <code>Instance.list</code>) and the specification of which version of the algorithm is to be run.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># Prepare algorithm function to be used in run_experiment():</span></a>
-<a class="sourceLine" id="cb4-2" data-line-number="2">myalgo &lt;-<span class="st"> </span><span class="cf">function</span>(type, instance){</a>
-<a class="sourceLine" id="cb4-3" data-line-number="3">  <span class="co"># Input parameters:</span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4">  <span class="co">#     - type (variant to use: "original", "original2", "moead.de" or "moead.de2")</span></a>
-<a class="sourceLine" id="cb4-5" data-line-number="5">  <span class="co">#     - instance (instance to be solved, e.g., instance = instances[[i]])</span></a>
-<a class="sourceLine" id="cb4-6" data-line-number="6">  <span class="co"># All other parameters are set internally</span></a>
-<a class="sourceLine" id="cb4-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb4-8" data-line-number="8">  <span class="co">## Extract instance information to build the MOEADr problem format</span></a>
-<a class="sourceLine" id="cb4-9" data-line-number="9">  fdef  &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unlist">unlist</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/strsplit">strsplit</a></span>(instance<span class="op">$</span>FUN, <span class="dt">split =</span> <span class="st">"_"</span>))</a>
-<a class="sourceLine" id="cb4-10" data-line-number="10">  uffun &lt;-<span class="st"> </span>smoof<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/smoof/topics/makeUFFunction">makeUFFunction</a></span>(<span class="dt">dimensions =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(fdef[<span class="dv">3</span>]),</a>
-<a class="sourceLine" id="cb4-11" data-line-number="11">                                 <span class="dt">id         =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(fdef[<span class="dv">2</span>]))</a>
-<a class="sourceLine" id="cb4-12" data-line-number="12">  fattr    &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/attr">attr</a></span>(uffun, <span class="st">"par.set"</span>)</a>
-<a class="sourceLine" id="cb4-13" data-line-number="13">  prob.dim &lt;-<span class="st"> </span>fattr<span class="op">$</span>pars<span class="op">$</span>x<span class="op">$</span>len</a>
-<a class="sourceLine" id="cb4-14" data-line-number="14">  </a>
-<a class="sourceLine" id="cb4-15" data-line-number="15">  <span class="co">## Build MOEADr problem list</span></a>
-<a class="sourceLine" id="cb4-16" data-line-number="16">  problem &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">name =</span> instance<span class="op">$</span>FUN,</a>
-<a class="sourceLine" id="cb4-17" data-line-number="17">                  <span class="dt">xmin =</span> fattr<span class="op">$</span>pars<span class="op">$</span>x<span class="op">$</span>lower,</a>
-<a class="sourceLine" id="cb4-18" data-line-number="18">                  <span class="dt">xmax =</span> fattr<span class="op">$</span>pars<span class="op">$</span>x<span class="op">$</span>upper,</a>
-<a class="sourceLine" id="cb4-19" data-line-number="19">                  <span class="dt">m    =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/attr">attr</a></span>(uffun, <span class="st">"n.objectives"</span>))</a>
-<a class="sourceLine" id="cb4-20" data-line-number="20"></a>
-<a class="sourceLine" id="cb4-21" data-line-number="21">  <span class="co">## Load presets for the algorithm provided in input 'type' and </span></a>
-<a class="sourceLine" id="cb4-22" data-line-number="22">  <span class="co">## modify whatever is needed for this particular experiment</span></a>
-<a class="sourceLine" id="cb4-23" data-line-number="23">  de2 &lt;-<span class="st"> </span><span class="ot">FALSE</span></a>
-<a class="sourceLine" id="cb4-24" data-line-number="24">  <span class="cf">if</span> (type <span class="op">==</span><span class="st"> "moead.de2"</span>){</a>
-<a class="sourceLine" id="cb4-25" data-line-number="25">    de2  &lt;-<span class="st"> </span><span class="ot">TRUE</span></a>
-<a class="sourceLine" id="cb4-26" data-line-number="26">    type &lt;-<span class="st"> "moead.de"</span></a>
-<a class="sourceLine" id="cb4-27" data-line-number="27">  }</a>
-<a class="sourceLine" id="cb4-28" data-line-number="28">  algo.preset &lt;-<span class="st"> </span>MOEADr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/MOEADr/topics/preset_moead">preset_moead</a></span>(type)</a>
-<a class="sourceLine" id="cb4-29" data-line-number="29">  algo.preset<span class="op">$</span>decomp<span class="op">$</span>H &lt;-<span class="st"> </span><span class="dv">99</span> <span class="co"># &lt;-- set population size</span></a>
-<a class="sourceLine" id="cb4-30" data-line-number="30">  algo.preset<span class="op">$</span>stopcrit[[<span class="dv">1</span>]]<span class="op">$</span>name &lt;-<span class="st"> "maxeval"</span> <span class="co"># &lt;-- type of stop criterion</span></a>
-<a class="sourceLine" id="cb4-31" data-line-number="31">  algo.preset<span class="op">$</span>stopcrit[[<span class="dv">1</span>]]<span class="op">$</span>maxeval &lt;-<span class="st"> </span><span class="dv">2000</span> <span class="op">*</span><span class="st"> </span>prob.dim <span class="co"># stop crit.</span></a>
-<a class="sourceLine" id="cb4-32" data-line-number="32">  poly.ind &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/which">which</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">sapply</a></span>(algo.preset<span class="op">$</span>variation,</a>
-<a class="sourceLine" id="cb4-33" data-line-number="33">                           <span class="cf">function</span>(x){x<span class="op">$</span>name <span class="op">==</span><span class="st"> "polymut"</span>}))</a>
-<a class="sourceLine" id="cb4-34" data-line-number="34">  algo.preset<span class="op">$</span>variation[[poly.ind]]<span class="op">$</span>pm &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">/</span><span class="st"> </span>prob.dim <span class="co"># &lt;--- pm = 1/d</span></a>
-<a class="sourceLine" id="cb4-35" data-line-number="35">  <span class="cf">if</span> (de2){</a>
-<a class="sourceLine" id="cb4-36" data-line-number="36">    algo.preset<span class="op">$</span>aggfun<span class="op">$</span>name &lt;-<span class="st"> "pbi"</span></a>
-<a class="sourceLine" id="cb4-37" data-line-number="37">    algo.preset<span class="op">$</span>aggfun<span class="op">$</span>theta &lt;-<span class="st"> </span><span class="dv">5</span></a>
-<a class="sourceLine" id="cb4-38" data-line-number="38">    algo.preset<span class="op">$</span>neighbors<span class="op">$</span>name =<span class="st"> "x"</span></a>
-<a class="sourceLine" id="cb4-39" data-line-number="39">  }</a>
-<a class="sourceLine" id="cb4-40" data-line-number="40">  </a>
-<a class="sourceLine" id="cb4-41" data-line-number="41">  <span class="co">## Run algorithm on "instance"</span></a>
-<a class="sourceLine" id="cb4-42" data-line-number="42">  out &lt;-<span class="st"> </span>MOEADr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/MOEADr/topics/moead">moead</a></span>(<span class="dt">preset =</span> algo.preset, <span class="dt">problem =</span> problem,</a>
-<a class="sourceLine" id="cb4-43" data-line-number="43">                       <span class="dt">showpars =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">show.iters =</span> <span class="st">"none"</span>))</a>
-<a class="sourceLine" id="cb4-44" data-line-number="44"></a>
-<a class="sourceLine" id="cb4-45" data-line-number="45">  <span class="co">## Read reference data to calculate the IGD</span></a>
-<a class="sourceLine" id="cb4-46" data-line-number="46">  Yref  &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">as.matrix</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/read.table">read.table</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste0</a></span>(<span class="st">"./inst/extdata/pf_data/"</span>,</a>
-<a class="sourceLine" id="cb4-47" data-line-number="47">                                       fdef[<span class="dv">1</span>], fdef[<span class="dv">2</span>], <span class="st">".dat"</span>)))</a>
-<a class="sourceLine" id="cb4-48" data-line-number="48">  IGD =<span class="st"> </span>MOEADr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/MOEADr/topics/calcIGD">calcIGD</a></span>(<span class="dt">Y =</span> out<span class="op">$</span>Y, <span class="dt">Yref =</span> Yref)</a>
-<a class="sourceLine" id="cb4-49" data-line-number="49"></a>
-<a class="sourceLine" id="cb4-50" data-line-number="50">  <span class="co">## Return IGD as field "value" in the output list</span></a>
-<a class="sourceLine" id="cb4-51" data-line-number="51">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/function">return</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">value =</span> IGD))</a>
-<a class="sourceLine" id="cb4-52" data-line-number="52">}</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Prepare algorithm function to be used in run_experiment():</span>
+myalgo &lt;-<span class="st"> </span><span class="cf">function</span>(type, instance){
+  <span class="co"># Input parameters:</span>
+  <span class="co">#     - type (variant to use: "original", "original2", "moead.de" or "moead.de2")</span>
+  <span class="co">#     - instance (instance to be solved, e.g., instance = instances[[i]])</span>
+  <span class="co"># All other parameters are set internally</span>
+
+  ## Extract instance information to build the MOEADr problem format
+  fdef  &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unlist">unlist</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/strsplit">strsplit</a></span>(instance<span class="op">$</span>FUN, <span class="dt">split =</span> <span class="st">"_"</span>))
+  uffun &lt;-<span class="st"> </span>smoof<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/smoof/topics/makeUFFunction">makeUFFunction</a></span>(<span class="dt">dimensions =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(fdef[<span class="dv">3</span>]),
+                                 <span class="dt">id         =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(fdef[<span class="dv">2</span>]))
+  fattr    &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/attr">attr</a></span>(uffun, <span class="st">"par.set"</span>)
+  prob.dim &lt;-<span class="st"> </span>fattr<span class="op">$</span>pars<span class="op">$</span>x<span class="op">$</span>len
+  
+  ## Build MOEADr problem list
+  problem &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">name =</span> instance<span class="op">$</span>FUN,
+                  <span class="dt">xmin =</span> fattr<span class="op">$</span>pars<span class="op">$</span>x<span class="op">$</span>lower,
+                  <span class="dt">xmax =</span> fattr<span class="op">$</span>pars<span class="op">$</span>x<span class="op">$</span>upper,
+                  <span class="dt">m    =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/attr">attr</a></span>(uffun, <span class="st">"n.objectives"</span>))
+
+  ## Load presets for the algorithm provided in input 'type' and 
+  ## modify whatever is needed for this particular experiment
+  de2 &lt;-<span class="st"> </span><span class="ot">FALSE</span>
+  <span class="cf">if</span> (type <span class="op">==</span><span class="st"> "moead.de2"</span>){
+    de2  &lt;-<span class="st"> </span><span class="ot">TRUE</span>
+    type &lt;-<span class="st"> "moead.de"</span>
+  }
+  algo.preset &lt;-<span class="st"> </span>MOEADr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/MOEADr/topics/preset_moead">preset_moead</a></span>(type)
+  algo.preset<span class="op">$</span>decomp<span class="op">$</span>H &lt;-<span class="st"> </span><span class="dv">99</span> <span class="co"># &lt;-- set population size</span>
+  algo.preset<span class="op">$</span>stopcrit[[<span class="dv">1</span>]]<span class="op">$</span>name &lt;-<span class="st"> "maxeval"</span> <span class="co"># &lt;-- type of stop criterion</span>
+  algo.preset<span class="op">$</span>stopcrit[[<span class="dv">1</span>]]<span class="op">$</span>maxeval &lt;-<span class="st"> </span><span class="dv">2000</span> <span class="op">*</span><span class="st"> </span>prob.dim <span class="co"># stop crit.</span>
+  poly.ind &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/which">which</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">sapply</a></span>(algo.preset<span class="op">$</span>variation,
+                           <span class="cf">function</span>(x){x<span class="op">$</span>name <span class="op">==</span><span class="st"> "polymut"</span>}))
+  algo.preset<span class="op">$</span>variation[[poly.ind]]<span class="op">$</span>pm &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">/</span><span class="st"> </span>prob.dim <span class="co"># &lt;--- pm = 1/d</span>
+  <span class="cf">if</span> (de2){
+    algo.preset<span class="op">$</span>aggfun<span class="op">$</span>name &lt;-<span class="st"> "pbi"</span>
+    algo.preset<span class="op">$</span>aggfun<span class="op">$</span>theta &lt;-<span class="st"> </span><span class="dv">5</span>
+    algo.preset<span class="op">$</span>neighbors<span class="op">$</span>name =<span class="st"> "x"</span>
+  }
+  
+  ## Run algorithm on "instance"
+  out &lt;-<span class="st"> </span>MOEADr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/MOEADr/topics/moead">moead</a></span>(<span class="dt">preset =</span> algo.preset, <span class="dt">problem =</span> problem,
+                       <span class="dt">showpars =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">show.iters =</span> <span class="st">"none"</span>))
+
+  ## Read reference data to calculate the IGD
+  Yref  &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">as.matrix</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/read.table">read.table</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste0</a></span>(<span class="st">"./inst/extdata/pf_data/"</span>,
+                                       fdef[<span class="dv">1</span>], fdef[<span class="dv">2</span>], <span class="st">".dat"</span>)))
+  IGD =<span class="st"> </span>MOEADr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/MOEADr/topics/calcIGD">calcIGD</a></span>(<span class="dt">Y =</span> out<span class="op">$</span>Y, <span class="dt">Yref =</span> Yref)
+
+  ## Return IGD as field "value" in the output list
+  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/function">return</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">value =</span> IGD))
+}</code></pre></div>
 <p>Finally, the <code>algorithms</code> parameter must be assembled as a list of algorithm objects (each containing fields <code>$FUN</code>, <code>$alias</code> and, in this case, <code>$type</code>).</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="co"># Assemble Algorithm.list. Notice that we need to provide an alias for each </span></a>
-<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co"># method, since both algorithms have the same '$FUN' argument.</span></a>
-<a class="sourceLine" id="cb5-3" data-line-number="3">algorithms &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">FUN   =</span> <span class="st">"myalgo"</span>, </a>
-<a class="sourceLine" id="cb5-4" data-line-number="4">                        <span class="dt">alias =</span> <span class="st">"Original 1"</span>, </a>
-<a class="sourceLine" id="cb5-5" data-line-number="5">                        <span class="dt">type  =</span> <span class="st">"original"</span>),</a>
-<a class="sourceLine" id="cb5-6" data-line-number="6">                   <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">FUN   =</span> <span class="st">"myalgo"</span>, </a>
-<a class="sourceLine" id="cb5-7" data-line-number="7">                        <span class="dt">alias =</span> <span class="st">"Original 2"</span>, </a>
-<a class="sourceLine" id="cb5-8" data-line-number="8">                        <span class="dt">type  =</span> <span class="st">"original2"</span>),</a>
-<a class="sourceLine" id="cb5-9" data-line-number="9">                   <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">FUN   =</span> <span class="st">"myalgo"</span>, </a>
-<a class="sourceLine" id="cb5-10" data-line-number="10">                        <span class="dt">alias =</span> <span class="st">"MOEAD-DE"</span>, </a>
-<a class="sourceLine" id="cb5-11" data-line-number="11">                        <span class="dt">type  =</span> <span class="st">"moead.de"</span>),</a>
-<a class="sourceLine" id="cb5-12" data-line-number="12">                   <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">FUN   =</span> <span class="st">"myalgo"</span>, </a>
-<a class="sourceLine" id="cb5-13" data-line-number="13">                        <span class="dt">alias =</span> <span class="st">"MOEAD-DE2"</span>, </a>
-<a class="sourceLine" id="cb5-14" data-line-number="14">                        <span class="dt">type  =</span> <span class="st">"moead.de2"</span>))</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Assemble Algorithm.list. Notice that we need to provide an alias for each </span>
+<span class="co"># method, since both algorithms have the same '$FUN' argument.</span>
+algorithms &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">FUN   =</span> <span class="st">"myalgo"</span>, 
+                        <span class="dt">alias =</span> <span class="st">"Original 1"</span>, 
+                        <span class="dt">type  =</span> <span class="st">"original"</span>),
+                   <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">FUN   =</span> <span class="st">"myalgo"</span>, 
+                        <span class="dt">alias =</span> <span class="st">"Original 2"</span>, 
+                        <span class="dt">type  =</span> <span class="st">"original2"</span>),
+                   <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">FUN   =</span> <span class="st">"myalgo"</span>, 
+                        <span class="dt">alias =</span> <span class="st">"MOEAD-DE"</span>, 
+                        <span class="dt">type  =</span> <span class="st">"moead.de"</span>),
+                   <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">FUN   =</span> <span class="st">"myalgo"</span>, 
+                        <span class="dt">alias =</span> <span class="st">"MOEAD-DE2"</span>, 
+                        <span class="dt">type  =</span> <span class="st">"moead.de2"</span>))</code></pre></div>
 </div>
 <div id="running-an-experiment-using-caiser" class="section level2">
 <h2 class="hasAnchor">
 <a href="#running-an-experiment-using-caiser" class="anchor"></a>Running an experiment using CAISEr</h2>
 <p>With the definitions above it is possible now to run an experiment using the iterative sample size determination implemented in CAISEr. For that, all we have to do is define the desired experimental parameters and use <code><a href="../reference/run_experiment.html">run_experiment()</a></code>.</p>
 <p><strong>IMPORTANT NOTICE:</strong> running this experiment takes a while (about 4 hours in a 3.6 GHz Intel Core i7 iMac with 16Gb RAM, using 7 cores). If you want a (much) faster example, check the documentation of <code><a href="../reference/run_experiment.html">run_experiment()</a></code>.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">my.results &lt;-<span class="st"> </span><span class="kw"><a href="../reference/run_experiment.html">run_experiment</a></span>(<span class="dt">instances  =</span> instances,</a>
-<a class="sourceLine" id="cb6-2" data-line-number="2">                             <span class="dt">algorithms =</span> algorithms,</a>
-<a class="sourceLine" id="cb6-3" data-line-number="3">                             <span class="dt">power =</span> <span class="fl">0.8</span>,      <span class="co"># Desired power: 80%</span></a>
-<a class="sourceLine" id="cb6-4" data-line-number="4">                             <span class="dt">power.target =</span> <span class="st">"mean"</span>, <span class="co"># on average,</span></a>
-<a class="sourceLine" id="cb6-5" data-line-number="5">                             <span class="dt">d =</span> <span class="fl">0.5</span>,          <span class="co"># to detect differences greater</span></a>
-<a class="sourceLine" id="cb6-6" data-line-number="6">                                               <span class="co"># than 0.5 standard deviations</span></a>
-<a class="sourceLine" id="cb6-7" data-line-number="7">                             <span class="dt">sig.level =</span> <span class="fl">0.05</span>, <span class="co"># at a 95% confidence level. </span></a>
-<a class="sourceLine" id="cb6-8" data-line-number="8">                             <span class="dt">se.max =</span> <span class="fl">0.05</span>,    <span class="co"># Measurement error: 5% </span></a>
-<a class="sourceLine" id="cb6-9" data-line-number="9">                             <span class="dt">dif =</span> <span class="st">"perc"</span>,     <span class="co"># on the paired percent </span></a>
-<a class="sourceLine" id="cb6-10" data-line-number="10">                                               <span class="co"># differences of means,</span></a>
-<a class="sourceLine" id="cb6-11" data-line-number="11">                             <span class="dt">method =</span> <span class="st">"param"</span>, <span class="co"># calculated using parametric</span></a>
-<a class="sourceLine" id="cb6-12" data-line-number="12">                                               <span class="co"># formula.</span></a>
-<a class="sourceLine" id="cb6-13" data-line-number="13">                             <span class="dt">comparisons =</span> <span class="st">"all.vs.all"</span>, <span class="co"># Compare all algorithms </span></a>
-<a class="sourceLine" id="cb6-14" data-line-number="14">                                                         <span class="co"># vs all others,</span></a>
-<a class="sourceLine" id="cb6-15" data-line-number="15">                             <span class="dt">nstart =</span> <span class="dv">15</span>,      <span class="co"># start with 15 runs/algo/inst</span></a>
-<a class="sourceLine" id="cb6-16" data-line-number="16">                             <span class="dt">nmax   =</span> <span class="dv">200</span>,     <span class="co"># and do no more than 200 runs/inst.</span></a>
-<a class="sourceLine" id="cb6-17" data-line-number="17">                             <span class="dt">seed   =</span> <span class="dv">1234</span>,    <span class="co"># PRNG seed (for reproducibility)</span></a>
-<a class="sourceLine" id="cb6-18" data-line-number="18">                             <span class="co">#</span></a>
-<a class="sourceLine" id="cb6-19" data-line-number="19">                             <span class="co"># </span><span class="al">NOTICE</span><span class="co">: Using all but 1 cores. Change if needed</span></a>
-<a class="sourceLine" id="cb6-20" data-line-number="20">                             <span class="dt">ncpus  =</span> parallel<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/parallel/topics/detectCores">detectCores</a></span>() <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my.results &lt;-<span class="st"> </span><span class="kw"><a href="../reference/run_experiment.html">run_experiment</a></span>(<span class="dt">instances  =</span> instances,
+                             <span class="dt">algorithms =</span> algorithms,
+                             <span class="dt">power =</span> <span class="fl">0.8</span>,      <span class="co"># Desired power: 80%</span>
+                             <span class="dt">power.target =</span> <span class="st">"mean"</span>, <span class="co"># on average,</span>
+                             <span class="dt">d =</span> <span class="fl">0.5</span>,          <span class="co"># to detect differences greater</span>
+                                               <span class="co"># than 0.5 standard deviations</span>
+                             <span class="dt">sig.level =</span> <span class="fl">0.05</span>, <span class="co"># at a 95% confidence level. </span>
+                             <span class="dt">se.max =</span> <span class="fl">0.05</span>,    <span class="co"># Measurement error: 5% </span>
+                             <span class="dt">dif =</span> <span class="st">"perc"</span>,     <span class="co"># on the paired percent </span>
+                                               <span class="co"># differences of means,</span>
+                             <span class="dt">method =</span> <span class="st">"param"</span>, <span class="co"># calculated using parametric</span>
+                                               <span class="co"># formula.</span>
+                             <span class="dt">comparisons =</span> <span class="st">"all.vs.all"</span>, <span class="co"># Compare all algorithms </span>
+                                                         <span class="co"># vs all others,</span>
+                             <span class="dt">nstart =</span> <span class="dv">15</span>,      <span class="co"># start with 15 runs/algo/inst</span>
+                             <span class="dt">nmax   =</span> <span class="dv">200</span>,     <span class="co"># and do no more than 200 runs/inst.</span>
+                             <span class="dt">seed   =</span> <span class="dv">1234</span>,    <span class="co"># PRNG seed (for reproducibility)</span>
+                             <span class="co">#</span>
+                             <span class="co"># </span><span class="al">NOTICE</span><span class="co">: Using all but 1 cores. Change if needed</span>
+                             <span class="dt">ncpus  =</span> parallel<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/parallel/topics/detectCores">detectCores</a></span>() <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)</code></pre></div>
 <p>After that we can interrogate the results and perform inference, if we are so inclined. For instance, we can check if all paired differences in performance are (at least approximately) Normal, so that we can assume a Normal sampling distribution of the means and use t-tests without much worry:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/message">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(car))</a>
-<a class="sourceLine" id="cb7-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb7-3" data-line-number="3">algopairs &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste</a></span>(my.results<span class="op">$</span>data.summary<span class="op">$</span>Alg1, </a>
-<a class="sourceLine" id="cb7-4" data-line-number="4">                   my.results<span class="op">$</span>data.summary<span class="op">$</span>Alg2,</a>
-<a class="sourceLine" id="cb7-5" data-line-number="5">                   <span class="dt">sep =</span> <span class="st">" - "</span>)</a>
-<a class="sourceLine" id="cb7-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">3</span>, <span class="dv">2</span>))</a>
-<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="cf">for</span> (i <span class="cf">in</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq_along</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(algopairs))){</a>
-<a class="sourceLine" id="cb7-9" data-line-number="9">  tmp &lt;-<span class="st"> </span>my.results<span class="op">$</span>data.summary[algopairs <span class="op">==</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(algopairs)[i], ]</a>
-<a class="sourceLine" id="cb7-10" data-line-number="10">  car<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/car/topics/qqPlot">qqPlot</a></span>(tmp<span class="op">$</span>Phi, </a>
-<a class="sourceLine" id="cb7-11" data-line-number="11">            <span class="dt">pch =</span> <span class="dv">16</span>, <span class="dt">las =</span> <span class="dv">1</span>, <span class="dt">main =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(algopairs)[i],</a>
-<a class="sourceLine" id="cb7-12" data-line-number="12">            <span class="dt">ylab =</span> <span class="st">"observed"</span>, <span class="dt">xlab =</span> <span class="st">"theoretical quantiles"</span>)</a>
-<a class="sourceLine" id="cb7-13" data-line-number="13">}</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/message">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(car))
+
+algopairs &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste</a></span>(my.results<span class="op">$</span>data.summary<span class="op">$</span>Alg1, 
+                   my.results<span class="op">$</span>data.summary<span class="op">$</span>Alg2,
+                   <span class="dt">sep =</span> <span class="st">" - "</span>)
+
+<span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">3</span>, <span class="dv">2</span>))
+<span class="cf">for</span> (i <span class="cf">in</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq_along</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(algopairs))){
+  tmp &lt;-<span class="st"> </span>my.results<span class="op">$</span>data.summary[algopairs <span class="op">==</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(algopairs)[i], ]
+  car<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/car/topics/qqPlot">qqPlot</a></span>(tmp<span class="op">$</span>Phi, 
+            <span class="dt">pch =</span> <span class="dv">16</span>, <span class="dt">las =</span> <span class="dv">1</span>, <span class="dt">main =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(algopairs)[i],
+            <span class="dt">ylab =</span> <span class="st">"observed"</span>, <span class="dt">xlab =</span> <span class="st">"theoretical quantiles"</span>)
+}</code></pre></div>
 <p><img src="Adapting_Algorithm_for_CAISEr_files/figure-html/unnamed-chunk-6-1.png" width="576" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>, <span class="dv">1</span>))</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>, <span class="dv">1</span>))</code></pre></div>
 <p>The normal QQ plots indicate some deviation from normality, with the <code>MOEA/D-DE</code> vs. <code>MOEA/D-DE2</code> comparison having a particularly longer left tail. We can check visually the effect of this in the sampling distribution of the means:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">3</span>, <span class="dv">2</span>))</a>
-<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="cf">for</span> (i <span class="cf">in</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq_along</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(algopairs))){</a>
-<a class="sourceLine" id="cb9-3" data-line-number="3">  tmp &lt;-<span class="st"> </span>my.results<span class="op">$</span>data.summary[algopairs <span class="op">==</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(algopairs)[i], ]</a>
-<a class="sourceLine" id="cb9-4" data-line-number="4">  boot.means &lt;-<span class="st"> </span>CAISEr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/CAISEr/topics/boot_sdm">boot_sdm</a></span>(tmp<span class="op">$</span>Phi, <span class="dt">boot.R =</span> <span class="dv">999</span>)</a>
-<a class="sourceLine" id="cb9-5" data-line-number="5">  <span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/hist">hist</a></span>(boot.means, <span class="dt">breaks =</span> <span class="dv">30</span>, <span class="dt">main =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(algopairs)[i], <span class="dt">las =</span> <span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb9-6" data-line-number="6">}</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">3</span>, <span class="dv">2</span>))
+<span class="cf">for</span> (i <span class="cf">in</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq_along</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(algopairs))){
+  tmp &lt;-<span class="st"> </span>my.results<span class="op">$</span>data.summary[algopairs <span class="op">==</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(algopairs)[i], ]
+  boot.means &lt;-<span class="st"> </span>CAISEr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/CAISEr/topics/boot_sdm">boot_sdm</a></span>(tmp<span class="op">$</span>Phi, <span class="dt">boot.R =</span> <span class="dv">999</span>)
+  <span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/hist">hist</a></span>(boot.means, <span class="dt">breaks =</span> <span class="dv">30</span>, <span class="dt">main =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(algopairs)[i], <span class="dt">las =</span> <span class="dv">1</span>)
+}</code></pre></div>
 <p><img src="Adapting_Algorithm_for_CAISEr_files/figure-html/unnamed-chunk-7-1.png" width="576" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>, <span class="dv">1</span>))</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>, <span class="dv">1</span>))</code></pre></div>
 <p>The deviations does not seem to be too severe, but are enough to justify using a nonparametric alternative (e.g., Wilcoxon’s Rank-Sum tests) instead of the t-test. This will sacrifice a little power for borderline cases (i.e., comparisons where the actual effect size is close to the value of <span class="math inline">\(d^*\)</span> used in the design of the experiment), but give us more confidence in the comparisons that end up being statistically significant.</p>
 <p>Some other graphical analysis can be quite informative:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">df &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cbind">cbind</a></span>(<span class="dt">Comparison =</span> algopairs, my.results<span class="op">$</span>data.summary)</a>
-<a class="sourceLine" id="cb11-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/message">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ggplot2))</a>
-<a class="sourceLine" id="cb11-4" data-line-number="4">mp &lt;-<span class="st"> </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(df, <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> Comparison, <span class="dt">y =</span> Phi, <span class="dt">fill =</span> Comparison))</a>
-<a class="sourceLine" id="cb11-5" data-line-number="5">mp <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb11-6" data-line-number="6"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_violin.html">geom_violin</a></span>(<span class="dt">alpha =</span> <span class="fl">0.6</span>, <span class="dt">show.legend =</span> <span class="ot">FALSE</span>, <span class="dt">scale =</span> <span class="st">"width"</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb11-7" data-line-number="7"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_boxplot.html">geom_boxplot</a></span>(<span class="dt">alpha =</span> <span class="dv">0</span>, <span class="dt">show.legend =</span> <span class="ot">FALSE</span>, </a>
-<a class="sourceLine" id="cb11-8" data-line-number="8">               <span class="dt">outlier.shape =</span> <span class="ot">NA</span>, <span class="dt">width =</span> <span class="fl">.15</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb11-9" data-line-number="9"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="dt">shape =</span> <span class="dv">16</span>, <span class="dt">col =</span> <span class="st">"black"</span>, <span class="dt">fill =</span> <span class="st">"black"</span>, <span class="dt">alpha =</span> <span class="fl">0.6</span>,</a>
-<a class="sourceLine" id="cb11-10" data-line-number="10">             <span class="dt">position =</span> <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/position_jitter.html">position_jitter</a></span>(<span class="dt">width =</span> <span class="fl">.15</span>)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb11-11" data-line-number="11"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_abline</a></span>(<span class="dt">slope =</span> <span class="dv">0</span>, <span class="dt">intercept =</span> <span class="dv">0</span>, <span class="dt">col =</span> <span class="st">"red"</span>, <span class="dt">lty =</span> <span class="dv">2</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb11-12" data-line-number="12"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span>(<span class="st">"Percent difference in IGD"</span>) <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span>(<span class="st">""</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb11-13" data-line-number="13"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="dt">axis.text.x =</span> <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="dt">angle =</span> <span class="dv">45</span>, <span class="dt">hjust =</span> <span class="dv">1</span>))</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cbind">cbind</a></span>(<span class="dt">Comparison =</span> algopairs, my.results<span class="op">$</span>data.summary)
+
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/message">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ggplot2))
+mp &lt;-<span class="st"> </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(df, <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> Comparison, <span class="dt">y =</span> Phi, <span class="dt">fill =</span> Comparison))
+mp <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_violin.html">geom_violin</a></span>(<span class="dt">alpha =</span> <span class="fl">0.6</span>, <span class="dt">show.legend =</span> <span class="ot">FALSE</span>, <span class="dt">scale =</span> <span class="st">"width"</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_boxplot.html">geom_boxplot</a></span>(<span class="dt">alpha =</span> <span class="dv">0</span>, <span class="dt">show.legend =</span> <span class="ot">FALSE</span>, 
+               <span class="dt">outlier.shape =</span> <span class="ot">NA</span>, <span class="dt">width =</span> .<span class="dv">15</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="dt">shape =</span> <span class="dv">16</span>, <span class="dt">col =</span> <span class="st">"black"</span>, <span class="dt">fill =</span> <span class="st">"black"</span>, <span class="dt">alpha =</span> <span class="fl">0.6</span>,
+             <span class="dt">position =</span> <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/position_jitter.html">position_jitter</a></span>(<span class="dt">width =</span> .<span class="dv">15</span>)) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_abline</a></span>(<span class="dt">slope =</span> <span class="dv">0</span>, <span class="dt">intercept =</span> <span class="dv">0</span>, <span class="dt">col =</span> <span class="st">"red"</span>, <span class="dt">lty =</span> <span class="dv">2</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span>(<span class="st">"Percent difference in IGD"</span>) <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span>(<span class="st">""</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="dt">axis.text.x =</span> <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="dt">angle =</span> <span class="dv">45</span>, <span class="dt">hjust =</span> <span class="dv">1</span>))</code></pre></div>
 <p><img src="Adapting_Algorithm_for_CAISEr_files/figure-html/unnamed-chunk-8-1.png" width="576" style="display: block; margin: auto;"></p>
 <p>Recall first that <code>smaller = better</code> for the quality indicator used in this experiment. Looking at the plot above shows that the differences between all pairs of algorithms were quite high - e.g., differences of up to 200% in the case of the <code>Original 2</code> versus both MOEA/D-DE versions. In general both <code>MOEA/D-DE</code> versions seem to generate better (lower) IGD values than the <code>Original</code> versions, and <code>MOEA/D-DE</code> seems generally better than <code>MOEA/D-DE2</code> (first comparison to the left. Also, the variability seem to be reasonably high for all comparisons.</p>
 <p>We can also visualise the individual estimates (with their standard errors):</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(df, <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> Instance, <span class="dt">y =</span> Phi, <span class="dt">colour =</span> Comparison,</a>
-<a class="sourceLine" id="cb12-2" data-line-number="2">                     <span class="dt">ymin =</span> Phi <span class="op">-</span><span class="st"> </span>SE, <span class="dt">ymax =</span> Phi <span class="op">+</span><span class="st"> </span>SE)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb12-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_linerange.html">geom_pointrange</a></span>(<span class="dt">show.legend =</span> <span class="ot">FALSE</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_abline</a></span>(<span class="dt">slope =</span> <span class="dv">0</span>, <span class="dt">intercept =</span> <span class="dv">0</span>, <span class="dt">col =</span> <span class="dv">1</span>, <span class="dt">lty =</span> <span class="dv">2</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb12-5" data-line-number="5"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html">facet_grid</a></span>(Comparison <span class="op">~</span><span class="st"> </span>.) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb12-6" data-line-number="6"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="dt">axis.text.x =</span> <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="dt">angle =</span> <span class="dv">60</span>, <span class="dt">hjust =</span> <span class="dv">1</span>)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb12-7" data-line-number="7"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span>(<span class="st">""</span>)</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(df, <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> Instance, <span class="dt">y =</span> Phi, <span class="dt">colour =</span> Comparison,
+                     <span class="dt">ymin =</span> Phi <span class="op">-</span><span class="st"> </span>SE, <span class="dt">ymax =</span> Phi <span class="op">+</span><span class="st"> </span>SE)) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_linerange.html">geom_pointrange</a></span>(<span class="dt">show.legend =</span> <span class="ot">FALSE</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_abline</a></span>(<span class="dt">slope =</span> <span class="dv">0</span>, <span class="dt">intercept =</span> <span class="dv">0</span>, <span class="dt">col =</span> <span class="dv">1</span>, <span class="dt">lty =</span> <span class="dv">2</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html">facet_grid</a></span>(Comparison <span class="op">~</span><span class="st"> </span>.) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="dt">axis.text.x =</span> <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="dt">angle =</span> <span class="dv">60</span>, <span class="dt">hjust =</span> <span class="dv">1</span>)) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span>(<span class="st">""</span>)</code></pre></div>
 <p><img src="Adapting_Algorithm_for_CAISEr_files/figure-html/unnamed-chunk-9-1.png" width="576" style="display: block; margin: auto;"></p>
 <p>Notice that the standard errors of the estimators are in most cases smaller than the marker used for the point estimate. Also notice that the observations fall, for each comparison, mainly on one side of the zero-line, which is an almost sure indicator that the comparisons will be statistically significant.</p>
 <p>Finally, we can examine our hypothesis tests. The <code>summary</code> method of class <code>CAISEr</code> already outputs the desired information:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/summary">summary</a></span>(my.results, <span class="dt">test =</span> <span class="st">"wilcoxon"</span>)</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/summary">summary</a></span>(my.results, <span class="dt">test =</span> <span class="st">"wilcoxon"</span>)</code></pre></div>
 <pre><code>## #====================================
 ##  CAISEr object:
 ##  Number of instances sampled: 46
