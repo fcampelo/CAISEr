@@ -1,3 +1,7 @@
+# CAISEr 1.0.16
+* Maintenance update:
+  * minor fix in `se_boot()` to remove CRAN warning.
+
 # CAISEr 1.0.15
 * Maintenance update:
   * minor fix in imported packages to remove NOTE in CRAN checks.

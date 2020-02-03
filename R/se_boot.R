@@ -11,7 +11,7 @@
 #'
 #' @inheritParams calc_se
 #' @param ... other parameters (used only for compatibility with calls to
-#'            [se_boot()], unused in this function)
+#'            [se_param()], unused in this function)
 #'
 #' @return Data frame containing, for each pair of interest, the estimated
 #'      difference (column "Phi") and the sample standard error (column "SE")
@@ -36,7 +36,8 @@
 se_boot <- function(Xk,                  # vector of observations
                     dif = "simple",      # type of difference
                     comparisons = "all.vs.all", # standard errors to calculate
-                    boot.R = 999)        # number of bootstrap resamples
+                    boot.R = 999, # number of bootstrap resamples
+                    ...)
 {
 
   # ========== Error catching ========== #

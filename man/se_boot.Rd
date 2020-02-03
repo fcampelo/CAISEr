@@ -4,7 +4,8 @@
 \alias{se_boot}
 \title{Bootstrap standard errors}
 \usage{
-se_boot(Xk, dif = "simple", comparisons = "all.vs.all", boot.R = 999)
+se_boot(Xk, dif = "simple", comparisons = "all.vs.all", boot.R = 999,
+  ...)
 }
 \arguments{
 \item{Xk}{list object where each position contains a vector of observations
@@ -23,7 +24,7 @@ and all pairwise SEs are desired).}
 (if \code{method == "boot"})}
 
 \item{...}{other parameters (used only for compatibility with calls to
-\code{\link[=se_boot]{se_boot()}}, unused in this function)}
+\code{\link[=se_param]{se_param()}}, unused in this function)}
 }
 \value{
 Data frame containing, for each pair of interest, the estimated
