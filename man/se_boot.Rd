@@ -4,8 +4,7 @@
 \alias{se_boot}
 \title{Bootstrap standard errors}
 \usage{
-se_boot(Xk, dif = "simple", comparisons = "all.vs.all", boot.R = 999,
-  ...)
+se_boot(Xk, dif = "simple", comparisons = "all.vs.all", boot.R = 999, ...)
 }
 \arguments{
 \item{Xk}{list object where each position contains a vector of observations

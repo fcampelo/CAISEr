@@ -4,8 +4,13 @@
 \alias{calc_se}
 \title{Calculates the standard error for simple and percent differences}
 \usage{
-calc_se(Xk, dif = "simple", comparisons = "all.vs.all",
-  method = "param", boot.R = 999)
+calc_se(
+  Xk,
+  dif = "simple",
+  comparisons = "all.vs.all",
+  method = "param",
+  boot.R = 999
+)
 }
 \arguments{
 \item{Xk}{list object where each position contains a vector of observations

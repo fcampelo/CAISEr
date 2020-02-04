@@ -4,8 +4,7 @@
 \alias{print.CAISEr}
 \title{print.CAISEr}
 \usage{
-\method{print}{CAISEr}(x, ..., echo = TRUE, digits = 4, right = TRUE,
-  breakrows = FALSE)
+\method{print}{CAISEr}(x, ..., echo = TRUE, digits = 4, right = TRUE, breakrows = FALSE)
 }
 \arguments{
 \item{x}{list object of class \emph{CAISEr}

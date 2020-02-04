@@ -4,8 +4,16 @@
 \alias{plot.CAISEr}
 \title{plot.CAISEr}
 \usage{
-\method{plot}{CAISEr}(x, y = NULL, ..., latex = FALSE,
-  reorder = FALSE, show.text = TRUE, digits = 3, layout = NULL)
+\method{plot}{CAISEr}(
+  x,
+  y = NULL,
+  ...,
+  latex = FALSE,
+  reorder = FALSE,
+  show.text = TRUE,
+  digits = 3,
+  layout = NULL
+)
 }
 \arguments{
 \item{x}{list object of class \emph{CAISEr}.}

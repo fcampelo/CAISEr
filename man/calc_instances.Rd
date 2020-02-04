@@ -4,9 +4,16 @@
 \alias{calc_instances}
 \title{Calculates number of instances for the comparison of multiple algorithms}
 \usage{
-calc_instances(ncomparisons, d, ninstances = NULL, power = NULL,
-  sig.level = 0.05, alternative.side = "two.sided", test = "t.test",
-  power.target = "mean")
+calc_instances(
+  ncomparisons,
+  d,
+  ninstances = NULL,
+  power = NULL,
+  sig.level = 0.05,
+  alternative.side = "two.sided",
+  test = "t.test",
+  power.target = "mean"
+)
 }
 \arguments{
 \item{ncomparisons}{number of comparisons planned}
@@ -55,14 +62,14 @@ Holm's step-down correction (the default). The routine also takes into
 account whether the desired statistical power refers to the mean power
 (the default), median, or worst-case (which is equivalent to
 designing the experiment for the more widely-known Bonferroni correction).
-See the reference by \code{Campelo and Wanner} for details.
+See the reference by \verb{Campelo and Wanner} for details.
 }
 \section{Sample Sizes for Nonparametric Methods}{
 
 If the parameter \code{test} is set to either \code{Wilcoxon} or \code{Binomial}, this
 routine approximates the number of instances using the ARE of these tests
 in relation to the paired t.test, using the formulas (see reference by
-\code{Campelo and Takahashi} for details):
+\verb{Campelo and Takahashi} for details):
 
 \deqn{n.wilcox = n.ttest / 0.86 = 1.163 * n.ttest}
 \deqn{n.binom = n.ttest / 0.637 = 1.570 * n.ttest}

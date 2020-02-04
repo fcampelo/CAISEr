@@ -7,8 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Adapting Algorithms for CAISEr • CAISEr</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="Adapting Algorithms for CAISEr">
 <meta property="og:description" content="">
 <meta name="twitter:card" content="summary">
@@ -30,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">CAISEr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.15</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.16</span>
       </span>
     </div>
 
@@ -38,7 +39,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -70,13 +71,14 @@
 <!--/.navbar -->
 
       
+
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1>Adapting Algorithms for CAISEr</h1>
                         <h4 class="author">Felipe Campelo</h4>
             
-            <h4 class="date">2019-08-19</h4>
+            <h4 class="date">2020-02-04</h4>
       
       
       <div class="hidden name"><code>Adapting_Algorithm_for_CAISEr.Rmd</code></div>
@@ -102,28 +104,28 @@
 <a href="#assembling-an-instance-list" class="anchor"></a>Assembling an instance list</h2>
 <p>As stated in the documentation of both <code><a href="../reference/run_experiment.html">run_experiment()</a></code> and <code><a href="../reference/calc_nreps.html">calc_nreps()</a></code>, each instance must be a named list containing all relevant parameters that define the problem instance. This list must contain at least the field <code>instance$FUN</code>, with the name of the problem instance function, that is, a routine that calculates <span class="math inline">\(y = f(x)\)</span>. If the instance requires additional parameters, these must also be provided as named fields. Each instance can also have an <code>alias</code>, a unique name to distinguish it from other instances. If no alias is provided, the name of the function (<code>instance$FUN</code>) is used as the instance ID.</p>
 <p>The <code>instances</code> parameter for <code><a href="../reference/run_experiment.html">run_experiment()</a></code> is simply a list or vector of these instance lists.</p>
-<p>To illustrate how to adapt existing implementations to this structure, we assume that we are interested in comparing four multi-objective optimisation algorithms for a (hypothetical) problem class represented by problems UF1 - UF7 (in dimensions between 10 and 40) from package <a href="https://CRAN.R-project.org/package=smoof">smoof</a>. For this implementation to work with the <code><a href="https://www.rdocumentation.org/packages/MOEADr/topics/moead">MOEADr::moead()</a></code> routine (see next section) some manipulation is necessary, but the instance list in this case is simply a list with each element containing the name of the routine as field <code>$FUN</code> (since all function names are different, no need for aliases).</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/message">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(smoof))</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/message">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(MOEADr))</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/message">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(CAISEr))</a>
+<p>To illustrate how to adapt existing implementations to this structure, we assume that we are interested in comparing four multi-objective optimisation algorithms for a (hypothetical) problem class represented by problems UF1 - UF7 (in dimensions between 10 and 40) from package <a href="https://CRAN.R-project.org/package=smoof">smoof</a>. For this implementation to work with the <code><a href="https://rdrr.io/pkg/MOEADr/man/moead.html">MOEADr::moead()</a></code> routine (see next section) some manipulation is necessary, but the instance list in this case is simply a list with each element containing the name of the routine as field <code>$FUN</code> (since all function names are different, no need for aliases).</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(smoof))</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(MOEADr))</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(CAISEr))</a>
 <a class="sourceLine" id="cb1-4" data-line-number="4"></a>
 <a class="sourceLine" id="cb1-5" data-line-number="5"><span class="co">### Build function names (instances: UF1 - UF7, dimensions 10 - 40)</span></a>
-<a class="sourceLine" id="cb1-6" data-line-number="6">fname   &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste0</a></span>(<span class="st">"UF_"</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">7</span>)</a>
-<a class="sourceLine" id="cb1-7" data-line-number="7">dims    &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">10</span><span class="op">:</span><span class="dv">40</span>)</a>
-<a class="sourceLine" id="cb1-8" data-line-number="8">allfuns &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/expand.grid">expand.grid</a></span>(fname, dims, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb1-6" data-line-number="6">fname   &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">"UF_"</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">7</span>)</a>
+<a class="sourceLine" id="cb1-7" data-line-number="7">dims    &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">10</span><span class="op">:</span><span class="dv">40</span>)</a>
+<a class="sourceLine" id="cb1-8" data-line-number="8">allfuns &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/expand.grid.html">expand.grid</a></span>(fname, dims, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</a>
 <a class="sourceLine" id="cb1-9" data-line-number="9"></a>
 <a class="sourceLine" id="cb1-10" data-line-number="10"><span class="co"># Assemble instances list</span></a>
-<a class="sourceLine" id="cb1-11" data-line-number="11">instances &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/vector">vector</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">nrow</a></span>(allfuns), <span class="dt">mode =</span> <span class="st">"list"</span>)</a>
-<a class="sourceLine" id="cb1-12" data-line-number="12"><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(instances)){</a>
-<a class="sourceLine" id="cb1-13" data-line-number="13">  instances[[i]]<span class="op">$</span>FUN &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste0</a></span>(allfuns[i,<span class="dv">1</span>], <span class="st">"_"</span>, allfuns[i,<span class="dv">2</span>])</a>
+<a class="sourceLine" id="cb1-11" data-line-number="11">instances &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/vector.html">vector</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(allfuns), <span class="dt">mode =</span> <span class="st">"list"</span>)</a>
+<a class="sourceLine" id="cb1-12" data-line-number="12"><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(instances)){</a>
+<a class="sourceLine" id="cb1-13" data-line-number="13">  instances[[i]]<span class="op">$</span>FUN &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(allfuns[i,<span class="dv">1</span>], <span class="st">"_"</span>, allfuns[i,<span class="dv">2</span>])</a>
 <a class="sourceLine" id="cb1-14" data-line-number="14">}</a>
 <a class="sourceLine" id="cb1-15" data-line-number="15"></a>
 <a class="sourceLine" id="cb1-16" data-line-number="16"><span class="co">### Build the functions listed above (so that they can be properly used)</span></a>
-<a class="sourceLine" id="cb1-17" data-line-number="17"><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">nrow</a></span>(allfuns)){</a>
-<a class="sourceLine" id="cb1-18" data-line-number="18">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/assign">assign</a></span>(<span class="dt">x =</span> instances[[i]]<span class="op">$</span>FUN,</a>
-<a class="sourceLine" id="cb1-19" data-line-number="19">     <span class="dt">value =</span> MOEADr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/MOEADr/topics/make_vectorized_smoof">make_vectorized_smoof</a></span>(<span class="dt">prob.name  =</span> <span class="st">"UF"</span>,</a>
+<a class="sourceLine" id="cb1-17" data-line-number="17"><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(allfuns)){</a>
+<a class="sourceLine" id="cb1-18" data-line-number="18">  <span class="kw"><a href="https://rdrr.io/r/base/assign.html">assign</a></span>(<span class="dt">x =</span> instances[[i]]<span class="op">$</span>FUN,</a>
+<a class="sourceLine" id="cb1-19" data-line-number="19">     <span class="dt">value =</span> MOEADr<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/MOEADr/man/make_vectorized_smoof.html">make_vectorized_smoof</a></span>(<span class="dt">prob.name  =</span> <span class="st">"UF"</span>,</a>
 <a class="sourceLine" id="cb1-20" data-line-number="20">                    <span class="dt">dimensions =</span> allfuns[i, <span class="dv">2</span>],</a>
-<a class="sourceLine" id="cb1-21" data-line-number="21">                    <span class="dt">id =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/strsplit">strsplit</a></span>(allfuns[i, <span class="dv">1</span>], <span class="st">"_"</span>)[[<span class="dv">1</span>]][<span class="dv">2</span>])))</a>
+<a class="sourceLine" id="cb1-21" data-line-number="21">                    <span class="dt">id =</span> <span class="kw"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/strsplit.html">strsplit</a></span>(allfuns[i, <span class="dv">1</span>], <span class="st">"_"</span>)[[<span class="dv">1</span>]][<span class="dv">2</span>])))</a>
 <a class="sourceLine" id="cb1-22" data-line-number="22">}</a></code></pre></div>
 </div>
 <div id="adaptation-of-an-existing-algorithm-implementation" class="section level2">
@@ -155,17 +157,17 @@ do.call(algorithm$FUN, args = myargs)</code></pre>
 <a class="sourceLine" id="cb4-6" data-line-number="6">  <span class="co"># All other parameters are set internally</span></a>
 <a class="sourceLine" id="cb4-7" data-line-number="7"></a>
 <a class="sourceLine" id="cb4-8" data-line-number="8">  <span class="co">## Extract instance information to build the MOEADr problem format</span></a>
-<a class="sourceLine" id="cb4-9" data-line-number="9">  fdef  &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unlist">unlist</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/strsplit">strsplit</a></span>(instance<span class="op">$</span>FUN, <span class="dt">split =</span> <span class="st">"_"</span>))</a>
-<a class="sourceLine" id="cb4-10" data-line-number="10">  uffun &lt;-<span class="st"> </span>smoof<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/smoof/topics/makeUFFunction">makeUFFunction</a></span>(<span class="dt">dimensions =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(fdef[<span class="dv">3</span>]),</a>
-<a class="sourceLine" id="cb4-11" data-line-number="11">                                 <span class="dt">id         =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(fdef[<span class="dv">2</span>]))</a>
-<a class="sourceLine" id="cb4-12" data-line-number="12">  fattr    &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/attr">attr</a></span>(uffun, <span class="st">"par.set"</span>)</a>
+<a class="sourceLine" id="cb4-9" data-line-number="9">  fdef  &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/strsplit.html">strsplit</a></span>(instance<span class="op">$</span>FUN, <span class="dt">split =</span> <span class="st">"_"</span>))</a>
+<a class="sourceLine" id="cb4-10" data-line-number="10">  uffun &lt;-<span class="st"> </span>smoof<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/smoof/man/makeUFFunction.html">makeUFFunction</a></span>(<span class="dt">dimensions =</span> <span class="kw"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span>(fdef[<span class="dv">3</span>]),</a>
+<a class="sourceLine" id="cb4-11" data-line-number="11">                                 <span class="dt">id         =</span> <span class="kw"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span>(fdef[<span class="dv">2</span>]))</a>
+<a class="sourceLine" id="cb4-12" data-line-number="12">  fattr    &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/attr.html">attr</a></span>(uffun, <span class="st">"par.set"</span>)</a>
 <a class="sourceLine" id="cb4-13" data-line-number="13">  prob.dim &lt;-<span class="st"> </span>fattr<span class="op">$</span>pars<span class="op">$</span>x<span class="op">$</span>len</a>
 <a class="sourceLine" id="cb4-14" data-line-number="14">  </a>
 <a class="sourceLine" id="cb4-15" data-line-number="15">  <span class="co">## Build MOEADr problem list</span></a>
-<a class="sourceLine" id="cb4-16" data-line-number="16">  problem &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">name =</span> instance<span class="op">$</span>FUN,</a>
+<a class="sourceLine" id="cb4-16" data-line-number="16">  problem &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">name =</span> instance<span class="op">$</span>FUN,</a>
 <a class="sourceLine" id="cb4-17" data-line-number="17">                  <span class="dt">xmin =</span> fattr<span class="op">$</span>pars<span class="op">$</span>x<span class="op">$</span>lower,</a>
 <a class="sourceLine" id="cb4-18" data-line-number="18">                  <span class="dt">xmax =</span> fattr<span class="op">$</span>pars<span class="op">$</span>x<span class="op">$</span>upper,</a>
-<a class="sourceLine" id="cb4-19" data-line-number="19">                  <span class="dt">m    =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/attr">attr</a></span>(uffun, <span class="st">"n.objectives"</span>))</a>
+<a class="sourceLine" id="cb4-19" data-line-number="19">                  <span class="dt">m    =</span> <span class="kw"><a href="https://rdrr.io/r/base/attr.html">attr</a></span>(uffun, <span class="st">"n.objectives"</span>))</a>
 <a class="sourceLine" id="cb4-20" data-line-number="20"></a>
 <a class="sourceLine" id="cb4-21" data-line-number="21">  <span class="co">## Load presets for the algorithm provided in input 'type' and </span></a>
 <a class="sourceLine" id="cb4-22" data-line-number="22">  <span class="co">## modify whatever is needed for this particular experiment</span></a>
@@ -174,11 +176,11 @@ do.call(algorithm$FUN, args = myargs)</code></pre>
 <a class="sourceLine" id="cb4-25" data-line-number="25">    de2  &lt;-<span class="st"> </span><span class="ot">TRUE</span></a>
 <a class="sourceLine" id="cb4-26" data-line-number="26">    type &lt;-<span class="st"> "moead.de"</span></a>
 <a class="sourceLine" id="cb4-27" data-line-number="27">  }</a>
-<a class="sourceLine" id="cb4-28" data-line-number="28">  algo.preset &lt;-<span class="st"> </span>MOEADr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/MOEADr/topics/preset_moead">preset_moead</a></span>(type)</a>
+<a class="sourceLine" id="cb4-28" data-line-number="28">  algo.preset &lt;-<span class="st"> </span>MOEADr<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/MOEADr/man/preset_moead.html">preset_moead</a></span>(type)</a>
 <a class="sourceLine" id="cb4-29" data-line-number="29">  algo.preset<span class="op">$</span>decomp<span class="op">$</span>H &lt;-<span class="st"> </span><span class="dv">99</span> <span class="co"># &lt;-- set population size</span></a>
 <a class="sourceLine" id="cb4-30" data-line-number="30">  algo.preset<span class="op">$</span>stopcrit[[<span class="dv">1</span>]]<span class="op">$</span>name &lt;-<span class="st"> "maxeval"</span> <span class="co"># &lt;-- type of stop criterion</span></a>
 <a class="sourceLine" id="cb4-31" data-line-number="31">  algo.preset<span class="op">$</span>stopcrit[[<span class="dv">1</span>]]<span class="op">$</span>maxeval &lt;-<span class="st"> </span><span class="dv">2000</span> <span class="op">*</span><span class="st"> </span>prob.dim <span class="co"># stop crit.</span></a>
-<a class="sourceLine" id="cb4-32" data-line-number="32">  poly.ind &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/which">which</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">sapply</a></span>(algo.preset<span class="op">$</span>variation,</a>
+<a class="sourceLine" id="cb4-32" data-line-number="32">  poly.ind &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/which.html">which</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span>(algo.preset<span class="op">$</span>variation,</a>
 <a class="sourceLine" id="cb4-33" data-line-number="33">                           <span class="cf">function</span>(x){x<span class="op">$</span>name <span class="op">==</span><span class="st"> "polymut"</span>}))</a>
 <a class="sourceLine" id="cb4-34" data-line-number="34">  algo.preset<span class="op">$</span>variation[[poly.ind]]<span class="op">$</span>pm &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">/</span><span class="st"> </span>prob.dim <span class="co"># &lt;--- pm = 1/d</span></a>
 <a class="sourceLine" id="cb4-35" data-line-number="35">  <span class="cf">if</span> (de2){</a>
@@ -188,30 +190,30 @@ do.call(algorithm$FUN, args = myargs)</code></pre>
 <a class="sourceLine" id="cb4-39" data-line-number="39">  }</a>
 <a class="sourceLine" id="cb4-40" data-line-number="40">  </a>
 <a class="sourceLine" id="cb4-41" data-line-number="41">  <span class="co">## Run algorithm on "instance"</span></a>
-<a class="sourceLine" id="cb4-42" data-line-number="42">  out &lt;-<span class="st"> </span>MOEADr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/MOEADr/topics/moead">moead</a></span>(<span class="dt">preset =</span> algo.preset, <span class="dt">problem =</span> problem,</a>
-<a class="sourceLine" id="cb4-43" data-line-number="43">                       <span class="dt">showpars =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">show.iters =</span> <span class="st">"none"</span>))</a>
+<a class="sourceLine" id="cb4-42" data-line-number="42">  out &lt;-<span class="st"> </span>MOEADr<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/MOEADr/man/moead.html">moead</a></span>(<span class="dt">preset =</span> algo.preset, <span class="dt">problem =</span> problem,</a>
+<a class="sourceLine" id="cb4-43" data-line-number="43">                       <span class="dt">showpars =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">show.iters =</span> <span class="st">"none"</span>))</a>
 <a class="sourceLine" id="cb4-44" data-line-number="44"></a>
 <a class="sourceLine" id="cb4-45" data-line-number="45">  <span class="co">## Read reference data to calculate the IGD</span></a>
-<a class="sourceLine" id="cb4-46" data-line-number="46">  Yref  &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">as.matrix</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/read.table">read.table</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste0</a></span>(<span class="st">"./inst/extdata/pf_data/"</span>,</a>
+<a class="sourceLine" id="cb4-46" data-line-number="46">  Yref  &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span>(<span class="kw"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">"./inst/extdata/pf_data/"</span>,</a>
 <a class="sourceLine" id="cb4-47" data-line-number="47">                                       fdef[<span class="dv">1</span>], fdef[<span class="dv">2</span>], <span class="st">".dat"</span>)))</a>
-<a class="sourceLine" id="cb4-48" data-line-number="48">  IGD =<span class="st"> </span>MOEADr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/MOEADr/topics/calcIGD">calcIGD</a></span>(<span class="dt">Y =</span> out<span class="op">$</span>Y, <span class="dt">Yref =</span> Yref)</a>
+<a class="sourceLine" id="cb4-48" data-line-number="48">  IGD =<span class="st"> </span>MOEADr<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/MOEADr/man/calcIGD.html">calcIGD</a></span>(<span class="dt">Y =</span> out<span class="op">$</span>Y, <span class="dt">Yref =</span> Yref)</a>
 <a class="sourceLine" id="cb4-49" data-line-number="49"></a>
 <a class="sourceLine" id="cb4-50" data-line-number="50">  <span class="co">## Return IGD as field "value" in the output list</span></a>
-<a class="sourceLine" id="cb4-51" data-line-number="51">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/function">return</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">value =</span> IGD))</a>
+<a class="sourceLine" id="cb4-51" data-line-number="51">  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">value =</span> IGD))</a>
 <a class="sourceLine" id="cb4-52" data-line-number="52">}</a></code></pre></div>
 <p>Finally, the <code>algorithms</code> parameter must be assembled as a list of algorithm objects (each containing fields <code>$FUN</code>, <code>$alias</code> and, in this case, <code>$type</code>).</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="co"># Assemble Algorithm.list. Notice that we need to provide an alias for each </span></a>
 <a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co"># method, since both algorithms have the same '$FUN' argument.</span></a>
-<a class="sourceLine" id="cb5-3" data-line-number="3">algorithms &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">FUN   =</span> <span class="st">"myalgo"</span>, </a>
+<a class="sourceLine" id="cb5-3" data-line-number="3">algorithms &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">FUN   =</span> <span class="st">"myalgo"</span>, </a>
 <a class="sourceLine" id="cb5-4" data-line-number="4">                        <span class="dt">alias =</span> <span class="st">"Original 1"</span>, </a>
 <a class="sourceLine" id="cb5-5" data-line-number="5">                        <span class="dt">type  =</span> <span class="st">"original"</span>),</a>
-<a class="sourceLine" id="cb5-6" data-line-number="6">                   <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">FUN   =</span> <span class="st">"myalgo"</span>, </a>
+<a class="sourceLine" id="cb5-6" data-line-number="6">                   <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">FUN   =</span> <span class="st">"myalgo"</span>, </a>
 <a class="sourceLine" id="cb5-7" data-line-number="7">                        <span class="dt">alias =</span> <span class="st">"Original 2"</span>, </a>
 <a class="sourceLine" id="cb5-8" data-line-number="8">                        <span class="dt">type  =</span> <span class="st">"original2"</span>),</a>
-<a class="sourceLine" id="cb5-9" data-line-number="9">                   <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">FUN   =</span> <span class="st">"myalgo"</span>, </a>
+<a class="sourceLine" id="cb5-9" data-line-number="9">                   <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">FUN   =</span> <span class="st">"myalgo"</span>, </a>
 <a class="sourceLine" id="cb5-10" data-line-number="10">                        <span class="dt">alias =</span> <span class="st">"MOEAD-DE"</span>, </a>
 <a class="sourceLine" id="cb5-11" data-line-number="11">                        <span class="dt">type  =</span> <span class="st">"moead.de"</span>),</a>
-<a class="sourceLine" id="cb5-12" data-line-number="12">                   <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">FUN   =</span> <span class="st">"myalgo"</span>, </a>
+<a class="sourceLine" id="cb5-12" data-line-number="12">                   <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">FUN   =</span> <span class="st">"myalgo"</span>, </a>
 <a class="sourceLine" id="cb5-13" data-line-number="13">                        <span class="dt">alias =</span> <span class="st">"MOEAD-DE2"</span>, </a>
 <a class="sourceLine" id="cb5-14" data-line-number="14">                        <span class="dt">type  =</span> <span class="st">"moead.de2"</span>))</a></code></pre></div>
 </div>
@@ -239,40 +241,40 @@ do.call(algorithm$FUN, args = myargs)</code></pre>
 <a class="sourceLine" id="cb6-17" data-line-number="17">                             <span class="dt">seed   =</span> <span class="dv">1234</span>,    <span class="co"># PRNG seed (for reproducibility)</span></a>
 <a class="sourceLine" id="cb6-18" data-line-number="18">                             <span class="co">#</span></a>
 <a class="sourceLine" id="cb6-19" data-line-number="19">                             <span class="co"># </span><span class="al">NOTICE</span><span class="co">: Using all but 1 cores. Change if needed</span></a>
-<a class="sourceLine" id="cb6-20" data-line-number="20">                             <span class="dt">ncpus  =</span> parallel<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/parallel/topics/detectCores">detectCores</a></span>() <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb6-20" data-line-number="20">                             <span class="dt">ncpus  =</span> parallel<span class="op">::</span><span class="kw"><a href="https://rdrr.io/r/parallel/detectCores.html">detectCores</a></span>() <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)</a></code></pre></div>
 <p>After that we can interrogate the results and perform inference, if we are so inclined. But first, CAISEr provides a useful plot function for the output of <code><a href="../reference/run_experiment.html">run_experiment()</a></code>. Let’s try it (type <code><a href="../reference/plot.CAISEr.html">?plot.CAISEr</a></code> for details):</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/plot">plot</a></span>(my.results)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(my.results)</a></code></pre></div>
 <p><img src="Adapting_Algorithm_for_CAISEr_files/figure-html/unnamed-chunk-6-1.png" width="768" style="display: block; margin: auto;"></p>
 <p>We can also check if all paired differences in performance are (at least approximately) Normal, so that we can assume a Normal sampling distribution of the means and use t-tests without much worry:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/message">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(car))</a>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(car))</a>
 <a class="sourceLine" id="cb8-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb8-3" data-line-number="3">algopairs &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste</a></span>(my.results<span class="op">$</span>data.summary<span class="op">$</span>Alg1, </a>
+<a class="sourceLine" id="cb8-3" data-line-number="3">algopairs &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(my.results<span class="op">$</span>data.summary<span class="op">$</span>Alg1, </a>
 <a class="sourceLine" id="cb8-4" data-line-number="4">                   my.results<span class="op">$</span>data.summary<span class="op">$</span>Alg2,</a>
 <a class="sourceLine" id="cb8-5" data-line-number="5">                   <span class="dt">sep =</span> <span class="st">" - "</span>)</a>
 <a class="sourceLine" id="cb8-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb8-7" data-line-number="7"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">3</span>, <span class="dv">2</span>))</a>
-<a class="sourceLine" id="cb8-8" data-line-number="8"><span class="cf">for</span> (i <span class="cf">in</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq_along</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(algopairs))){</a>
-<a class="sourceLine" id="cb8-9" data-line-number="9">  tmp &lt;-<span class="st"> </span>my.results<span class="op">$</span>data.summary[algopairs <span class="op">==</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(algopairs)[i], ]</a>
-<a class="sourceLine" id="cb8-10" data-line-number="10">  car<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/car/topics/qqPlot">qqPlot</a></span>(tmp<span class="op">$</span>Phi, </a>
-<a class="sourceLine" id="cb8-11" data-line-number="11">            <span class="dt">pch =</span> <span class="dv">16</span>, <span class="dt">las =</span> <span class="dv">1</span>, <span class="dt">main =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(algopairs)[i],</a>
+<a class="sourceLine" id="cb8-7" data-line-number="7"><span class="kw"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">3</span>, <span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb8-8" data-line-number="8"><span class="cf">for</span> (i <span class="cf">in</span> <span class="kw"><a href="https://rdrr.io/r/base/seq.html">seq_along</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(algopairs))){</a>
+<a class="sourceLine" id="cb8-9" data-line-number="9">  tmp &lt;-<span class="st"> </span>my.results<span class="op">$</span>data.summary[algopairs <span class="op">==</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(algopairs)[i], ]</a>
+<a class="sourceLine" id="cb8-10" data-line-number="10">  car<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/car/man/qqPlot.html">qqPlot</a></span>(tmp<span class="op">$</span>Phi, </a>
+<a class="sourceLine" id="cb8-11" data-line-number="11">            <span class="dt">pch =</span> <span class="dv">16</span>, <span class="dt">las =</span> <span class="dv">1</span>, <span class="dt">main =</span> <span class="kw"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(algopairs)[i],</a>
 <a class="sourceLine" id="cb8-12" data-line-number="12">            <span class="dt">ylab =</span> <span class="st">"observed"</span>, <span class="dt">xlab =</span> <span class="st">"theoretical quantiles"</span>)</a>
 <a class="sourceLine" id="cb8-13" data-line-number="13">}</a></code></pre></div>
 <p><img src="Adapting_Algorithm_for_CAISEr_files/figure-html/unnamed-chunk-7-1.png" width="576" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>, <span class="dv">1</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span>, <span class="dv">1</span>))</a></code></pre></div>
 <p>The normal QQ plots indicate some deviation from normality, with the <code>MOEA/D-DE</code> vs. <code>MOEA/D-DE2</code> comparison having a particularly longer left tail. We can check visually the effect of this in the sampling distribution of the means:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">3</span>, <span class="dv">2</span>))</a>
-<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="cf">for</span> (i <span class="cf">in</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq_along</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(algopairs))){</a>
-<a class="sourceLine" id="cb10-3" data-line-number="3">  tmp &lt;-<span class="st"> </span>my.results<span class="op">$</span>data.summary[algopairs <span class="op">==</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(algopairs)[i], ]</a>
-<a class="sourceLine" id="cb10-4" data-line-number="4">  boot.means &lt;-<span class="st"> </span>CAISEr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/CAISEr/topics/boot_sdm">boot_sdm</a></span>(tmp<span class="op">$</span>Phi, <span class="dt">boot.R =</span> <span class="dv">999</span>)</a>
-<a class="sourceLine" id="cb10-5" data-line-number="5">  <span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/hist">hist</a></span>(boot.means, <span class="dt">breaks =</span> <span class="dv">30</span>, <span class="dt">main =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(algopairs)[i], <span class="dt">las =</span> <span class="dv">1</span>)</a>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">3</span>, <span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="cf">for</span> (i <span class="cf">in</span> <span class="kw"><a href="https://rdrr.io/r/base/seq.html">seq_along</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(algopairs))){</a>
+<a class="sourceLine" id="cb10-3" data-line-number="3">  tmp &lt;-<span class="st"> </span>my.results<span class="op">$</span>data.summary[algopairs <span class="op">==</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(algopairs)[i], ]</a>
+<a class="sourceLine" id="cb10-4" data-line-number="4">  boot.means &lt;-<span class="st"> </span>CAISEr<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/CAISEr/man/boot_sdm.html">boot_sdm</a></span>(tmp<span class="op">$</span>Phi, <span class="dt">boot.R =</span> <span class="dv">999</span>)</a>
+<a class="sourceLine" id="cb10-5" data-line-number="5">  <span class="kw"><a href="https://rdrr.io/r/graphics/hist.html">hist</a></span>(boot.means, <span class="dt">breaks =</span> <span class="dv">30</span>, <span class="dt">main =</span> <span class="kw"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(algopairs)[i], <span class="dt">las =</span> <span class="dv">1</span>)</a>
 <a class="sourceLine" id="cb10-6" data-line-number="6">}</a></code></pre></div>
 <p><img src="Adapting_Algorithm_for_CAISEr_files/figure-html/unnamed-chunk-8-1.png" width="576" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>, <span class="dv">1</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span>, <span class="dv">1</span>))</a></code></pre></div>
 <p>The deviations does not seem to be too severe, but are enough to justify using a nonparametric alternative (e.g., Wilcoxon’s Rank-Sum tests) instead of the t-test. This will sacrifice a little power for borderline cases (i.e., comparisons where the actual effect size is close to the value of <span class="math inline">\(d^*\)</span> used in the design of the experiment), but give us more confidence in the comparisons that end up being statistically significant.</p>
 <p>Some other graphical analysis can be quite informative:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">df &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cbind">cbind</a></span>(<span class="dt">Comparison =</span> algopairs, my.results<span class="op">$</span>data.summary)</a>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">df &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span>(<span class="dt">Comparison =</span> algopairs, my.results<span class="op">$</span>data.summary)</a>
 <a class="sourceLine" id="cb12-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb12-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/message">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ggplot2))</a>
+<a class="sourceLine" id="cb12-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(ggplot2))</a>
 <a class="sourceLine" id="cb12-4" data-line-number="4">mp &lt;-<span class="st"> </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(df, <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> Comparison, <span class="dt">y =</span> Phi, <span class="dt">fill =</span> Comparison))</a>
 <a class="sourceLine" id="cb12-5" data-line-number="5">mp <span class="op">+</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb12-6" data-line-number="6"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_violin.html">geom_violin</a></span>(<span class="dt">alpha =</span> <span class="fl">0.6</span>, <span class="dt">show.legend =</span> <span class="ot">FALSE</span>, <span class="dt">scale =</span> <span class="st">"width"</span>) <span class="op">+</span><span class="st"> </span></a>
@@ -296,7 +298,7 @@ do.call(algorithm$FUN, args = myargs)</code></pre>
 <p><img src="Adapting_Algorithm_for_CAISEr_files/figure-html/unnamed-chunk-10-1.png" width="576" style="display: block; margin: auto;"></p>
 <p>Notice that the standard errors of the estimators are in most cases smaller than the marker used for the point estimate. Also notice that the observations fall, for each comparison, mainly on one side of the zero-line, which is an almost sure indicator that the comparisons will be statistically significant.</p>
 <p>Finally, we can examine our hypothesis tests. The <code>summary</code> method of class <code>CAISEr</code> already outputs the desired information:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/summary">summary</a></span>(my.results, <span class="dt">test =</span> <span class="st">"wilcoxon"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(my.results, <span class="dt">test =</span> <span class="st">"wilcoxon"</span>)</a></code></pre></div>
 <pre><code>## #====================================
 ##  CAISEr object:
 ##  Number of instances sampled: 46
@@ -371,6 +373,7 @@ do.call(algorithm$FUN, args = myargs)</code></pre>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+
         <div id="tocnav">
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
@@ -386,17 +389,20 @@ do.call(algorithm$FUN, args = myargs)</code></pre>
 </div>
 
 
+
       <footer><div class="copyright">
   <p>Developed by Felipe Campelo.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
+
       </footer>
 </div>
 
   
+
 
   </body>
 </html>

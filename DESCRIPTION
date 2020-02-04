@@ -10,7 +10,7 @@ Authors@R: c(person(given = "Felipe", family = "Campelo",
                     email = "fernandact@ufmg.br",
                     role = "ctb"),
              person(given = "Elizabeth", family = "Wanner",
-                    email = "e.wanner@aston.ac.uk",
+                    email = "efwanner@decom.cefetmg.br",
                     role = "ctb"))
 Description: Functions for performing experimental comparisons of algorithms 
              using adequate sample sizes for power and accuracy. Implements the 
@@ -34,7 +34,7 @@ Suggests: MOEADr,
           pkgdown
 LazyData: TRUE
 Encoding: UTF-8
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
 URL: https://fcampelo.github.io/CAISEr/

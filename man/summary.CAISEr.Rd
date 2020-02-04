@@ -4,8 +4,7 @@
 \alias{summary.CAISEr}
 \title{summary.CAISEr}
 \usage{
-\method{summary}{CAISEr}(object, test = NULL, alternative = NULL,
-  sig.level = NULL, ...)
+\method{summary}{CAISEr}(object, test = NULL, alternative = NULL, sig.level = NULL, ...)
 }
 \arguments{
 \item{object}{list object of class \emph{CAISEr}

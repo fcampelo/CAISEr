@@ -4,10 +4,22 @@
 \alias{calc_nreps}
 \title{Determine sample sizes for a set of algorithms on a single problem instance}
 \usage{
-calc_nreps(instance, algorithms, se.max, dif = "simple",
-  comparisons = "all.vs.all", method = "param", nstart = 20,
-  nmax = 1000, seed = NULL, boot.R = 499, ncpus = 1,
-  force.balanced = FALSE, load.folder = NA, save.folder = NA)
+calc_nreps(
+  instance,
+  algorithms,
+  se.max,
+  dif = "simple",
+  comparisons = "all.vs.all",
+  method = "param",
+  nstart = 20,
+  nmax = 1000,
+  seed = NULL,
+  boot.R = 499,
+  ncpus = 1,
+  force.balanced = FALSE,
+  load.folder = NA,
+  save.folder = NA
+)
 }
 \arguments{
 \item{instance}{a list object containing the definitions of the problem
@@ -19,7 +31,7 @@ See Section \code{Algorithms} for details.}
 
 \item{se.max}{desired upper limit for the standard error of the estimated
 difference between pairs of algorithms. See Section
-\code{Pairwise Differences} for details.}
+\verb{Pairwise Differences} for details.}
 
 \item{dif}{type of difference to be used. Accepts "perc" (for percent
 differences) or "simple" (for simple differences)}
@@ -33,7 +45,7 @@ and all pairwise comparisons are desired).}
 "param" (for parametric) or "boot" (for bootstrap)}
 
 \item{nstart}{initial number of algorithm runs for each algorithm.
-See Section \code{Initial Number of Observations} for details.}
+See Section \verb{Initial Number of Observations} for details.}
 
 \item{nmax}{maximum \strong{total} allowed number of runs to execute. Loaded
 results (see \code{load.folder} below) do not count towards this

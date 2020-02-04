@@ -5,19 +5,35 @@
 \title{Run a full experiment for comparing multiple algorithms using multiple
 instances}
 \usage{
-run_experiment(instances, algorithms, d, se.max, power = 0.8,
-  sig.level = 0.05, power.target = "mean", dif = "simple",
-  comparisons = "all.vs.all", alternative = "two.sided",
-  test = "t.test", method = "param", nstart = 20, nmax = 100 *
-  length(algorithms), force.balanced = FALSE, ncpus = 2,
-  boot.R = 499, seed = NULL, save.partial.results = NA,
-  load.partial.results = NA, save.final.result = NA)
+run_experiment(
+  instances,
+  algorithms,
+  d,
+  se.max,
+  power = 0.8,
+  sig.level = 0.05,
+  power.target = "mean",
+  dif = "simple",
+  comparisons = "all.vs.all",
+  alternative = "two.sided",
+  test = "t.test",
+  method = "param",
+  nstart = 20,
+  nmax = 100 * length(algorithms),
+  force.balanced = FALSE,
+  ncpus = 2,
+  boot.R = 499,
+  seed = NULL,
+  save.partial.results = NA,
+  load.partial.results = NA,
+  save.final.result = NA
+)
 }
 \arguments{
 \item{instances}{list object containing the definitions of the
 \emph{available} instances. This list may (or may not) be exhausted in the
 experiment. To estimate the number of required instances,
-see \code{\link[=calc_instances]{calc_instances()}}. For more details, see Section \code{Instance List}.}
+see \code{\link[=calc_instances]{calc_instances()}}. For more details, see Section \verb{Instance List}.}
 
 \item{algorithms}{a list object containing the definitions of all algorithms.
 See Section \code{Algorithms} for details.}
@@ -28,7 +44,7 @@ See \code{\link[=calc_instances]{calc_instances()}} for details.}
 
 \item{se.max}{desired upper limit for the standard error of the estimated
 difference between pairs of algorithms. See Section
-\code{Pairwise Differences} for details.}
+\verb{Pairwise Differences} for details.}
 
 \item{power}{(desired) test power. See \code{\link[=calc_instances]{calc_instances()}} for details.
 Any value equal to or greater than one will force the method to use all
@@ -59,7 +75,7 @@ and all pairwise comparisons are desired).}
 "param" (for parametric) or "boot" (for bootstrap)}
 
 \item{nstart}{initial number of algorithm runs for each algorithm.
-See Section \code{Initial Number of Observations} for details.}
+See Section \verb{Initial Number of Observations} for details.}
 
 \item{nmax}{maximum number of runs to execute on each instance (see
 \code{\link[=calc_nreps]{calc_nreps()}}). Loaded results (see \code{load.partial.results}

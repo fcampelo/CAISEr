@@ -9,11 +9,12 @@
 * Felipe Campelo ([f.campelo@aston.ac.uk](mailto:f.campelo@aston.ac.uk)) [1,2]  
 
 **Contributors:**
-- Elizabeth Wanner ([e.wanner@aston.ac.uk](mailto:e.wanner@aston.ac.uk))[1] (2019-)
+- Elizabeth Wanner ([efwanner@decom.cefetmg.br](mailto:efwanner@decom.cefetmg.br))[3] (2019-)
 - Fernanda Takahashi ([fernandact@ufmg.br](mailto:fernandact@ufmg.br))[2] (2016-2018)
 
 [1] Department of Computer Science, Aston University, Birmingham UK  
 [2] Operations Research and Complex Systems Laboratory, Universidade Federal de Minas Gerais, Belo Horizonte, Brazil  
+[3] Department of Computer Science, CEFET-MG, Brazil
 
 ***
 
