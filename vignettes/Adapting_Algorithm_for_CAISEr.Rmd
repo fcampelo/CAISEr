@@ -42,12 +42,20 @@ assume that we are interested in comparing four multi-objective optimisation
 algorithms for a (hypothetical) problem class represented by 
 problems UF1 - UF7 (in dimensions between 10 and 40) from package 
 [smoof](https://CRAN.R-project.org/package=smoof). For this implementation to 
-work with the `MOEADr::moead()` routine (see next section) some 
+work with the `moead()` routine from the `MOEADr` package (see next section) some 
 manipulation is necessary, but the instance list in this case is simply a list 
 with each element containing the name of the routine as field `$FUN` (since 
 all function names are different, no need for aliases).
 
-```{r}
+```{r, echo=FALSE}
+suppressPackageStartupMessages(library(smoof))
+suppressPackageStartupMessages(library(CAISEr))
+```
+
+```{r, eval=FALSE}
+# Install if needed
+# devtools::install_github("fcampelo/MOEADr")
+
 suppressPackageStartupMessages(library(smoof))
 suppressPackageStartupMessages(library(MOEADr))
 suppressPackageStartupMessages(library(CAISEr))
@@ -73,9 +81,9 @@ for (i in 1:nrow(allfuns)){
 ```
 
 ## Adaptation of an existing algorithm implementation
-We will use the MOEA/D implementation available in the [MOEADr](https://CRAN.R-project.org/package=MOEADr) package as our base 
+We will use the MOEA/D implementation available in the [MOEADr](https://github.com/fcampelo/MOEADr) package as our base 
 algorithm, and assume that we are interested in comparing the performance of 
-four versions of this algorithm: the two versions described in the [original MOEA/D paper](https://ieeexplore.ieee.org/document/4358754), the one described in the [MOEA/D-DE paper](https://ieeexplore.ieee.org/document/4633340), and a variation of the MOEA/D-DE configuration that uses PBI as the aggregation function and calculates neighborhoods based on the space of parameters instead of on the scalarisation weight vectors (see the documentation of [MOEADr](https://CRAN.R-project.org/package=MOEADr) and 
+four versions of this algorithm: the two versions described in the [original MOEA/D paper](https://ieeexplore.ieee.org/document/4358754), the one described in the [MOEA/D-DE paper](https://ieeexplore.ieee.org/document/4633340), and a variation of the MOEA/D-DE configuration that uses PBI as the aggregation function and calculates neighborhoods based on the space of parameters instead of on the scalarisation weight vectors (see the documentation of [MOEADr](https://github.com/fcampelo/MOEADr) and 
 references therein for details of these methods) as solvers of the hypothetical 
 problem class represented by the available test instances. The performance of 
 each algorithm on each instance will be measured according to an indicator 
@@ -122,7 +130,7 @@ which receives only two inputs: the instance to be solved (i.e., one element
 from `Instance.list`) and the specification of which version of the algorithm 
 is to be run.
 
-```{r}
+```{r, eval=FALSE}
 # Prepare algorithm function to be used in run_experiment():
 myalgo <- function(type, instance){
   # Input parameters:
@@ -181,7 +189,7 @@ Finally, the `algorithms` parameter must be assembled as a list of
 algorithm objects (each containing fields `$FUN`, `$alias` and, in 
 this case, `$type`).
 
-```{r}
+```{r, eval=FALSE}
 # Assemble Algorithm.list. Notice that we need to provide an alias for each 
 # method, since both algorithms have the same '$FUN' argument.
 algorithms <- list(list(FUN   = "myalgo", 
