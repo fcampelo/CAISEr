@@ -4,7 +4,7 @@ Title: Comparison of Algorithms with Iterative Sample Size Estimation
 Version: 1.0.17
 Date: 2022-11-16
 Authors@R: c(person(given = "Felipe", family = "Campelo",
-                    email = "f.campelo@aston.ac.uk",
+                    email = "fcampelo@gmail.com",
                     role = c("aut", "cre")),
              person(given = "Fernanda", family = "Takahashi",
                     email = "fernandact@ufmg.br",
